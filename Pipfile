@@ -6,10 +6,10 @@ name = "pypi"
 [packages]
 numpy = "*"
 cython = "*"
-pandas = "*"
-scipy = "*"
+ssm = {editable = true, path = "./lib/ssm"}
+jupyter = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.9"
+python_version = "3.7"
