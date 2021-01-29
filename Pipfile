@@ -6,8 +6,10 @@ name = "pypi"
 [packages]
 numpy = "*"
 cython = "*"
-ssm = {editable = true, path = "./lib/ssm"}
 jupyter = "*"
+pandas = "*"
+setuptools = "*"
+ssm = {editable = true, ref = "master", git = "https://github.com/lindermanlab/ssm.git"}
 
 [dev-packages]
 
