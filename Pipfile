@@ -10,6 +10,7 @@ jupyter = "*"
 pandas = "*"
 setuptools = "*"
 ssm = {editable = true, ref = "master", git = "https://github.com/lindermanlab/ssm.git"}
+mat73 = "*"
 
 [dev-packages]
 
