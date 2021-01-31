@@ -9,10 +9,19 @@ cython = "*"
 jupyter = "*"
 pandas = "*"
 setuptools = "*"
-ssm = {editable = true, ref = "master", git = "https://github.com/lindermanlab/ssm.git"}
 mat73 = "*"
 
 [dev-packages]
 
 [requires]
 python_version = "3.7"
+
+[packages.ssm]
+editable = true
+ref = "master"
+git = "https://github.com/lindermanlab/ssm.git"
+
+[packages.pyaldata]
+git = "https://github.com/mattperich/pyaldata.git"
+editable = true
+ref = "main"
