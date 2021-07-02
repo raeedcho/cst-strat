@@ -1,4 +1,3 @@
-import mat73
 import pandas as pd
 import pyaldata
 import matplotlib.pyplot as plt
@@ -65,61 +64,68 @@ def plot_sensorimotor_velocity(trial, ax=None, scatter_args=dict()):
     ax.set_ylabel('Hand velocity')
     sns.despine(ax=ax,left=True,bottom=True)
     
-def plot_sm_tangent_polar(trial, scatter_args=dict()):
-    fig,ax = plt.subplots(2,1,figsize=(5,5),sharex=True,sharey=False)
-    
+def plot_sm_tangent_angle(trial,ax=None,scatter_args=dict()):
+    if ax is None:
+        ax = plt.gca()
+        
     # plot out guidance lines for tangent angle interpretation
-    ax[0].plot(
+    ax.plot(
         [trial['trialtime'][0],trial['trialtime'][-1]],
         [-90,-90],
         '--k'
     )
-    ax[0].plot(
+    ax.plot(
         [trial['trialtime'][0],trial['trialtime'][-1]],
         [90,90],
         '--k'
     )
-    ax[0].plot(
+    ax.plot(
         [trial['trialtime'][0],trial['trialtime'][-1]],
         [-45,-45],
         '--g'
     )
-    ax[0].plot(
+    ax.plot(
         [trial['trialtime'][0],trial['trialtime'][-1]],
         [135,135],
         '--g'
     )
-    ax[0].fill_between(
+    ax.fill_between(
         trial['trialtime'],
         0, y2=90,
         color=[1,0.8,0.8]
     )
-    ax[0].fill_between(
+    ax.fill_between(
         trial['trialtime'],
         -180, y2=-90,
         color=[1,0.8,0.8]
     )
     
     # actual tangent angle plot
-    ax[0].scatter(
+    ax.scatter(
         trial['trialtime'],
         np.arctan2(trial['hand_vel'][:,0],trial['cst_cursor_command'][:,0])*180/np.pi,
         **scatter_args
     )
     
-    ax[0].set_ylabel('SM tangent angle')
-    ax[0].set_xticks([])
-    ax[0].set_yticks([-180,-90,0,90,180])
+    ax.set_ylabel('SM tangent angle')
+    ax.set_xticks([])
+    ax.set_yticks([-180,-90,0,90,180])
     
+    sns.despine(ax=ax,left=False,trim=True)
+    
+def plot_sm_tangent_magnitude(trial,ax=None,scatter_args=dict()):
+    if ax is None:
+        ax = plt.gca()
+        
     # sensorimotor tangent magnitude
-    ax[1].scatter(
+    ax.scatter(
         trial['trialtime'],
         trial['hand_vel'][:,0]**2 + trial['cst_cursor_command'][:,0]**2,
         **scatter_args
     )
-    ax[1].set_xlabel('Time (s)')
-    ax[1].set_ylabel('SM tangent magnitude')
-    ax[1].set_xticks(np.arange(7))
+    ax.set_xlabel('Time (s)')
+    ax.set_ylabel('SM tangent magnitude')
+    ax.set_xticks(np.arange(7))
     
-    sns.despine(ax=ax[0],left=False,bottom=True,trim=True)
-    sns.despine(ax=ax[1],left=False,trim=True)
+    sns.despine(ax=ax,left=False,trim=True)
+    
