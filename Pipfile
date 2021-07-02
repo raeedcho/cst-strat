@@ -10,6 +10,7 @@ jupyter = "*"
 pandas = "*"
 setuptools = "*"
 mat73 = "*"
+jupytext = "*"
 
 [dev-packages]
 
