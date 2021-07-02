@@ -7,14 +7,13 @@ import seaborn as sns
 import numpy as np
 
 
-def plot_sensorimotor(trial, scale=60, ax=None, scatter_args=dict()):
+def plot_sensorimotor(trial, ax=None, scatter_args=dict()):
     """ Make sensorimotor plot of hand position vs cursor position
     
     Inputs:
     (positional)
         trial - pyaldata row to plot
     (keyword)
-        scale (60) - scale at which to plot (ylim and xlim set to -scale to scale)
         ax (None) - axis object to plot in (default behavior makes a new axis object)
         scatter_args (dict()) - dict of kwargs to pass into ax.scatter
     """
@@ -32,8 +31,6 @@ def plot_sensorimotor(trial, scale=60, ax=None, scatter_args=dict()):
     
     ax.set_xticks([])
     ax.set_yticks([])
-    ax.set_xlim(-scale,scale)
-    ax.set_ylim(-scale,scale)
     ax.set_xlabel('Cursor position')
     ax.set_ylabel('Hand position')
     sns.despine(ax=ax,left=True,bottom=True)
@@ -45,7 +42,6 @@ def plot_sensorimotor_velocity(trial, ax=None, scatter_args=dict()):
     (positional)
         trial - pyaldata row to plot
     (keyword)
-        scale (60) - scale at which to plot (ylim and xlim set to -scale to scale)
         ax (None) - axis object to plot in (default behavior makes a new axis object)
         scatter_args (dict()) - dict of kwargs to pass into ax.scatter
     """
