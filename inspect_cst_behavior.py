@@ -77,11 +77,15 @@ def plot_cst_trial(trial_id):
 #     sns.despine(ax=trace_ax[1],left=False,trim=True)
     sm_fig = plt.figure(figsize=(6,6))
     gs = mpl.gridspec.GridSpec(3,2,height_ratios=(2,1,1))
-    cst.plot_sensorimotor(trial,ax=sm_fig.add_subplot(gs[0,0]),scatter_args=sm_scatter_args)
-    cst.plot_sensorimotor_velocity(trial,sm_fig.add_subplot(gs[0,1]),scatter_args=sm_scatter_args)
+    sm_ax = sm_fig.add_subplot(gs[0,0])
+    sm_vel_ax = sm_fig.add_subplot(gs[0,1])
+    cst.plot_sensorimotor(trial,ax=sm_ax,scatter_args=sm_scatter_args)
+    cst.plot_sensorimotor_velocity(trial,ax=sm_vel_ax,scatter_args=sm_scatter_args)
     
-    cst.plot_sm_tangent_angle(trial,ax=sm_fig.add_subplot(gs[1,:]),scatter_args=sm_scatter_args)
-    cst.plot_sm_tangent_magnitude(trial,ax=sm_fig.add_subplot(gs[2,:]),scatter_args=sm_scatter_args)
+    sm_tangent_angle_ax = sm_fig.add_subplot(gs[1,:]);
+    sm_tangent_magnitude_ax = sm_fig.add_subplot(gs[2,:],sharex=sm_tangent_angle_ax);
+    cst.plot_sm_tangent_angle(trial,ax=sm_tangent_angle_ax,scatter_args=sm_scatter_args)
+    cst.plot_sm_tangent_magnitude(trial,ax=sm_tangent_magnitude_ax,scatter_args=sm_scatter_args)
 
 # %%
 # Pick out specific trial
