@@ -27,7 +27,7 @@ mpl.rcParams['ps.fonttype'] = 42
 import seaborn as sns
 sns.set_style("ticks")
 sns.set_context("talk")
-# %matplotlib notebook
+# %matplotlib inline
 
 # Speficy whether or not to save figures
 save_figures = False
@@ -107,44 +107,130 @@ def plot_cst_trial(trial_id):
 # %%
 # Pick out specific trial
 trial_id = 159
-color_by_state=True
 scale=35
 
-trial = td_lambda.loc[trial_id,:]
-data = trial['hand_vel'][:,0][:,None]
-inpt = np.column_stack((trial['cursor_pos_shift'][:,0],trial['cursor_vel_shift'][:,0],trial['hand_pos'][:,0]))
-hmm_z = hmm.most_likely_states(data,input=inpt)
+trial = td.loc[trial_id,:]
 
-# old fig + SM plots
-fig,ax = plt.subplots(1,2,figsize=(10,5))
-ax[0].plot([0,6],[0,0],'-k')
-ax[0].set_xlim(0,6)
-ax[0].set_ylim(-scale,scale)
-ax[0].set_yticks([-30,30])
-ax[0].set_xticks([])
-ax[0].set_xlabel('Time (s)')
-ax[0].set_ylabel('Cursor or hand position')
-sns.despine(ax=ax[0],left=False,bottom=True,trim=True)
-ax[1].set_xlim(-scale,scale)
-ax[1].set_ylim(-scale,scale)
-ax[1].set_xticks([])
-ax[1].set_yticks([])
-ax[1].yaxis.tick_right()
-ax[1].set_xlabel('Cursor position')
-ax[1].set_ylabel('Hand position')
-sns.despine(ax=ax[1],left=True,bottom=True)
-ax[1].plot([-60,60],[60,-60],'--k')
-ax[1].plot([0,0],[-60,60],'-k')
-ax[1].plot([-60,60],[0,0],'-k')
+# set up figure layout
+plt.rcParams['figure.figsize'] = [10,30]
+fig = plt.figure(figsize=(10,5))
+gs = mpl.gridspec.GridSpec(3,3)
+monitor_ax = fig.add_subplot(gs[0,0])
+trace_ax = fig.add_subplot(gs[1:,0],sharex=monitor_ax)
+sm_ax = fig.add_subplot(gs[:-1,1])
+sm_vel_ax = fig.add_subplot(gs[:-1,2])
+# sm_tangent_angle_ax = fig.add_subplot(gs[1,1:])
+sm_energy_ax = fig.add_subplot(gs[2,1:],sharex=sm_tangent_angle_ax)
 
-cursor_l, = ax[0].plot([],[],'-b')
-hand_l, = ax[0].plot([],[],'-r')
-sm_l, = ax[1].plot([],[],'k',lw=4)
+# monitor view
+monitor_ax.fill_between(
+    [-50,50],
+    0,y2=2,
+    color=[0.5,0.5,0.5]
+)
+monitor_ax.set_xlim(-60,60)
+monitor_ax.set_ylim(-2,2)
+monitor_ax.set_xticks([])
+monitor_ax.set_yticks([])
+cursor_sc = monitor_ax.scatter(0,1,s=60,c='b')
+hand_sc = monitor_ax.scatter(0,-1,s=60,c='r')
+sns.despine(ax=monitor_ax,left=True,bottom=True)
+
+# cursor and hand traces (old way)
+trace_ax.plot([0,0],[0,6],'-k')
+trace_ax.set_ylim(0,6)
+trace_ax.set_xlim(-60,60)
+trace_ax.set_xticks([-50,50])
+trace_ax.set_yticks([])
+trace_ax.set_ylabel('Time (s)')
+trace_ax.set_xlabel('Cursor or hand position')
+sns.despine(ax=trace_ax,left=True,bottom=False,trim=True)
+cursor_l, = trace_ax.plot([],[],'-b')
+hand_l, = trace_ax.plot([],[],'-r')
+
+# Sensorimotor plot
+sm_ax.set_xlim(-scale,scale)
+sm_ax.set_ylim(-scale,scale)
+sm_ax.set_xticks([])
+sm_ax.set_yticks([])
+sm_ax.yaxis.tick_right()
+sm_ax.set_xlabel('Cursor position')
+sm_ax.set_ylabel('Hand position')
+sns.despine(ax=sm_ax,left=True,bottom=True)
+sm_ax.plot([-60,60],[60,-60],'--k')
+sm_ax.plot([0,0],[-60,60],'-k')
+sm_ax.plot([-60,60],[0,0],'-k')
+sm_l, = sm_ax.plot([],[],'k',lw=4)
+
+# SM velocity plot
+sm_vel_ax.set_xlim(-60,60)
+sm_vel_ax.set_ylim(-100,100)
+sm_vel_ax.set_xticks([])
+sm_vel_ax.set_yticks([])
+sm_vel_ax.yaxis.tick_right()
+sm_vel_ax.set_xlabel('Cursor velocity')
+sm_vel_ax.set_ylabel('Hand velocity')
+sns.despine(ax=sm_vel_ax,left=True,bottom=True)
+sm_vel_ax.plot([-60,60],[60,-60],'--g')
+sm_vel_ax.plot([0,0],[-100,100],'--k')
+sm_vel_ax.plot([-60,60],[0,0],'-k')
+sm_vel_l, = sm_vel_ax.plot([],[],'k',lw=4)
+
+
+# SM tangent angle
+# sm_tangent_angle_ax.plot(
+#     [trial['trialtime'][0],trial['trialtime'][-1]],
+#     [-90,-90],
+#     '--k'
+# )
+# sm_tangent_angle_ax.plot(
+#     [trial['trialtime'][0],trial['trialtime'][-1]],
+#     [90,90],
+#     '--k'
+# )
+# sm_tangent_angle_ax.plot(
+#     [trial['trialtime'][0],trial['trialtime'][-1]],
+#     [-45,-45],
+#     '--g'
+# )
+# sm_tangent_angle_ax.plot(
+#     [trial['trialtime'][0],trial['trialtime'][-1]],
+#     [135,135],
+#     '--g'
+# )
+# sm_tangent_angle_ax.fill_between(
+#     trial['trialtime'],
+#     0, y2=90,
+#     color=[1,0.8,0.8]
+# )
+# sm_tangent_angle_ax.fill_between(
+#     trial['trialtime'],
+#     -180, y2=-90,
+#     color=[1,0.8,0.8]
+# )
+# # sm_tangent_angle_ax.set_ylabel('SM tangent angle')
+# sm_tangent_angle_ax.set_xticks([])
+# sm_tangent_angle_ax.set_yticks([-180,-90,0,90,180])
+# sns.despine(ax=sm_tangent_angle_ax,left=False,trim=True)
+# sm_tangent_l = sm_tangent_angle_ax.scatter([],[],s=5,c='k')
+
+# SM energy
+sm_energy_ax.set_xlabel('Time (s)')
+# sm_energy_ax.set_ylabel('SM tangent magnitude')
+sm_energy_ax.set_xticks(np.arange(7))
+sm_energy_ax.set_ylim(0,1e4)
+sns.despine(ax=sm_energy_ax,left=False,trim=True)
+sm_energy_l, = sm_energy_ax.plot([],[],'-k')
 
 def animate_smplot(i):
-    cursor_l.set_data(trial['trialtime'][:i],trial['cursor_pos'][:i,0])
-    hand_l.set_data(trial['trialtime'][:i],trial['hand_pos'][:i,0])
+    cursor_sc.set_offsets(np.c_[trial['cursor_pos'][i,0],1])
+    hand_sc.set_offsets(np.c_[trial['hand_pos'][i,0],-1])
+    cursor_l.set_data(trial['cursor_pos'][:i,0],trial['trialtime'][:i])
+    hand_l.set_data(trial['hand_pos'][:i,0],trial['trialtime'][:i])
     sm_l.set_data(trial['cursor_pos'][:i,0],trial['hand_pos'][:i,0])
+    sm_vel_l.set_data(trial['cst_cursor_command'][:i,0],trial['hand_vel'][:i,0])
+    # sm_tangent_l.set_offsets(np.c_[trial['trialtime'][:i],np.arctan2(trial['hand_vel'][:i,0],trial['cst_cursor_command'][:i,0])*180/np.pi])
+    sm_energy_l.set_data(trial['trialtime'][:i],trial['hand_vel'][:i,0]**2+trial['cst_cursor_command'][:i,0]**2)
     
 ani = mpl.animation.FuncAnimation(
     fig=fig,
@@ -154,48 +240,47 @@ ani = mpl.animation.FuncAnimation(
     repeat=False
 )
 
-# from IPython.display import HTML
-# HTML(ani.to_jshtml())
+from IPython.display import HTML
+HTML(ani.to_jshtml())
 
 # anim_savename = r'/mnt/c/Users/Raeed/Wiki/professional/cabinet/talks/20210420-ncm2021/assets/Ford_20180618_CST_trial159_anim.mp4'
 # writer = mpl.animation.FFMpegWriter(fps=30) 
 # ani.save(anim_savename, writer=writer)
 
-_,sm_ax = plt.subplots(1,1,figsize=(5,5))
-sm_ax.plot([-60,60],[60,-60],'--k')
-sm_ax.plot([0,0],[-60,60],'-k')
-sm_ax.plot([-60,60],[0,0],'-k')
-sm_ax.scatter(
-    trial['cursor_pos'][:,0],
-    trial['hand_pos'][:,0],
-    c=hmm_z,
-    cmap=cmap,
-    s=10,
-    norm=mpl.colors.Normalize(vmin=0,vmax=len(color_names)-1)
-)
-sm_ax.set_xticks([])
-sm_ax.set_yticks([])
-sm_ax.set_xlim(-scale,scale)
-sm_ax.set_ylim(-scale,scale)
-sm_ax.set_xlabel('Cursor position')
-sm_ax.set_ylabel('Hand position')
-sns.despine(ax=sm_ax,left=True,bottom=True)
-# plt.savefig(r'/mnt/c/Users/Raeed/Wiki/professional/cabinet/talks/20210420-ncm2021/assets/Ford_20180618_CST_trial159_smplot.pdf')
+# _,sm_ax = plt.subplots(1,1,figsize=(5,5))
+# sm_ax.plot([-60,60],[60,-60],'--k')
+# sm_ax.plot([0,0],[-60,60],'-k')
+# sm_ax.plot([-60,60],[0,0],'-k')
+# sm_ax.scatter(
+#     trial['cursor_pos'][:,0],
+#     trial['hand_pos'][:,0],
+#     c=trial['trialtime'],
+#     cmap='viridis',
+#     s=10
+# )
+# sm_ax.set_xticks([])
+# sm_ax.set_yticks([])
+# sm_ax.set_xlim(-scale,scale)
+# sm_ax.set_ylim(-scale,scale)
+# sm_ax.set_xlabel('Cursor position')
+# sm_ax.set_ylabel('Hand position')
+# sns.despine(ax=sm_ax,left=True,bottom=True)
+# # plt.savefig(r'/mnt/c/Users/Raeed/Wiki/professional/cabinet/talks/20210420-ncm2021/assets/Ford_20180618_CST_trial159_smplot.pdf')
 
-fig,ax = plt.subplots(num_states+1,1,figsize=(6,6),sharex=True,sharey=True)
-ax[0].hist(
-    trial['hand_vel'][:,0],
-    bins=np.linspace(trial['hand_vel'][:,0].min(),trial['hand_vel'][:,0].max(),30),
-    color='k')
-for statenum in range(num_states):
-    ax[statenum+1].hist(
-        trial['hand_vel'][hmm_z==statenum,0],
-        bins=np.linspace(trial['hand_vel'][:,0].min(),trial['hand_vel'][:,0].max(),30),
-        color=colors[statenum])
-    sns.despine()
+# fig,ax = plt.subplots(num_states+1,1,figsize=(6,6),sharex=True,sharey=True)
+# trace_ax.hist(
+#     trial['hand_vel'][:,0],
+#     bins=np.linspace(trial['hand_vel'][:,0].min(),trial['hand_vel'][:,0].max(),30),
+#     color='k')
+# for statenum in range(num_states):
+#     ax[statenum+1].hist(
+#         trial['hand_vel'][hmm_z==statenum,0],
+#         bins=np.linspace(trial['hand_vel'][:,0].min(),trial['hand_vel'][:,0].max(),30),
+#         color=colors[statenum])
+#     sns.despine()
 
-ax[0].set_title('Hand velocity distribution per state')
-ax[-1].set_xlabel('Hand velocity (mm/s)')
-ax[-1].set_ylabel('Number of 1 ms bins')
+# trace_ax.set_title('Hand velocity distribution per state')
+# ax[-1].set_xlabel('Hand velocity (mm/s)')
+# ax[-1].set_ylabel('Number of 1 ms bins')
 # plt.savefig(r'/mnt/c/Users/Raeed/Wiki/professional/cabinet/talks/20210420-ncm2021/assets/Ford_20180618_CST_trial159_handvelhist.pdf')
 
