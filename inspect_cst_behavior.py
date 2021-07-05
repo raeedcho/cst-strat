@@ -76,16 +76,33 @@ def plot_cst_trial(trial_id):
 #     sns.despine(ax=trace_ax[0],left=False,bottom=True,trim=True)
 #     sns.despine(ax=trace_ax[1],left=False,trim=True)
     sm_fig = plt.figure(figsize=(6,6))
-    gs = mpl.gridspec.GridSpec(3,2,height_ratios=(2,1,1))
+    gs = mpl.gridspec.GridSpec(4,2,height_ratios=(2,1,1,1))
     sm_ax = sm_fig.add_subplot(gs[0,0])
     sm_vel_ax = sm_fig.add_subplot(gs[0,1])
     cst.plot_sensorimotor(trial,ax=sm_ax,scatter_args=sm_scatter_args)
     cst.plot_sensorimotor_velocity(trial,ax=sm_vel_ax,scatter_args=sm_scatter_args)
     
-    sm_tangent_angle_ax = sm_fig.add_subplot(gs[1,:]);
-    sm_tangent_magnitude_ax = sm_fig.add_subplot(gs[2,:],sharex=sm_tangent_angle_ax);
+    sm_tangent_angle_ax = sm_fig.add_subplot(gs[1,:])
+    sm_tangent_magnitude_ax = sm_fig.add_subplot(gs[2,:],sharex=sm_tangent_angle_ax)
     cst.plot_sm_tangent_angle(trial,ax=sm_tangent_angle_ax,scatter_args=sm_scatter_args)
     cst.plot_sm_tangent_magnitude(trial,ax=sm_tangent_magnitude_ax,scatter_args=sm_scatter_args)
+    
+    hand_energy_ax = sm_fig.add_subplot(gs[3,:],sharex=sm_tangent_angle_ax)
+    hand_energy_ax.scatter(
+        trial['trialtime'],
+        trial['hand_vel'][:,0]**2,
+        **sm_scatter_args
+    )
+    hand_energy_ax.set_ylabel('Hand Energy')
+    
+#     cursor_energy_ax = sm_fig.add_subplot(gs[4,:],sharex=sm_tangent_angle_ax)
+#     cursor_energy_ax.scatter(
+#         trial['trialtime'],
+#         trial['cst_cursor_command'][:,0]**2,
+#         **sm_scatter_args
+#     )
+#     cursor_energy_ax.set_ylabel('Cursor Energy')
+
 
 # %%
 # Pick out specific trial
