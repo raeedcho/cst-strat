@@ -27,7 +27,6 @@ mpl.rcParams['ps.fonttype'] = 42
 import seaborn as sns
 sns.set_style("ticks")
 sns.set_context("talk")
-# %matplotlib inline
 
 # Speficy whether or not to save figures
 save_figures = False
@@ -42,6 +41,8 @@ td.set_index('trial_id',inplace=True)
 import importlib
 importlib.reload(cst)
 
+# %matplotlib notebook
+
 from ipywidgets import interact
 
 @interact(trial_id=list(td.index))
@@ -52,6 +53,14 @@ def plot_cst_trial(trial_id):
         'c': trial['trialtime'],
         'cmap': 'viridis',
         's': 10
+    }
+    
+    trial_info = {
+        'trialtime': trial['trialtime'],
+        'cursor_pos': trial['cursor_pos'][:,0],
+        'cursor_vel': trial['cst_cursor_command'][:,0],
+        'hand_pos': trial['hand_pos'][:,0],
+        'hand_vel': trial['hand_vel'][:,0]
     }
 
 #     # old way
@@ -79,13 +88,13 @@ def plot_cst_trial(trial_id):
     gs = mpl.gridspec.GridSpec(4,2,height_ratios=(2,1,1,1))
     sm_ax = sm_fig.add_subplot(gs[0,0])
     sm_vel_ax = sm_fig.add_subplot(gs[0,1])
-    cst.plot_sensorimotor(trial,ax=sm_ax,scatter_args=sm_scatter_args)
-    cst.plot_sensorimotor_velocity(trial,ax=sm_vel_ax,scatter_args=sm_scatter_args)
+    cst.plot_sensorimotor(**trial_info,ax=sm_ax,scatter_args=sm_scatter_args)
+    cst.plot_sensorimotor_velocity(**trial_info,ax=sm_vel_ax,scatter_args=sm_scatter_args)
     
     sm_tangent_angle_ax = sm_fig.add_subplot(gs[1,:])
     sm_tangent_magnitude_ax = sm_fig.add_subplot(gs[2,:],sharex=sm_tangent_angle_ax)
-    cst.plot_sm_tangent_angle(trial,ax=sm_tangent_angle_ax,scatter_args=sm_scatter_args)
-    cst.plot_sm_tangent_magnitude(trial,ax=sm_tangent_magnitude_ax,scatter_args=sm_scatter_args)
+    cst.plot_sm_tangent_angle(**trial_info,ax=sm_tangent_angle_ax,scatter_args=sm_scatter_args)
+    cst.plot_sm_tangent_magnitude(**trial_info,ax=sm_tangent_magnitude_ax,scatter_args=sm_scatter_args)
     
     hand_energy_ax = sm_fig.add_subplot(gs[3,:],sharex=sm_tangent_angle_ax)
     hand_energy_ax.scatter(
@@ -105,11 +114,21 @@ def plot_cst_trial(trial_id):
 
 
 # %%
+import importlib
+importlib.reload(cst)
+
+# %matplotlib inline
+
 # Pick out specific trial
 trial_id = 159
 scale=35
 
 trial = td.loc[trial_id,:]
+
+sm_scatter_args = {
+    'c': 'k',
+    's': 5
+}
 
 # set up figure layout
 plt.rcParams['figure.figsize'] = [10,30]
@@ -120,117 +139,39 @@ trace_ax = fig.add_subplot(gs[1:,0],sharex=monitor_ax)
 sm_ax = fig.add_subplot(gs[:-1,1])
 sm_vel_ax = fig.add_subplot(gs[:-1,2])
 # sm_tangent_angle_ax = fig.add_subplot(gs[1,1:])
-sm_energy_ax = fig.add_subplot(gs[2,1:],sharex=sm_tangent_angle_ax)
+sm_energy_ax = fig.add_subplot(gs[2,1:])
 
 # monitor view
-monitor_ax.fill_between(
-    [-50,50],
-    0,y2=2,
-    color=[0.5,0.5,0.5]
-)
-monitor_ax.set_xlim(-60,60)
-monitor_ax.set_ylim(-2,2)
-monitor_ax.set_xticks([])
-monitor_ax.set_yticks([])
-cursor_sc = monitor_ax.scatter(0,1,s=60,c='b')
-hand_sc = monitor_ax.scatter(0,-1,s=60,c='r')
-sns.despine(ax=monitor_ax,left=True,bottom=True)
+cursor_sc,hand_sc = cst.plot_cst_monitor_instant(ax=monitor_ax)
 
 # cursor and hand traces (old way)
-trace_ax.plot([0,0],[0,6],'-k')
-trace_ax.set_ylim(0,6)
-trace_ax.set_xlim(-60,60)
-trace_ax.set_xticks([-50,50])
-trace_ax.set_yticks([])
-trace_ax.set_ylabel('Time (s)')
-trace_ax.set_xlabel('Cursor or hand position')
-sns.despine(ax=trace_ax,left=True,bottom=False,trim=True)
-cursor_l, = trace_ax.plot([],[],'-b')
-hand_l, = trace_ax.plot([],[],'-r')
+cursor_l,hand_l = cst.plot_cst_traces(ax=trace_ax,flipxy=True)
 
 # Sensorimotor plot
 sm_ax.set_xlim(-scale,scale)
 sm_ax.set_ylim(-scale,scale)
-sm_ax.set_xticks([])
-sm_ax.set_yticks([])
-sm_ax.yaxis.tick_right()
-sm_ax.set_xlabel('Cursor position')
-sm_ax.set_ylabel('Hand position')
-sns.despine(ax=sm_ax,left=True,bottom=True)
-sm_ax.plot([-60,60],[60,-60],'--k')
-sm_ax.plot([0,0],[-60,60],'-k')
-sm_ax.plot([-60,60],[0,0],'-k')
-sm_l, = sm_ax.plot([],[],'k',lw=4)
+sm_sc = cst.plot_sensorimotor(ax=sm_ax,scatter_args=sm_scatter_args)
 
 # SM velocity plot
-sm_vel_ax.set_xlim(-60,60)
-sm_vel_ax.set_ylim(-100,100)
-sm_vel_ax.set_xticks([])
-sm_vel_ax.set_yticks([])
-sm_vel_ax.yaxis.tick_right()
-sm_vel_ax.set_xlabel('Cursor velocity')
-sm_vel_ax.set_ylabel('Hand velocity')
-sns.despine(ax=sm_vel_ax,left=True,bottom=True)
-sm_vel_ax.plot([-60,60],[60,-60],'--g')
-sm_vel_ax.plot([0,0],[-100,100],'--k')
-sm_vel_ax.plot([-60,60],[0,0],'-k')
-sm_vel_l, = sm_vel_ax.plot([],[],'k',lw=4)
-
+sm_vel_sc = cst.plot_sensorimotor_velocity(ax=sm_vel_ax,scatter_args=sm_scatter_args)
 
 # SM tangent angle
-# sm_tangent_angle_ax.plot(
-#     [trial['trialtime'][0],trial['trialtime'][-1]],
-#     [-90,-90],
-#     '--k'
-# )
-# sm_tangent_angle_ax.plot(
-#     [trial['trialtime'][0],trial['trialtime'][-1]],
-#     [90,90],
-#     '--k'
-# )
-# sm_tangent_angle_ax.plot(
-#     [trial['trialtime'][0],trial['trialtime'][-1]],
-#     [-45,-45],
-#     '--g'
-# )
-# sm_tangent_angle_ax.plot(
-#     [trial['trialtime'][0],trial['trialtime'][-1]],
-#     [135,135],
-#     '--g'
-# )
-# sm_tangent_angle_ax.fill_between(
-#     trial['trialtime'],
-#     0, y2=90,
-#     color=[1,0.8,0.8]
-# )
-# sm_tangent_angle_ax.fill_between(
-#     trial['trialtime'],
-#     -180, y2=-90,
-#     color=[1,0.8,0.8]
-# )
-# # sm_tangent_angle_ax.set_ylabel('SM tangent angle')
-# sm_tangent_angle_ax.set_xticks([])
-# sm_tangent_angle_ax.set_yticks([-180,-90,0,90,180])
-# sns.despine(ax=sm_tangent_angle_ax,left=False,trim=True)
-# sm_tangent_l = sm_tangent_angle_ax.scatter([],[],s=5,c='k')
+# sm_tangent_sc = cst.plot_sm_tangent_angle(ax=sm_tangent_angle_ax,scatter_args=sm_scatter_args)
 
 # SM energy
-sm_energy_ax.set_xlabel('Time (s)')
-# sm_energy_ax.set_ylabel('SM tangent magnitude')
-sm_energy_ax.set_xticks(np.arange(7))
 sm_energy_ax.set_ylim(0,1e4)
-sns.despine(ax=sm_energy_ax,left=False,trim=True)
-sm_energy_l, = sm_energy_ax.plot([],[],'-k')
+sm_energy_sc = cst.plot_sm_tangent_magnitude(ax=sm_energy_ax,scatter_args=sm_scatter_args)
+sm_energy_ax.set_ylabel('')
 
 def animate_smplot(i):
     cursor_sc.set_offsets(np.c_[trial['cursor_pos'][i,0],1])
     hand_sc.set_offsets(np.c_[trial['hand_pos'][i,0],-1])
     cursor_l.set_data(trial['cursor_pos'][:i,0],trial['trialtime'][:i])
     hand_l.set_data(trial['hand_pos'][:i,0],trial['trialtime'][:i])
-    sm_l.set_data(trial['cursor_pos'][:i,0],trial['hand_pos'][:i,0])
-    sm_vel_l.set_data(trial['cst_cursor_command'][:i,0],trial['hand_vel'][:i,0])
-    # sm_tangent_l.set_offsets(np.c_[trial['trialtime'][:i],np.arctan2(trial['hand_vel'][:i,0],trial['cst_cursor_command'][:i,0])*180/np.pi])
-    sm_energy_l.set_data(trial['trialtime'][:i],trial['hand_vel'][:i,0]**2+trial['cst_cursor_command'][:i,0]**2)
+    sm_sc.set_offsets(np.c_[trial['cursor_pos'][:i,0],trial['hand_pos'][:i,0]])
+    sm_vel_sc.set_offsets(np.c_[trial['cst_cursor_command'][:i,0],trial['hand_vel'][:i,0]])
+    # sm_tangent_sc.set_offsets(np.c_[trial['trialtime'][:i],np.arctan2(trial['hand_vel'][:i,0],trial['cst_cursor_command'][:i,0])*180/np.pi])
+    sm_energy_sc.set_offsets(np.c_[trial['trialtime'][:i],trial['hand_vel'][:i,0]**2+trial['cst_cursor_command'][:i,0]**2])
     
 ani = mpl.animation.FuncAnimation(
     fig=fig,
