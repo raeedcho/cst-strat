@@ -34,7 +34,7 @@ def plot_sensorimotor(cursor_pos=[],hand_pos=[], ax=None, scatter_args=dict(),**
     sns.despine(ax=ax,left=True,bottom=True)
     
     return sc
-    
+
 def plot_sensorimotor_velocity(cursor_vel=[],hand_vel=[], ax=None, scatter_args=dict(),**kwargs):
     """ Make sensorimotor plot of hand velocity vs cursor velocity
     
@@ -65,7 +65,7 @@ def plot_sensorimotor_velocity(cursor_vel=[],hand_vel=[], ax=None, scatter_args=
     sns.despine(ax=ax,left=True,bottom=True)
     
     return sc
-    
+
 def plot_sm_tangent_angle(trialtime=[],cursor_vel=[],hand_vel=[],ax=None,scatter_args=dict(),**kwargs):
     if ax is None:
         ax = plt.gca()
@@ -92,7 +92,7 @@ def plot_sm_tangent_angle(trialtime=[],cursor_vel=[],hand_vel=[],ax=None,scatter
     sns.despine(ax=ax,left=False,trim=True)
     
     return sc
-    
+
 def plot_sm_tangent_magnitude(trialtime=[],cursor_vel=np.array([]),hand_vel=np.array([]),ax=None,scatter_args=dict(),**kwargs):
     if ax is None:
         ax = plt.gca()
@@ -124,8 +124,8 @@ def plot_cst_monitor_instant(cursor_pos=0,hand_pos=0,ax=None,**kwargs):
     ax.set_ylim(-2,2)
     ax.set_xticks([])
     ax.set_yticks([])
-    cursor_sc = ax.scatter(0,1,s=60,c='b')
-    hand_sc = ax.scatter(0,-1,s=60,c='r')
+    cursor_sc = ax.scatter(0,1,s=100,c='b')
+    hand_sc = ax.scatter(0,-1,s=100,c='r')
     sns.despine(ax=ax,left=True,bottom=True)
     
     return cursor_sc,hand_sc
@@ -138,7 +138,7 @@ def plot_cst_traces(trialtime=[],cursor_pos=[],hand_pos=[],ax=None,flipxy=False,
         ax.plot([0,0],[0,6],'-k')
         ax.set_ylim(0,6)
         ax.set_xlim(-60,60)
-        ax.set_xticks([-50,50])
+        ax.set_xticks([])
         ax.set_yticks([])
         ax.set_ylabel('Time (s)')
         ax.set_xlabel('Cursor or hand position')

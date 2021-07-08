@@ -127,12 +127,12 @@ trial = td.loc[trial_id,:]
 
 sm_scatter_args = {
     'c': 'k',
-    's': 5
+    's': 2
 }
 
 # set up figure layout
 plt.rcParams['figure.figsize'] = [10,30]
-fig = plt.figure(figsize=(10,5))
+fig = plt.figure(figsize=(20,10))
 gs = mpl.gridspec.GridSpec(3,3)
 monitor_ax = fig.add_subplot(gs[0,0])
 trace_ax = fig.add_subplot(gs[1:,0],sharex=monitor_ax)
@@ -181,13 +181,15 @@ ani = mpl.animation.FuncAnimation(
     repeat=False
 )
 
-from IPython.display import HTML
-HTML(ani.to_jshtml())
+# from IPython.display import HTML
+# HTML(ani.to_jshtml())
 
-# anim_savename = r'/mnt/c/Users/Raeed/Wiki/professional/cabinet/talks/20210420-ncm2021/assets/Ford_20180618_CST_trial159_anim.mp4'
-# writer = mpl.animation.FFMpegWriter(fps=30) 
-# ani.save(anim_savename, writer=writer)
+anim_savename = r'/mnt/c/Users/Raeed/Wiki/professional/agendas/smr-meetings/presentations/20210709-cst-analysis/assets/Ford_20180618_CST_trial159_anim.mp4'
+writer = mpl.animation.FFMpegWriter(fps=15) 
+ani.save(anim_savename, writer=writer)
 
+
+# %%
 # _,sm_ax = plt.subplots(1,1,figsize=(5,5))
 # sm_ax.plot([-60,60],[60,-60],'--k')
 # sm_ax.plot([0,0],[-60,60],'-k')
@@ -224,4 +226,3 @@ HTML(ani.to_jshtml())
 # ax[-1].set_xlabel('Hand velocity (mm/s)')
 # ax[-1].set_ylabel('Number of 1 ms bins')
 # plt.savefig(r'/mnt/c/Users/Raeed/Wiki/professional/cabinet/talks/20210420-ncm2021/assets/Ford_20180618_CST_trial159_handvelhist.pdf')
-
