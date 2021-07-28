@@ -63,27 +63,6 @@ def plot_cst_trial(trial_id):
         'hand_vel': trial['hand_vel'][:,0]
     }
 
-#     # old way
-#     trace_fig,trace_ax = plt.subplots(2,1,figsize=(7.5,5),sharex=True)
-#     trace_ax[0].plot([0,6],[0,0],'-k')
-#     trace_ax[0].plot(trial['trialtime'],trial['cursor_pos'][:,0],'-b')
-#     trace_ax[0].plot(trial['trialtime'],trial['hand_pos'][:,0],'-r')
-#     trace_ax[0].set_xlim(0,6)
-#     trace_ax[0].set_xticks([])
-#     trace_ax[0].set_ylim(-60,60)
-#     trace_ax[0].set_ylabel('Cursor or hand position')
-#     trace_ax[0].set_title('$\lambda = {}$'.format(trial['lambda']))
-    
-#     trace_ax[1].plot([0,6],[0,0],'-k')
-#     trace_ax[1].plot(trial['trialtime'],trial['cst_cursor_command'][:,0],'-b')
-#     trace_ax[1].plot(trial['trialtime'],trial['hand_vel'][:,0],'-r')
-#     trace_ax[1].set_xlim(0,6)
-#     trace_ax[1].set_xticks([])
-#     trace_ax[1].set_ylim(-100,100)
-#     trace_ax[1].set_ylabel('Cursor or hand velocity')
-#     trace_ax[1].set_xlabel('Time (s)')
-#     sns.despine(ax=trace_ax[0],left=False,bottom=True,trim=True)
-#     sns.despine(ax=trace_ax[1],left=False,trim=True)
     sm_fig = plt.figure(figsize=(6,6))
     gs = mpl.gridspec.GridSpec(4,2,height_ratios=(2,1,1,1))
     sm_ax = sm_fig.add_subplot(gs[0,0])
@@ -181,12 +160,12 @@ ani = mpl.animation.FuncAnimation(
     repeat=False
 )
 
-# from IPython.display import HTML
-# HTML(ani.to_jshtml())
+from IPython.display import HTML
+HTML(ani.to_jshtml())
 
-anim_savename = r'/mnt/c/Users/Raeed/Wiki/professional/agendas/smr-meetings/presentations/20210709-cst-analysis/assets/Ford_20180618_CST_trial159_anim.mp4'
-writer = mpl.animation.FFMpegWriter(fps=15) 
-ani.save(anim_savename, writer=writer)
+# anim_savename = r'/mnt/c/Users/Raeed/Wiki/professional/agendas/smr-meetings/presentations/20210709-cst-analysis/assets/Ford_20180618_CST_trial159_anim.mp4'
+# writer = mpl.animation.FFMpegWriter(fps=15) 
+# ani.save(anim_savename, writer=writer)
 
 
 # %%
