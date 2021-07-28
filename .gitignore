@@ -81,7 +81,7 @@ target/
 .ipynb_checkpoints
 
 # Jupytext (don't save ipynb files)
-.ipynb
+*.ipynb
 
 # IPython
 profile_default/
