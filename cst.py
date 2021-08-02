@@ -5,6 +5,23 @@ import matplotlib as mpl
 import seaborn as sns
 import numpy as np
 
+def load_clean_data(filename):
+    td = pyaldata.mat2dataframe(filename,True,'trial_data')
+    td.set_index('trial_id',inplace=True)
+    
+    # remove aborts
+    abort_idx = np.isnan(td['idx_goCueTime']);
+    td = td[~abort_idx]
+    print(f"Removed {sum(abort_idx)} trials that monkey aborted")
+
+    # trim nans off the end of trials for hand pos
+    for (_,trial) in td.iterrows():
+        nan_times = np.any(np.isnan(trial['hand_pos']),axis=1)
+
+        first_viable_time = np.nonzero(~nan_times)[0][0]
+        last_viable_time = np.nonzero(~nan_times)[0][-1]
+        trial = pyaldata.restrict_to_interval(trial)
+        # td(trialnum) = trimTD(td(trialnum),{'start',first_viable_time-1},{'start',last_viable_time-1});
 
 def plot_sensorimotor(cursor_pos=[],hand_pos=[], ax=None, scatter_args=dict(),**kwargs):
     """ Make sensorimotor plot of hand position vs cursor position
