@@ -7,8 +7,31 @@ import numpy as np
 
 def load_clean_data(filename):
     td = pyaldata.mat2dataframe(filename,True,'trial_data')
-    td.set_index('trial_id',inplace=True)
+
+    # condition dates and times
+    td['date_time'] = pd.to_datetime(td['date_time'])
+    td['session_date'] = pd.DatetimeIndex(td['date_time']).normalize()
+
+    # separate out non-time-varying fields into a separate trial table
+    timevar_cols = td.columns.intersection(pyaldata.get_time_varying_fields(td))
+    trial_info = td.drop(columns=timevar_cols)
+    timevar_data = td[timevar_cols]
+
+    # melt out time information in time-varying column dataframe
+    for (idx,trial) in timevar_data.iterrows():
+        #split out rows of numpy array
+        temp = pd.DataFrame({key: list(val_array) for (key,val_array) in trial.iteritems()})
+
+        # add a timedelta column to DataFrame
+        temp['trialtime'] = pd.to_timedelta(trial_info.loc[idx,'bin_size']*np.arange(trial[timevar_cols[0]].shape[0]))
+
+        # add trial index columns (have to figure out what to do about unit guide...)
+        for col in trial_info.columns:
+            temp[col] = trial_info.loc[idx,col]
     
+    # set up a multi-index for trials
+    td.set_index(['monkey','session_date','trial_id'],inplace=True)
+
     # remove aborts
     abort_idx = np.isnan(td['idx_goCueTime']);
     td = td[~abort_idx]
