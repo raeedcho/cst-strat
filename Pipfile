@@ -11,6 +11,7 @@ pandas = "*"
 setuptools = "*"
 mat73 = "*"
 jupytext = "*"
+jupyter-contrib-nbextensions = "*"
 
 [dev-packages]
 
