@@ -24,6 +24,6 @@ ref = "master"
 git = "https://github.com/raeedcho/ssm.git"
 
 [packages.pyaldata]
-git = "https://github.com/mattperich/pyaldata.git"
+git = "https://github.com/raeedcho/pyaldata.git"
 editable = true
 ref = "main"
