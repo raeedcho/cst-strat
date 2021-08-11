@@ -31,16 +31,21 @@ sns.set_context("talk")
 # Speficy whether or not to save figures
 save_figures = False
 
+# %load_ext autoreload
+# %autoreload 2
+
 # %%
 # filename = '/data/raeed/project-data/smile/cst-gainlag/library/python/Ford_20180618_COCST_TD.mat'
-filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/python/Ford_20180618_COCST_TD.mat'
-td = pyaldata.mat2dataframe(filename,True,'td_cst')
+filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/Ford_20180618_COCST_TD.mat'
+td = cst.load_clean_data(filename)
 td.set_index('trial_id',inplace=True)
 
 # %%
-import importlib
-importlib.reload(cst)
+# subselect CST trials
+td_cst = td.loc[td['task']=='CST']
+td_cst = pyaldata.restrict_to_interval(td_cst,start_point_name='idx_cstStartTime',end_point_name='idx_cstEndTime')
 
+# %%
 # %matplotlib notebook
 
 from ipywidgets import interact
