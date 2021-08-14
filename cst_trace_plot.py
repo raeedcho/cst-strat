@@ -54,8 +54,9 @@ end_time = 0.4
 td = pyaldata.restrict_to_interval(
     td,
     start_point_name='idx_goCueTime',
-    rel_start=start_time/td.loc[0,'bin_size'],
-    rel_end=end_time/td.loc[0,'bin_size']
+    rel_start=start_time/td.loc[td.index[0],'bin_size'],
+    rel_end=end_time/td.loc[td.index[0],'bin_size'],
+    reset_index=False
 )
 
 # %%
@@ -73,10 +74,9 @@ for dirnum,target_dir in enumerate(target_dirs):
     
     ax.plot(td_co_dir['M1_pca'].mean()[:,0],td_co_dir['M1_pca'].mean()[:,1],color=dir_colors(dirnum),lw=2)
     
-cst_trace = td_cst.loc[td_cst['trial_id']==159,'M1_pca'].squeeze()
 ax.plot(
-    cst_trace[:,0],
-    cst_trace[:,1],
+    td_cst.loc[159,'M1_pca'][:,0],
+    td_cst.loc[159,'M1_pca'][:,1],
     color='k',
     lw=2
 )
