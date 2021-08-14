@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.3
+#       jupytext_version: 1.11.4
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -170,7 +170,7 @@ def plot_cst_trial(trial_id,scale,color_by_state):
 #     ax[0].set_title('Hand velocity distribution per state')
 #     ax[-1].set_xlabel('Hand velocity (mm/s)')
 #     ax[-1].set_ylabel('Number of 1 ms bins')
-    
+
 
 # %%
 plt.figure()

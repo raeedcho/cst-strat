@@ -38,21 +38,22 @@ save_figures = False
 # filename = '/data/raeed/project-data/smile/cst-gainlag/library/python/Ford_20180618_COCST_TD.mat'
 filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/Ford_20180618_COCST_TD.mat'
 td = cst.load_clean_data(filename)
-td.set_index('trial_id',inplace=True)
+# td.set_index('trial_id',inplace=True)
 
 # %%
 # subselect CST trials
 td_cst = td.loc[td['task']=='CST']
 td_cst = pyaldata.restrict_to_interval(td_cst,start_point_name='idx_cstStartTime',end_point_name='idx_cstEndTime')
+td_cst['trialtime'] = [trial['bin_size']*np.arange(trial['hand_pos'].shape[0]) for _,trial in td_cst.iterrows()]
 
 # %%
 # %matplotlib notebook
 
 from ipywidgets import interact
 
-@interact(trial_id=list(td.index))
+@interact(trial_id=list(td_cst.index))
 def plot_cst_trial(trial_id):
-    trial = td.loc[trial_id,:]
+    trial = td_cst.loc[trial_id,:]
 
     sm_scatter_args = {
         'c': trial['trialtime'],
@@ -98,16 +99,13 @@ def plot_cst_trial(trial_id):
 
 
 # %%
-import importlib
-importlib.reload(cst)
-
 # %matplotlib inline
 
 # Pick out specific trial
 trial_id = 159
 scale=35
 
-trial = td.loc[trial_id,:]
+trial = td_cst.loc[td_cst['trial_id']==trial_id,:].squeeze()
 
 sm_scatter_args = {
     'c': 'k',
