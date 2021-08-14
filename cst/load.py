@@ -13,26 +13,6 @@ def load_clean_data(filename):
     # add trial time to td
     td['trialtime'] = [trial['bin_size']*np.arange(trial['hand_pos'].shape[0]) for (_,trial) in td.iterrows()]
 
-    # # separate out non-time-varying fields into a separate trial table
-    # timevar_cols = td.columns.intersection(pyaldata.get_time_varying_fields(td))
-    # trial_info = td.drop(columns=timevar_cols)
-    # timevar_data = td[timevar_cols]
-
-    # # melt out time information in time-varying column dataframe
-    # for (idx,trial) in timevar_data.iterrows():
-    #     #split out rows of numpy array
-    #     temp = pd.DataFrame({key: list(val_array) for (key,val_array) in trial.iteritems()})
-
-    #     # add a timedelta column to DataFrame
-    #     temp['trialtime'] = pd.to_timedelta(trial_info.loc[idx,'bin_size']*np.arange(trial[timevar_cols[0]].shape[0]))
-
-    #     # add trial index columns (have to figure out what to do about unit guide...)
-    #     for col in trial_info.columns:
-    #         temp[col] = trial_info.loc[idx,col]
-    # 
-    # # set up a multi-index for trials
-    # td.set_index(['monkey','session_date','trial_id'],inplace=True)
-
     # remove aborts
     abort_idx = np.isnan(td['idx_goCueTime']);
     td = td[~abort_idx]
@@ -60,23 +40,17 @@ def load_clean_data(filename):
 
     return td
 
-@pyaldata.copy_td
-def trim_nans(td):
+def trim_nans(trial_data):
     """
     Trim nans off of end of trials when hand position wasn't recorded
     """
-    for trial_idx, trial in td.iterrows():
+    def epoch_fun(trial):
         nan_times = np.any(np.isnan(trial['hand_pos']),axis=1)
         first_viable_time = np.nonzero(~nan_times)[0][0]
         last_viable_time = np.nonzero(~nan_times)[0][-1]
-        epoch_fun = lambda x: slice(first_viable_time,last_viable_time+1)
-        new_trial = pyaldata.restrict_to_interval(
-                trial.to_frame().T,
-                epoch_fun=epoch_fun
-                ).squeeze()
-        td.loc[trial_idx,:] = new_trial
+        return slice(first_viable_time,last_viable_time+1)
 
-    return td
+    return pyaldata.restrict_to_interval(trial_data,epoch_fun=epoch_fun)
 
 @pyaldata.copy_td
 def fill_kinematic_signals(td,cutoff=30):
@@ -89,9 +63,9 @@ def fill_kinematic_signals(td,cutoff=30):
     samprate = 1/td.at[td.index[0],'bin_size'];
     filt_b, filt_a = scipy.signal.butter(4,cutoff/(samprate/2));
     td['hand_pos'] = [scipy.signal.filtfilt(filt_b,filt_a,signal,axis=0) for signal in td['hand_pos']]
-    td = pyaldata.add_gradient(td,'hand_pos',outfield='hand_vel',normalize=True)
-    td = pyaldata.add_gradient(td,'hand_vel',outfield='hand_acc',normalize=True)
-    td = pyaldata.add_gradient(td,'cursor_pos',outfield='cursor_vel',normalize=True)
+    td['hand_vel'] = [np.gradient(trial['hand_pos'],trial['bin_size'],axis=0) for _,trial in td.iterrows()]
+    td['hand_acc'] = [np.gradient(trial['hand_vel'],trial['bin_size'],axis=0) for _,trial in td.iterrows()]
+    td['cursor_vel'] = [np.gradient(trial['cursor_pos'],trial['bin_size'],axis=0) for _,trial in td.iterrows()]
 
     return td
 
@@ -102,3 +76,42 @@ def mask_neural_data(td,mask):
     (Basically just masks out both the actual neural data and the unit guide simultaneously)
     """
     pass
+
+@pyaldata.copy_td
+def relationize_td(trial_data):
+    """
+    Split out trial info and time-varying signals into their own tables
+
+    Returns (trial_info,signals)
+        trial_info - DataFrame with info about individual trials
+        signals - 'trialtime' indexed DataFrame with signal values
+    """
+    # start out by making sure that trial_id is index
+    td = trial_data.set_index('trial_id')
+
+    # separate out non-time-varying fields into a separate trial table
+    timevar_cols = td.columns.intersection(pyaldata.get_time_varying_fields(td))
+    trial_info = td.drop(columns=timevar_cols)
+    timevar_data = td[timevar_cols].copy()
+
+    # melt out time information in time-varying column dataframe
+    signals = []
+    for (idx,trial) in timevar_data.iterrows():
+        #split out rows of numpy array
+        signal_dict = {key: list(val_array.copy()) for (key,val_array) in trial.iteritems()}
+        signal_dict['trial_id'] = idx
+        temp = pd.DataFrame(signal_dict)
+
+        # add a timedelta column to DataFrame
+        # temp['trialtime'] = pd.to_timedelta(trial_info.loc[idx,'bin_size']*np.arange(trial[timevar_cols[0]].shape[0]))
+        temp['trialtime'] = pd.to_timedelta(trial_info.loc[idx,'bin_size']*np.arange(trial[timevar_cols[0]].shape[0]),unit='seconds')
+
+        signals.append(temp)
+
+    signals = pd.concat(signals)
+    signals.set_index(['trial_id','trialtime'],inplace=True)
+    
+    # set up a multi-index for trials
+    # td.set_index(['monkey','session_date','trial_id'],inplace=True)
+
+    return trial_info,signals
