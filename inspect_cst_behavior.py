@@ -19,6 +19,8 @@ import pandas as pd
 import scipy
 import pyaldata
 import cst
+import sklearn
+import ssa
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -27,6 +29,9 @@ mpl.rcParams['ps.fonttype'] = 42
 import seaborn as sns
 sns.set_style("ticks")
 sns.set_context("talk")
+import k3d
+
+from ipywidgets import interact
 
 # Speficy whether or not to save figures
 save_figures = False
@@ -38,27 +43,34 @@ save_figures = False
 # filename = '/data/raeed/project-data/smile/cst-gainlag/library/python/Ford_20180618_COCST_TD.mat'
 filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/Ford_20180618_COCST_TD.mat'
 td = cst.load_clean_data(filename)
-# td.set_index('trial_id',inplace=True)
+td.set_index('trial_id',inplace=True)
+
+# %%
+td['M1_rates'] = [pyaldata.smooth_data(spikes/bin_size,dt=bin_size,std=0.05) 
+                  for spikes,bin_size in zip(td['M1_spikes'],td['bin_size'])]
 
 # %%
 # subselect CST trials
-td_cst = td.loc[td['task']=='CST']
-td_cst = pyaldata.restrict_to_interval(td_cst,start_point_name='idx_cstStartTime',end_point_name='idx_cstEndTime')
+td_cst = td.loc[td['task']=='CST'].copy()
+td_cst = pyaldata.restrict_to_interval(td_cst,start_point_name='idx_cstStartTime',end_point_name='idx_cstEndTime',reset_index=False)
 td_cst['trialtime'] = [trial['bin_size']*np.arange(trial['hand_pos'].shape[0]) for _,trial in td_cst.iterrows()]
 
 # %%
 # %matplotlib notebook
 
-from ipywidgets import interact
+sm_fig = plt.figure(figsize=(6,6))
+gs = mpl.gridspec.GridSpec(4,2,height_ratios=(2,1,1,1))
+sm_ax = sm_fig.add_subplot(gs[0,0])
+sm_vel_ax = sm_fig.add_subplot(gs[0,1])
 
 @interact(trial_id=list(td_cst.index))
-def plot_cst_trial(trial_id):
+def plot_cst_behavior(trial_id):
     trial = td_cst.loc[trial_id,:]
 
     sm_scatter_args = {
         'c': trial['trialtime'],
         'cmap': 'viridis',
-        's': 10
+        's': 5
     }
     
     trial_info = {
@@ -68,11 +80,7 @@ def plot_cst_trial(trial_id):
         'hand_pos': trial['hand_pos'][:,0],
         'hand_vel': trial['hand_vel'][:,0]
     }
-
-    sm_fig = plt.figure(figsize=(6,6))
-    gs = mpl.gridspec.GridSpec(4,2,height_ratios=(2,1,1,1))
-    sm_ax = sm_fig.add_subplot(gs[0,0])
-    sm_vel_ax = sm_fig.add_subplot(gs[0,1])
+    
     cst.plot_sensorimotor(**trial_info,ax=sm_ax,scatter_args=sm_scatter_args)
     cst.plot_sensorimotor_velocity(**trial_info,ax=sm_vel_ax,scatter_args=sm_scatter_args)
     
@@ -97,6 +105,27 @@ def plot_cst_trial(trial_id):
 #     )
 #     cursor_energy_ax.set_ylabel('Cursor Energy')
 
+
+# %%
+td_cst = td.loc[td['task']=='CST',:].copy()
+td_cst = pyaldata.restrict_to_interval(
+    td_cst,
+    start_point_name='idx_cstStartTime',
+    end_point_name='idx_cstEndTime',
+    reset_index=False
+)
+td_cst['trialtime'] = [trial['bin_size']*np.arange(trial['hand_pos'].shape[0]) for _,trial in td_cst.iterrows()]
+M1_cst_pca_model = sklearn.decomposition.PCA()
+td_cst = pyaldata.dim_reduce(td_cst,M1_cst_pca_model,'M1_rates','M1_pca')
+
+behavior_signals = lambda trial: np.column_stack([
+    trial['cursor_pos'][:,0],
+    trial['hand_pos'][:,0],
+    0.25*trial['hand_vel'][:,0]
+]).astype(np.float32)
+neural_signals = lambda trial: trial['M1_pca'][:,0:3]
+
+cst.plot.make_behavior_neural_widget(td_cst,behavior_signals=behavior_signals,neural_signals=neural_signals)
 
 # %%
 # %matplotlib inline
@@ -170,6 +199,59 @@ HTML(ani.to_jshtml())
 # writer = mpl.animation.FFMpegWriter(fps=15) 
 # ani.save(anim_savename, writer=writer)
 
+
+# %%
+td_cst = td.loc[td['task']=='CST',:].copy()
+td_cst = pyaldata.restrict_to_interval(
+    td_cst,
+    start_point_name='idx_cstStartTime',
+    end_point_name='idx_cstEndTime',
+    reset_index=False
+)
+td_cst['trialtime'] = [trial['bin_size']*np.arange(trial['hand_pos'].shape[0]) for _,trial in td_cst.iterrows()]
+M1_cst_pca_model = sklearn.decomposition.PCA()
+td_cst = pyaldata.dim_reduce(td_cst,M1_cst_pca_model,'M1_rates','M1_pca')
+
+ssa_model,ssa_latents,_ = ssa.models.fit_ssa(X=td_cst.loc[159,'M1_pca'],R=10,n_epochs=10000)
+
+ssa_latents = ssa_latents.detach().numpy()
+
+
+# %%
+plt.figure(figsize=(10,5))
+R_est = 10
+for i in range(R_est):
+    
+    # Plot SSA results
+    plt.subplot(R_est,2,2*i+1)
+    plt.plot(td_cst.loc[159,'trialtime'][[0,-1]],[0,0],color='k')
+    plt.plot(td_cst.loc[159,'trialtime'],ssa_latents[:,i])
+    
+#     plt.ylim([-1.1, 1.1])
+    plt.yticks([])    
+    if i<R_est-1:
+        plt.xticks([])
+    else:
+        plt.xlabel('Time')
+
+    # Plot PCA results
+    plt.subplot(R_est,2,2*i+2)
+    plt.plot(td_cst.loc[159,'trialtime'][[0,-1]],[0,0],color='k')
+    plt.plot(td_cst.loc[159,'trialtime'],td_cst.loc[159,'M1_pca'][:,i])
+    
+#     plt.ylim([-1.1, 1.1])
+    plt.yticks([])
+    if i<R_est-1:
+        plt.xticks([])
+    else:
+        plt.xlabel('Time')        
+
+#Titles
+plt.subplot(R_est,2,1)
+plt.title('SSA LowD Projections')
+
+plt.subplot(R_est,2,2)
+plt.title('PCA LowD Projections')
 
 # %%
 # _,sm_ax = plt.subplots(1,1,figsize=(5,5))
