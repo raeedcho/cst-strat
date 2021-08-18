@@ -12,6 +12,9 @@ setuptools = "*"
 mat73 = "*"
 jupytext = "*"
 jupyter-contrib-nbextensions = "*"
+k3d = "*"
+ipyvolume = "*"
+torch = "*"
 
 [dev-packages]
 
@@ -27,3 +30,14 @@ git = "https://github.com/raeedcho/ssm.git"
 git = "https://github.com/raeedcho/pyaldata.git"
 editable = true
 ref = "main"
+
+[packages.geotorch]
+git = "https://github.com/Lezcano/geotorch.git"
+editable = false
+ref = "master"
+
+[packages.ssa]
+git = "https://github.com/jglaser2/ssa.git"
+editable = true
+ref = "main"
+
