@@ -28,6 +28,8 @@ mpl.rcParams['ps.fonttype'] = 42
 import seaborn as sns
 sns.set_style("ticks")
 sns.set_context("talk")
+import k3d
+from ipywidgets import interact
 
 # Speficy whether or not to save figures
 save_figures = False
@@ -40,7 +42,7 @@ save_figures = False
 # %%
 filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/Ford_20180618_COCST_TD.mat'
 td = cst.load_clean_data(filename)
-# td.set_index('trial_id',inplace=True)
+td.set_index('trial_id',inplace=True)
 
 # %%
 td['M1_rates'] = [pyaldata.smooth_data(spikes/bin_size,dt=bin_size,std=0.05) 
@@ -51,7 +53,7 @@ td = pyaldata.dim_reduce(td,M1_pca_model,'M1_rates','M1_pca')
 # %%
 start_time = -0.4
 end_time = 0.4
-td = pyaldata.restrict_to_interval(
+td_trim = pyaldata.restrict_to_interval(
     td,
     start_point_name='idx_goCueTime',
     rel_start=start_time/td.loc[td.index[0],'bin_size'],
@@ -60,25 +62,73 @@ td = pyaldata.restrict_to_interval(
 )
 
 # %%
-td_co = td.loc[td['task']=='CO',:].copy()
-td_cst = td.loc[td['task']=='CST',:].copy()
+td_co = td_trim.loc[td_trim['task']=='CO',:].copy()
+td_cst = td_trim.loc[td_trim['task']=='CST',:].copy()
 
 target_dirs = td_co['tgtDir'].unique()
 dir_colors = plt.get_cmap('Dark2',8)
-fig,ax = plt.subplots()
+# fig,ax = plt.subplots()
+trace_plot = k3d.plot(name='Neural Traces')
 for dirnum,target_dir in enumerate(target_dirs):
     # plot traces
+    color_val = int(255*dir_colors(dirnum)[0]) << 16 | int(255*dir_colors(dirnum)[1]) << 8 | int(255*dir_colors(dirnum)[2])
     td_co_dir = td_co.loc[np.isclose(td_co['tgtDir'],target_dir)]
     for neural_trace in td_co_dir['M1_pca'].sample(n=5):
-        ax.plot(neural_trace[:,0],neural_trace[:,1],color=dir_colors(dirnum),lw=0.5)
+        trace_plot+=k3d.line(neural_trace[:,0:3],shader='mesh',width=0.2,color=color_val)
     
-    ax.plot(td_co_dir['M1_pca'].mean()[:,0],td_co_dir['M1_pca'].mean()[:,1],color=dir_colors(dirnum),lw=2)
+    trace_plot+=k3d.line(td_co_dir['M1_pca'].mean()[:,0:3],shader='mesh',width=1,color=color_val)
     
-ax.plot(
-    td_cst.loc[159,'M1_pca'][:,0],
-    td_cst.loc[159,'M1_pca'][:,1],
-    color='k',
-    lw=2
+trace_plot+=k3d.line(
+    td_cst.loc[159,'M1_pca'][:,0:3],
+    shader='mesh',
+    width=1,
+    color=0,
 )
-ax.axis('equal')
-ax.axis('off')
+trace_plot.display()
+# ax.axis('equal')
+# ax.axis('off')
+
+# %%
+td_cst = td.loc[td['task']=='CST',:].copy()
+td_cst = pyaldata.restrict_to_interval(
+    td_cst,
+    start_point_name='idx_cstStartTime',
+    end_point_name='idx_cstEndTime',
+    reset_index=False
+)
+td_cst['trialtime'] = [trial['bin_size']*np.arange(trial['hand_pos'].shape[0]) for _,trial in td_cst.iterrows()]
+M1_cst_pca_model = sklearn.decomposition.PCA()
+td_cst = pyaldata.dim_reduce(td_cst,M1_cst_pca_model,'M1_rates','M1_cst_pca')
+
+
+cst_trace_plot = k3d.plot(name='CST neural traces',camera_fov=40)
+cst_trace_line = k3d.line(
+    np.array([0,0,0],dtype=np.float32),
+    attribute=np.float32(6),
+    color_map=k3d.matplotlib_color_maps.Viridis,
+    color_range=[0,6],
+    shader='mesh',
+    width=0.25,
+)
+cst_trace_dot = k3d.points(
+    np.array([0,0,0],dtype=np.float32),
+    color=0,
+    point_size=2
+)
+cst_trace_plot+=cst_trace_line
+cst_trace_plot+=cst_trace_dot
+cst_trace_plot.display()
+cst_trace_plot.start_auto_play()
+
+@interact(trial_id=list(td_cst.index))
+def plot_cst_neural_trace(trial_id):
+    trial = td_cst.loc[trial_id,:]
+    # plot traces
+    cst_trace_line.vertices = trial['M1_cst_pca'][:,0:3]
+    cst_trace_line.attribute = trial['trialtime'].astype(np.float32)
+    # cst_trace_dot.positions = {
+    #     str(time*5): neural_state
+    #     for time,neural_state in zip(trial['trialtime'][0:-1:50],trial['M1_cst_pca'][0:-1:50,0:3])
+    # }
+    cst_trace_dot.positions = trial['M1_cst_pca'][0,0:3]
+
