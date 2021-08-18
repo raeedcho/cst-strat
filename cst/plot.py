@@ -5,6 +5,8 @@ import matplotlib as mpl
 import seaborn as sns
 import numpy as np
 import scipy
+import k3d
+import ipywidgets
 
 def plot_sensorimotor(cursor_pos=[],hand_pos=[], ax=None, scatter_args=dict(),**kwargs):
     """ Make sensorimotor plot of hand position vs cursor position
@@ -156,3 +158,50 @@ def plot_cst_traces(trialtime=[],cursor_pos=[],hand_pos=[],ax=None,flipxy=False,
         hand_l, = ax.plot(trialtime,hand_pos,'-r')
         
     return cursor_l,hand_l
+
+def make_behavior_neural_widget(trial_data,behavior_signals=None,neural_signals=None):
+    """
+    Make widgets to explore behavior and neural activity of trial data simultaneously
+    Inputs:
+        trial_data - pandas DataFrame with trial_data structure
+        behavior_signals - callable function to extract behavioral signals from single trial
+            (sigs = behavior_signals(trial))
+        neural_signals - callable function to extract neural signals from single trial
+            (sigs = neural_signals(trial))
+    """
+
+    assert callable(behavior_signals) and callable(neural_signals), 'behavior and neural signals inputs must be callable functions!'
+    behavior_plot = k3d.plot(name='Behavioral plot')
+    behavior_line = k3d.line(
+        np.array([0,0,0],dtype=np.float32),
+        attribute=np.float32(6),
+        color_map=k3d.matplotlib_color_maps.Viridis,
+        color_range=[0,6],
+        shader='mesh',
+        width=0.25,
+    )
+    behavior_plot+=behavior_line
+    
+    trace_plot = k3d.plot(name='Neural traces',camera_fov=40)
+    trace_line = k3d.line(
+        np.array([0,0,0],dtype=np.float32),
+        attribute=np.float32(6),
+        color_map=k3d.matplotlib_color_maps.Viridis,
+        color_range=[0,6],
+        shader='mesh',
+        width=0.25,
+    )
+    trace_plot+=trace_line
+    
+    @ipywidgets.interact(trial_id=list(trial_data.index))
+    def plot_trace(trial_id):
+        trial = trial_data.loc[trial_id,:]
+        # plot traces
+        behavior_line.vertices = behavior_signals(trial)
+        behavior_line.attribute = trial['trialtime'].astype(np.float32)
+
+        trace_line.vertices = neural_signals(trial)
+        trace_line.attribute = trial['trialtime'].astype(np.float32)
+        
+    behavior_plot.display()
+    trace_plot.display()
