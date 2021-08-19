@@ -50,13 +50,12 @@ td['M1_rates'] = [pyaldata.smooth_data(spikes/bin_size,dt=bin_size,std=0.05)
                   for spikes,bin_size in zip(td['M1_spikes'],td['bin_size'])]
 
 # %%
+# %matplotlib notebook
+
 # subselect CST trials
 td_cst = td.loc[td['task']=='CST'].copy()
 td_cst = pyaldata.restrict_to_interval(td_cst,start_point_name='idx_cstStartTime',end_point_name='idx_cstEndTime',reset_index=False)
 td_cst['trialtime'] = [trial['bin_size']*np.arange(trial['hand_pos'].shape[0]) for _,trial in td_cst.iterrows()]
-
-# %%
-# %matplotlib notebook
 
 sm_fig = plt.figure(figsize=(6,6))
 gs = mpl.gridspec.GridSpec(4,2,height_ratios=(2,1,1,1))
@@ -130,6 +129,11 @@ cst.plot.make_behavior_neural_widget(td_cst,behavior_signals=behavior_signals,ne
 # %%
 # %matplotlib inline
 
+# subselect CST trials
+td_cst = td.loc[td['task']=='CST'].copy()
+td_cst = pyaldata.restrict_to_interval(td_cst,start_point_name='idx_cstStartTime',end_point_name='idx_cstEndTime',reset_index=False)
+td_cst['trialtime'] = [trial['bin_size']*np.arange(trial['hand_pos'].shape[0]) for _,trial in td_cst.iterrows()]
+
 # Pick out specific trial
 trial_id = 159
 scale=35
@@ -199,59 +203,6 @@ HTML(ani.to_jshtml())
 # writer = mpl.animation.FFMpegWriter(fps=15) 
 # ani.save(anim_savename, writer=writer)
 
-
-# %%
-td_cst = td.loc[td['task']=='CST',:].copy()
-td_cst = pyaldata.restrict_to_interval(
-    td_cst,
-    start_point_name='idx_cstStartTime',
-    end_point_name='idx_cstEndTime',
-    reset_index=False
-)
-td_cst['trialtime'] = [trial['bin_size']*np.arange(trial['hand_pos'].shape[0]) for _,trial in td_cst.iterrows()]
-M1_cst_pca_model = sklearn.decomposition.PCA()
-td_cst = pyaldata.dim_reduce(td_cst,M1_cst_pca_model,'M1_rates','M1_pca')
-
-ssa_model,ssa_latents,_ = ssa.models.fit_ssa(X=td_cst.loc[159,'M1_pca'],R=10,n_epochs=10000)
-
-ssa_latents = ssa_latents.detach().numpy()
-
-
-# %%
-plt.figure(figsize=(10,5))
-R_est = 10
-for i in range(R_est):
-    
-    # Plot SSA results
-    plt.subplot(R_est,2,2*i+1)
-    plt.plot(td_cst.loc[159,'trialtime'][[0,-1]],[0,0],color='k')
-    plt.plot(td_cst.loc[159,'trialtime'],ssa_latents[:,i])
-    
-#     plt.ylim([-1.1, 1.1])
-    plt.yticks([])    
-    if i<R_est-1:
-        plt.xticks([])
-    else:
-        plt.xlabel('Time')
-
-    # Plot PCA results
-    plt.subplot(R_est,2,2*i+2)
-    plt.plot(td_cst.loc[159,'trialtime'][[0,-1]],[0,0],color='k')
-    plt.plot(td_cst.loc[159,'trialtime'],td_cst.loc[159,'M1_pca'][:,i])
-    
-#     plt.ylim([-1.1, 1.1])
-    plt.yticks([])
-    if i<R_est-1:
-        plt.xticks([])
-    else:
-        plt.xlabel('Time')        
-
-#Titles
-plt.subplot(R_est,2,1)
-plt.title('SSA LowD Projections')
-
-plt.subplot(R_est,2,2)
-plt.title('PCA LowD Projections')
 
 # %%
 # _,sm_ax = plt.subplots(1,1,figsize=(5,5))
