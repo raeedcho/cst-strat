@@ -51,6 +51,15 @@ M1_pca_model = sklearn.decomposition.PCA()
 td = pyaldata.dim_reduce(td,M1_pca_model,'M1_rates','M1_pca')
 
 # %%
+# GPFA (elephant keeps killing kernel...)
+# new_bin_size = 0.02
+# M1_gpfa_model = cst.models.GPFA(bin_size=new_bin_size,x_dim=10)
+# M1_gpfa_model.fit(td['M1_spikes'].to_list())
+# M1_gpfa = M1_gpfa_model.transform(td['M1_spikes'].to_list())
+# td_bin = pyaldata.combine_time_bins(td,np.floor(new_bin_size/td.loc[td.index[0],'bin_size']))
+# td_bin['M1_gpfa'] = M1_gpfa
+
+# %%
 start_time = -0.4
 end_time = 0.4
 td_trim = pyaldata.restrict_to_interval(
