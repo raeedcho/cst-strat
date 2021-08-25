@@ -21,6 +21,7 @@ import pyaldata
 import cst
 import sklearn
 import ssa
+import elephant.gpfa
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -51,36 +52,46 @@ td['M1_rates'] = [pyaldata.smooth_data(spikes/bin_size,dt=bin_size,std=0.05)
 
 # %%
 # test out SSA against PCA
-td_cst = td.loc[td['task']=='CST',:].copy()
-td_cst = pyaldata.restrict_to_interval(
-    td_cst,
-    start_point_name='idx_cstStartTime',
-    end_point_name='idx_cstEndTime',
+td_task = td.loc[td['task']=='CO',:].copy()
+td_task = pyaldata.restrict_to_interval(
+    td_task,
+    start_point_name='idx_goCueTime',
+    rel_start=-400,
+    rel_end=400,
     reset_index=False
 )
-td_cst['trialtime'] = [trial['bin_size']*np.arange(trial['hand_pos'].shape[0]) for _,trial in td_cst.iterrows()]
+td_task['trialtime'] = [trial['bin_size']*np.arange(trial['hand_pos'].shape[0]) for _,trial in td_task.iterrows()]
+
+td_task_select = td_task.copy()
 
 # parameters
 num_dims = 10
 
 # fit PCA model
-M1_cst_pca_model = sklearn.decomposition.PCA()
-td_cst = pyaldata.dim_reduce(td_cst,M1_cst_pca_model,'M1_rates','M1_pca')
+M1_task_pca_model = sklearn.decomposition.PCA()
+M1_task_pca_model.fit(np.concatenate(td_task_select['M1_rates'].values))
+td_task_select['M1_pca'] = [M1_task_pca_model.transform(sig) for sig in td_task_select['M1_rates']]
+# td_task_select = pyaldata.dim_reduce(td_task_select,M1_task_pca_model,'M1_rates','M1_pca')
 
 # fit SSA model (start with PCA because it's mean centered and it's the initialization anyway)
-M1_cst_ssa_model = cst.models.SSA(R=num_dims,n_epochs=2000)
-td_cst = pyaldata.dim_reduce(td_cst,M1_cst_ssa_model,'M1_pca','M1_ssa')
+M1_task_ssa_model = cst.models.SSA(R=num_dims,n_epochs=3000,lr=0.01)
+M1_task_ssa_model.fit(np.concatenate(td_task_select['M1_rates'].values))
+td_task_select['M1_ssa'] = [M1_task_ssa_model.transform(sig) for sig in td_task_select['M1_rates']]
+# td_task_select = pyaldata.dim_reduce(td_task_select,M1_task_ssa_model,'M1_pca','M1_ssa')
+
+# fit GPFA model
 
 
 # %%
-trial_to_plot = 159
+trial_to_plot = td_task_select.index[0]
+
 plt.figure(figsize=(10,5))
 for i in range(num_dims):
     
     # Plot SSA results
     plt.subplot(num_dims,2,2*i+1)
-    plt.plot(td_cst.loc[trial_to_plot,'trialtime'][[0,-1]],[0,0],color='k')
-    plt.plot(td_cst.loc[trial_to_plot,'trialtime'],ssa_latents[:,i])
+    plt.plot(td_task_select.loc[trial_to_plot,'trialtime'][[0,-1]],[0,0],color='k')
+    plt.plot(td_task_select.loc[trial_to_plot,'trialtime'],td_task_select.loc[trial_to_plot,'M1_ssa'][:,i])
     
 #     plt.ylim([-1.1, 1.1])
     plt.yticks([])    
@@ -91,8 +102,8 @@ for i in range(num_dims):
 
     # Plot PCA results
     plt.subplot(num_dims,2,2*i+2)
-    plt.plot(td_cst.loc[trial_to_plot,'trialtime'][[0,-1]],[0,0],color='k')
-    plt.plot(td_cst.loc[trial_to_plot,'trialtime'],td_cst.loc[trial_to_plot,'M1_pca'][:,i])
+    plt.plot(td_task_select.loc[trial_to_plot,'trialtime'][[0,-1]],[0,0],color='k')
+    plt.plot(td_task_select.loc[trial_to_plot,'trialtime'],td_task_select.loc[trial_to_plot,'M1_pca'][:,i])
     
 #     plt.ylim([-1.1, 1.1])
     plt.yticks([])
