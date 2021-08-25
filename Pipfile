@@ -15,6 +15,7 @@ jupyter-contrib-nbextensions = "*"
 k3d = "*"
 ipyvolume = "*"
 torch = "*"
+elephant = "*"
 
 [dev-packages]
 
@@ -40,4 +41,3 @@ ref = "master"
 git = "https://github.com/jglaser2/ssa.git"
 editable = true
 ref = "main"
-
