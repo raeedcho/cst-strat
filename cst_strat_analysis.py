@@ -53,8 +53,8 @@ save_figures = False
 
 # %%
 # filename = '/data/raeed/project-data/smile/cst-gainlag/library/python/Ford_20180618_COCST_TD.mat'
-filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/python/Ford_20180618_COCST_TD.mat'
-td = pyaldata.mat2dataframe(filename,True,'td_cst')
+filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/Ford_20180618_COCST_TD.mat'
+td = cst.load_clean_data(filename)
 td.set_index('trial_id',inplace=True)
 
 # %%
