@@ -51,6 +51,8 @@ color_names = [
 colors = sns.xkcd_palette(color_names)
 cmap = gradient_cmap(colors)
 
+# %load_ext autoreload
+# %autoreload 2
 
 # Speficy whether or not to save figures
 save_figures = False
@@ -149,7 +151,7 @@ def plot_slds_fit(trial_id):
 # %%
 target_dirs = td_co['tgtDir'].unique()
 dir_colors = plt.get_cmap('Dark2',8)
-dims_to_plot=[1,2,3]
+dims_to_plot=[0,4,5]
 # fig,ax = plt.subplots()
 trace_plot = k3d.plot(name='Neural Traces')
 for dirnum,target_dir in enumerate(target_dirs):
@@ -164,8 +166,6 @@ for dirnum,target_dir in enumerate(target_dirs):
 trace_plot.display()
 # ax.axis('equal')
 # ax.axis('off')
-
-# %%
 
 # %%
 # try a decoder on new continuous state?
@@ -211,3 +211,80 @@ ax.set_ylabel('Neural-decoded hand velocity')
 sns.despine(fig, offset=10, trim=True)
 
 # %%
+## Now try switching model on CST data
+td_cst = td.loc[td['task']=='CST',:].copy()
+td_cst = pyaldata.restrict_to_interval(
+    td_cst,
+    start_point_name='idx_cstStartTime',
+    rel_start=-0.2/td_cst['bin_size'].values[0],
+    end_point_name='idx_cstEndTime',
+    reset_index=False
+)
+td_cst = pyaldata.combine_time_bins(td_cst,20)
+
+# SLDS params
+emissions_dim = td_cst['M1_spikes'].values[0].shape[1]
+num_disc_states = 3 # Complete guess
+latent_dim = 10 # just a guess
+
+# extract neural data + inputs
+neural_datas = list(td_cst['M1_spikes'])
+go_cue = [np.float32(np.arange(sig.shape[0])==go_cue_idx) for sig,go_cue_idx in zip(td_cst['M1_spikes'],td_cst['idx_goCueTime'])]
+
+# fit the SLDS
+slds_cst = ssm.SLDS(emissions_dim,num_disc_states,latent_dim,emissions='poisson_orthog',transitions='sticky')
+elbos_cst,q_cst = slds_cst.fit(neural_datas,num_iters=20,alpha=0.0)
+
+# add states back into data structure
+td_cst['M1_slds_cont'] = q_cst.mean_continuous_states
+td_cst['M1_slds_disc'] = [slds_cst.most_likely_states(cont_latent,data) for cont_latent,data in zip(td_cst['M1_slds_cont'],td_cst['M1_spikes'])]
+
+# make plots
+fig,ax = plt.subplots()
+ax.plot(elbos_cst, label="Laplace EM")
+ax.set_xlabel("EM Iteration")
+ax.set_ylabel("ELBO")
+ax.legend(loc="lower right")
+
+# %%
+# plot out discrete and continuous latents for each given trial
+fig,ax = plt.subplots(4,1,figsize=(8,8))
+
+@interact(trial_id=list(td_cst.index))
+def plot_slds_fit(trial_id):
+    trial = td_cst.loc[trial_id,:]
+    
+    for gca in ax:
+        gca.clear()
+    
+    cmap_limited = mpl.colors.ListedColormap(colors[0:num_disc_states])
+    ax[0].imshow(trial['M1_slds_disc'][None,:],aspect='auto',cmap=cmap_limited)
+    ax[0].plot(trial['idx_goCueTime']*np.array([1,1]),[-0.5,0.5],'--r')
+    ax[0].set_yticks([])
+    ax[0].set_xticks([])
+    ax[0].set_title('Most likely discrete state')
+    sns.despine(ax=ax[0],left=True,bottom=True)
+
+    for d in range(latent_dim):
+        ax[1].plot(trial['M1_slds_cont'][:,d],'-k')
+    lim = abs(trial['M1_slds_cont']).max()
+    ax[1].plot(trial['idx_goCueTime']*np.array([1,1]),lim*np.array([-1,1]),'--r')
+    ax[1].set_xticks([])
+    ax[1].set_title('Estimated continuous latents')
+    sns.despine(ax=ax[1],bottom=True,trim=True)
+
+    ax[2].imshow(trial['M1_spikes'].T,aspect='auto',cmap='inferno')
+    ax[2].plot(trial['idx_goCueTime']*np.array([1,1]),[0,trial['M1_spikes'].shape[1]],'--r')
+    ax[2].set_xticks([])
+    ax[2].set_yticks([])
+    ax[2].set_title('Emissions raster')
+    sns.despine(ax=ax[1],bottom=True,trim=True)
+
+    cursor_l,hand_l = cst.plot_cst_traces(
+        ax=ax[3],
+        cursor_pos=trial['cursor_pos'][:,0],
+        hand_pos=trial['hand_pos'][:,0],
+        trialtime=trial['bin_size']*np.arange(trial['hand_pos'].shape[0])
+    )
+    lim = abs(trial['hand_pos'][:,0]).max()
+    ax[3].plot(trial['idx_goCueTime']*np.array([1,1]),lim*np.array([-1,1]),'--r')
