@@ -41,7 +41,7 @@ save_figures = False
 
 # %%
 # filename = '/data/raeed/project-data/smile/cst-gainlag/library/python/Ford_20180618_COCST_TD.mat'
-filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/Ford_20180618_COCST_TD.mat'
+filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/Earl_20190716_COCST_TD.mat'
 td = cst.load_clean_data(filename)
 td.set_index('trial_id',inplace=True)
 
@@ -55,7 +55,7 @@ td['M1_rates'] = [pyaldata.smooth_data(spikes/bin_size,dt=bin_size,std=0.05)
 # subselect CST trials
 td_cst = td.loc[td['task']=='CST'].copy()
 td_cst = pyaldata.restrict_to_interval(td_cst,start_point_name='idx_cstStartTime',end_point_name='idx_cstEndTime',reset_index=False)
-td_cst['trialtime'] = [trial['bin_size']*np.arange(trial['hand_pos'].shape[0]) for _,trial in td_cst.iterrows()]
+td_cst['trialtime'] = [trial['bin_size']*np.arange(trial['rel_hand_pos'].shape[0]) for _,trial in td_cst.iterrows()]
 
 sm_fig = plt.figure(figsize=(6,6))
 gs = mpl.gridspec.GridSpec(4,2,height_ratios=(2,1,1,1))
@@ -74,9 +74,9 @@ def plot_cst_behavior(trial_id):
     
     trial_info = {
         'trialtime': trial['trialtime'],
-        'cursor_pos': trial['cursor_pos'][:,0],
+        'cursor_pos': trial['rel_cursor_pos'][:,0],
         'cursor_vel': trial['cst_cursor_command'][:,0],
-        'hand_pos': trial['hand_pos'][:,0],
+        'hand_pos': trial['rel_hand_pos'][:,0],
         'hand_vel': trial['hand_vel'][:,0]
     }
     
@@ -135,10 +135,10 @@ td_cst = pyaldata.restrict_to_interval(td_cst,start_point_name='idx_cstStartTime
 td_cst['trialtime'] = [trial['bin_size']*np.arange(trial['hand_pos'].shape[0]) for _,trial in td_cst.iterrows()]
 
 # Pick out specific trial
-trial_id = 159
-scale=35
+trial_id = 233
+scale=15
 
-trial = td_cst.loc[td_cst['trial_id']==trial_id,:].squeeze()
+trial = td_cst.loc[trial_id,:].squeeze()
 
 sm_scatter_args = {
     'c': 'k',
@@ -165,10 +165,10 @@ cursor_l,hand_l = cst.plot_cst_traces(ax=trace_ax,flipxy=True)
 # Sensorimotor plot
 sm_ax.set_xlim(-scale,scale)
 sm_ax.set_ylim(-scale,scale)
-sm_sc = cst.plot_sensorimotor(ax=sm_ax,scatter_args=sm_scatter_args)
+sm_sc = cst.plot_sensorimotor(ax=sm_ax,scatter_args=sm_scatter_args,clear_ax=False)
 
 # SM velocity plot
-sm_vel_sc = cst.plot_sensorimotor_velocity(ax=sm_vel_ax,scatter_args=sm_scatter_args)
+sm_vel_sc = cst.plot_sensorimotor_velocity(ax=sm_vel_ax,scatter_args=sm_scatter_args,clear_ax=False)
 
 # SM tangent angle
 # sm_tangent_sc = cst.plot_sm_tangent_angle(ax=sm_tangent_angle_ax,scatter_args=sm_scatter_args)
@@ -179,11 +179,11 @@ sm_energy_sc = cst.plot_sm_tangent_magnitude(ax=sm_energy_ax,scatter_args=sm_sca
 sm_energy_ax.set_ylabel('')
 
 def animate_smplot(i):
-    cursor_sc.set_offsets(np.c_[trial['cursor_pos'][i,0],1])
-    hand_sc.set_offsets(np.c_[trial['hand_pos'][i,0],-1])
-    cursor_l.set_data(trial['cursor_pos'][:i,0],trial['trialtime'][:i])
-    hand_l.set_data(trial['hand_pos'][:i,0],trial['trialtime'][:i])
-    sm_sc.set_offsets(np.c_[trial['cursor_pos'][:i,0],trial['hand_pos'][:i,0]])
+    cursor_sc.set_offsets(np.c_[trial['rel_cursor_pos'][i,0],1])
+    hand_sc.set_offsets(np.c_[trial['rel_hand_pos'][i,0],-1])
+    cursor_l.set_data(trial['rel_cursor_pos'][:i,0],trial['trialtime'][:i])
+    hand_l.set_data(trial['rel_hand_pos'][:i,0],trial['trialtime'][:i])
+    sm_sc.set_offsets(np.c_[trial['rel_cursor_pos'][:i,0],trial['rel_hand_pos'][:i,0]])
     sm_vel_sc.set_offsets(np.c_[trial['cst_cursor_command'][:i,0],trial['hand_vel'][:i,0]])
     # sm_tangent_sc.set_offsets(np.c_[trial['trialtime'][:i],np.arctan2(trial['hand_vel'][:i,0],trial['cst_cursor_command'][:i,0])*180/np.pi])
     sm_energy_sc.set_offsets(np.c_[trial['trialtime'][:i],trial['hand_vel'][:i,0]**2+trial['cst_cursor_command'][:i,0]**2])

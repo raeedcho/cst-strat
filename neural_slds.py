@@ -21,6 +21,7 @@ import pandas as pd
 import cst
 import pyaldata
 import scipy
+import sklearn
 
 import ssm
 from ssm.util import find_permutation
@@ -53,13 +54,17 @@ cmap = gradient_cmap(colors)
 
 # %load_ext autoreload
 # %autoreload 2
+# %autosave 0
 
 # Speficy whether or not to save figures
 save_figures = False
 
 # %%
-# filename = '/data/raeed/project-data/smile/cst-gainlag/library/Ford_20180618_COCST_TD.mat'
-filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/Ford_20180618_COCST_TD.mat'
+file_info = {
+    'monkey': 'Earl',
+    'session_date': '20190716'
+}
+filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/{monkey}_{session_date}_COCST_TD.mat'.format(**file_info)
 td = cst.load_clean_data(filename)
 td.set_index('trial_id',inplace=True)
 
@@ -86,7 +91,7 @@ go_cue = [np.float32(np.arange(sig.shape[0])==go_cue_idx) for sig,go_cue_idx in 
 
 # fit the SLDS
 slds = ssm.SLDS(emissions_dim,num_disc_states,latent_dim,emissions='poisson_orthog')
-elbos,q = slds.fit(neural_datas,num_iters=20,alpha=0.0)
+elbos,q = slds.fit(neural_datas,num_iters=40,alpha=0.0)
 
 # add states back into data structure
 td_co['M1_slds_cont'] = q.mean_continuous_states
@@ -101,50 +106,50 @@ ax.legend(loc="lower right")
 
 # %%
 # plot out discrete and continuous latents for each given trial
-fig,ax = plt.subplots(4,1,figsize=(8,8))
+fig = plt.figure(figsize=(8,8))
 
 @interact(trial_id=list(td_co.index))
 def plot_slds_fit(trial_id):
     trial = td_co.loc[trial_id,:]
     
-    for gca in ax:
-        gca.clear()
+    fig.clear()   
+    [beh_ax,disc_ax,cont_ax,emis_ax] = fig.subplots(4,1)
+    
+    hand_pos = trial['rel_hand_pos']
+    lim = abs(hand_pos[:2]).max()
+    for d in range(2):
+        beh_ax.plot(hand_pos[:,d]+lim*d,'-k')
+    beh_ax.plot(trial['idx_goCueTime']*np.array([1,1]),lim*np.array([-1,1]),'--r')
+    beh_ax.set_xticks([])
+    beh_ax.set_yticks(np.arange(2) * lim)
+    beh_ax.set_yticklabels(['horizontal','vertical'])
+    beh_ax.set_title('Hand position')
+    sns.despine(ax=beh_ax,trim=True,bottom=True)
     
     cmap_limited = mpl.colors.ListedColormap(colors[0:num_disc_states])
-    ax[0].imshow(trial['M1_slds_disc'][None,:],aspect='auto',cmap=cmap_limited)
-    ax[0].plot(trial['idx_goCueTime']*np.array([1,1]),[-0.5,0.5],'--r')
-    ax[0].set_yticks([])
-    ax[0].set_xticks([])
-    ax[0].set_title('Most likely discrete state')
+    disc_ax.imshow(trial['M1_slds_disc'][None,:],aspect='auto',cmap=cmap_limited)
+    disc_ax.plot(trial['idx_goCueTime']*np.array([1,1]),[-0.5,0.5],'--r')
+    disc_ax.set_yticks([])
+    disc_ax.set_xticks([])
+    disc_ax.set_title('Most likely discrete state')
     
-    sns.despine(ax=ax[0],left=True,bottom=True)
+    sns.despine(ax=disc_ax,left=True,bottom=True)
 
     lim = abs(trial['M1_slds_cont']).max()
     for d in range(latent_dim):
-        ax[1].plot(trial['M1_slds_cont'][:,d],'-k')
-    ax[1].plot(trial['idx_goCueTime']*np.array([1,1]),lim*np.array([-1,1]),'--r')
-    # ax[1].set_yticks(np.arange(latent_dim) * lim)
-    # ax[1].set_yticklabels(["$x_{}$".format(d+1) for d in range(latent_dim)])
-    ax[1].set_xticks([])
-    ax[1].set_title('Estimated continuous latents')
-    sns.despine(ax=ax[1],bottom=True,trim=True)
+        cont_ax.plot(trial['M1_slds_cont'][:,d],'-k')
+    cont_ax.plot(trial['idx_goCueTime']*np.array([1,1]),lim*np.array([-1,1]),'--r')
+    # cont_ax.set_yticks(np.arange(latent_dim) * lim)
+    # cont_ax.set_yticklabels(["$x_{}$".format(d+1) for d in range(latent_dim)])
+    cont_ax.set_xticks([])
+    cont_ax.set_title('Estimated continuous latents')
+    sns.despine(ax=cont_ax,bottom=True,trim=True)
 
-    ax[2].imshow(trial['M1_spikes'].T,aspect='auto',cmap='inferno')
-    ax[2].plot(trial['idx_goCueTime']*np.array([1,1]),[0,trial['M1_spikes'].shape[1]],'--r')
-    ax[2].set_xticks([])
-    ax[2].set_yticks([])
-    ax[2].set_title('Emissions raster')
-    sns.despine(ax=ax[1],bottom=True,trim=True)
-
-    hand_pos = trial['hand_pos']-[0,470,0]
-    lim = abs(hand_pos[:2]).max()
-    for d in range(2):
-        ax[3].plot(hand_pos[:,d]+lim*d,'-k')
-    ax[3].plot(trial['idx_goCueTime']*np.array([1,1]),lim*np.array([-1,1]),'--r')
-    ax[3].set_yticks(np.arange(2) * lim)
-    ax[3].set_yticklabels(['hand x','hand y'])
-    ax[3].set_title('Hand position')
-    sns.despine(ax=ax[3],trim=True)
+    emis_ax.imshow(trial['M1_spikes'].T,aspect='auto',cmap='inferno')
+    emis_ax.plot(trial['idx_goCueTime']*np.array([1,1]),[0,trial['M1_spikes'].shape[1]],'--r')
+    emis_ax.set_yticks([])
+    emis_ax.set_title('Emissions raster')
+    sns.despine(ax=emis_ax,trim=True)
 
 
 
@@ -221,6 +226,7 @@ td_cst = pyaldata.restrict_to_interval(
     reset_index=False
 )
 td_cst = pyaldata.combine_time_bins(td_cst,20)
+# td_cst = pyaldata.soft_normalize_signal(td_cst,'M1_spikes',alpha=5)
 
 # SLDS params
 emissions_dim = td_cst['M1_spikes'].values[0].shape[1]
@@ -232,8 +238,8 @@ neural_datas = list(td_cst['M1_spikes'])
 go_cue = [np.float32(np.arange(sig.shape[0])==go_cue_idx) for sig,go_cue_idx in zip(td_cst['M1_spikes'],td_cst['idx_goCueTime'])]
 
 # fit the SLDS
-slds_cst = ssm.SLDS(emissions_dim,num_disc_states,latent_dim,emissions='poisson_orthog',transitions='sticky')
-elbos_cst,q_cst = slds_cst.fit(neural_datas,num_iters=20,alpha=0.0)
+slds_cst = ssm.SLDS(emissions_dim,num_disc_states,latent_dim,emissions='poisson_orthog')
+elbos_cst,q_cst = slds_cst.fit(neural_datas,num_iters=40,alpha=0.0)
 
 # add states back into data structure
 td_cst['M1_slds_cont'] = q_cst.mean_continuous_states
@@ -248,43 +254,58 @@ ax.legend(loc="lower right")
 
 # %%
 # plot out discrete and continuous latents for each given trial
-fig,ax = plt.subplots(4,1,figsize=(8,8))
+fig = plt.figure(figsize=(8,8))
+fig,
 
 @interact(trial_id=list(td_cst.index))
 def plot_slds_fit(trial_id):
-    trial = td_cst.loc[trial_id,:]
+    trial = td_cst.loc[trial_id,:].copy()
     
-    for gca in ax:
-        gca.clear()
+    trial['trialtime']=trial['bin_size']*np.arange(trial['hand_pos'].shape[0])
+    
+    fig.clear()
+    [beh_ax,disc_ax,cont_ax,emis_ax] = fig.subplots(4,1,sharex=True)
+    
+    cursor_l,hand_l = cst.plot_cst_traces(
+        ax=beh_ax,
+        cursor_pos=trial['rel_cursor_pos'][:,0],
+        hand_pos=trial['rel_hand_pos'][:,0],
+        trialtime=trial['trialtime']
+    )
+    lim = abs(trial['rel_hand_pos'][:,0]).max()
+#     beh_ax.plot(trial['idx_goCueTime']*np.array([1,1]),lim*np.array([-1,1]),'--r')
     
     cmap_limited = mpl.colors.ListedColormap(colors[0:num_disc_states])
-    ax[0].imshow(trial['M1_slds_disc'][None,:],aspect='auto',cmap=cmap_limited)
-    ax[0].plot(trial['idx_goCueTime']*np.array([1,1]),[-0.5,0.5],'--r')
-    ax[0].set_yticks([])
-    ax[0].set_xticks([])
-    ax[0].set_title('Most likely discrete state')
-    sns.despine(ax=ax[0],left=True,bottom=True)
+    disc_ax.imshow(
+        trial['M1_slds_disc'][None,:],
+        aspect='auto',
+        cmap=cmap_limited,
+        extent=(0,trial['trialtime'][-1],0.5,-0.5))
+#     disc_ax.plot(trial['trialtime'][trial['idx_goCueTime']]*np.array([1,1]),[-0.5,0.5],'--r')
+    disc_ax.set_yticks([])
+    disc_ax.set_xticks([])
+    disc_ax.set_title('Most likely discrete state')
+    sns.despine(ax=disc_ax,left=True,bottom=True)
 
     for d in range(latent_dim):
-        ax[1].plot(trial['M1_slds_cont'][:,d],'-k')
+        cont_ax.plot(trial['trialtime'],trial['M1_slds_cont'][:,d],'-k')
     lim = abs(trial['M1_slds_cont']).max()
-    ax[1].plot(trial['idx_goCueTime']*np.array([1,1]),lim*np.array([-1,1]),'--r')
-    ax[1].set_xticks([])
-    ax[1].set_title('Estimated continuous latents')
-    sns.despine(ax=ax[1],bottom=True,trim=True)
+#     cont_ax.plot(trial['idx_goCueTime']*np.array([1,1]),lim*np.array([-1,1]),'--r')
+    cont_ax.set_xticks([])
+    cont_ax.set_title('Estimated continuous latents')
+    sns.despine(ax=cont_ax,bottom=True,trim=True)
 
-    ax[2].imshow(trial['M1_spikes'].T,aspect='auto',cmap='inferno')
-    ax[2].plot(trial['idx_goCueTime']*np.array([1,1]),[0,trial['M1_spikes'].shape[1]],'--r')
-    ax[2].set_xticks([])
-    ax[2].set_yticks([])
-    ax[2].set_title('Emissions raster')
-    sns.despine(ax=ax[1],bottom=True,trim=True)
-
-    cursor_l,hand_l = cst.plot_cst_traces(
-        ax=ax[3],
-        cursor_pos=trial['cursor_pos'][:,0],
-        hand_pos=trial['hand_pos'][:,0],
-        trialtime=trial['bin_size']*np.arange(trial['hand_pos'].shape[0])
+    emis_ax.imshow(
+        trial['M1_spikes'].T,
+        aspect='auto',
+        cmap='inferno',
+        extent=(0,trial['trialtime'][-1],0.5,-0.5),
     )
-    lim = abs(trial['hand_pos'][:,0]).max()
-    ax[3].plot(trial['idx_goCueTime']*np.array([1,1]),lim*np.array([-1,1]),'--r')
+#     emis_ax.plot(trial['idx_goCueTime']*np.array([1,1]),[0,trial['M1_spikes'].shape[1]],'--r')
+    emis_ax.set_xticks([])
+    emis_ax.set_yticks([])
+    emis_ax.set_title('Emissions raster')
+    emis_ax.set_xticks(np.arange(6)+1)
+    sns.despine(ax=cont_ax,bottom=True,trim=True)
+
+

@@ -40,9 +40,15 @@ save_figures = False
 # %matplotlib notebook
 
 # %%
-filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/Ford_20180618_COCST_TD.mat'
+file_info = {
+    'monkey': 'Earl',
+    'session_date': '20190716'
+}
+filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/{monkey}_{session_date}_COCST_TD.mat'.format(**file_info)
 td = cst.load_clean_data(filename)
 td.set_index('trial_id',inplace=True)
+
+# %%
 td['M1_rates'] = [pyaldata.smooth_data(spikes/bin_size,dt=bin_size,std=0.05) 
                   for spikes,bin_size in zip(td['M1_spikes'],td['bin_size'])]
 
@@ -137,17 +143,28 @@ sm_sc = cst.plot_sensorimotor(ax=sm_ax,scatter_args={'c':'k','s':5})
 @interact(trial_id=list(td_cst.index))
 def plot_cst_neural_behavior(trial_id):
     trial = td_cst.loc[trial_id,:]
-    trialtime = trial['bin_size']*np.arange(trial['hand_pos'].shape[0])
+    trialtime = trial['bin_size']*np.arange(trial['rel_hand_pos'].shape[0])
     
     # plot "neural activity" in top plot
     neural_l.set_data(trialtime,trial['hand_vel_pred'][:,0])
     
     # and hand/cursor movement in bottom
-    cursor_l.set_data(trialtime,trial['cursor_pos'][:,0])
-    hand_l.set_data(trialtime,trial['hand_pos'][:,0])
+    cursor_l.set_data(trialtime,trial['rel_hand_pos'][:,0])
+    hand_l.set_data(trialtime,trial['hand_vel'][:,0])
     
     # sm plot on the right
-    sm_sc.set_offsets(np.column_stack([
-        trial['cursor_pos'][:,0],
-        trial['hand_pos'][:,0]
-    ]))
+    cst.plot_sensorimotor(
+        ax=sm_ax,
+        cursor_pos=trial['rel_cursor_pos'][:,0],
+        hand_pos = trial['rel_hand_pos'][:,0],
+        scatter_args={
+            's':5,
+            'c': abs(trial['hand_vel_pred'][:,0]),
+            'cmap': 'viridis'
+        }
+    )
+#     sm_sc.set_offsets(np.column_stack([
+#         trial['rel_cursor_pos'][:,0],
+#         trial['rel_hand_pos'][:,0]
+#     ]))
+#     sm_sc.set_color(abs(trial['hand_vel_pred']))

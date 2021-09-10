@@ -16,6 +16,7 @@ k3d = "*"
 ipyvolume = "*"
 torch = "*"
 elephant = "*"
+scipy = "*"
 
 [dev-packages]
 

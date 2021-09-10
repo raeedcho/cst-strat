@@ -66,6 +66,7 @@ def fill_kinematic_signals(td,cutoff=30):
     td['hand_vel'] = [np.gradient(trial['hand_pos'],trial['bin_size'],axis=0) for _,trial in td.iterrows()]
     td['hand_acc'] = [np.gradient(trial['hand_vel'],trial['bin_size'],axis=0) for _,trial in td.iterrows()]
     td['cursor_vel'] = [np.gradient(trial['cursor_pos'],trial['bin_size'],axis=0) for _,trial in td.iterrows()]
+    td['hand_speed'] = [np.linalg.norm(vel,axis=1) for vel in td['hand_vel']]
 
     return td
 

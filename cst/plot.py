@@ -8,7 +8,7 @@ import scipy
 import k3d
 import ipywidgets
 
-def plot_sensorimotor(cursor_pos=[],hand_pos=[], ax=None, scatter_args=dict(),**kwargs):
+def plot_sensorimotor(cursor_pos=[],hand_pos=[], ax=None, clear_ax=True, scatter_args=dict(),**kwargs):
     """ Make sensorimotor plot of hand position vs cursor position
     
     Inputs:
@@ -21,6 +21,9 @@ def plot_sensorimotor(cursor_pos=[],hand_pos=[], ax=None, scatter_args=dict(),**
     """
     if ax is None:
         ax = plt.gca()
+
+    if clear_ax is True:
+        ax.clear()
 
     ax.plot([-60,60],[60,-60],'--k')
     ax.plot([0,0],[-60,60],'-k')
@@ -35,7 +38,7 @@ def plot_sensorimotor(cursor_pos=[],hand_pos=[], ax=None, scatter_args=dict(),**
     
     return sc
 
-def plot_sensorimotor_velocity(cursor_vel=[],hand_vel=[], ax=None, scatter_args=dict(),**kwargs):
+def plot_sensorimotor_velocity(cursor_vel=[],hand_vel=[], ax=None, clear_ax=True, scatter_args=dict(),**kwargs):
     """ Make sensorimotor plot of hand velocity vs cursor velocity
     
     Inputs:
@@ -50,6 +53,9 @@ def plot_sensorimotor_velocity(cursor_vel=[],hand_vel=[], ax=None, scatter_args=
     """
     if ax is None:
         ax = plt.gca()
+
+    if clear_ax is True:
+        ax.clear()
 
     ax.plot([-60,60],[60,-60],'--g')
     ax.plot([0,0],[-100,100],'--k')
@@ -66,10 +72,13 @@ def plot_sensorimotor_velocity(cursor_vel=[],hand_vel=[], ax=None, scatter_args=
     
     return sc
 
-def plot_sm_tangent_angle(trialtime=[],cursor_vel=[],hand_vel=[],ax=None,scatter_args=dict(),**kwargs):
+def plot_sm_tangent_angle(trialtime=[],cursor_vel=[],hand_vel=[],ax=None,clear_ax=True,scatter_args=dict(),**kwargs):
     if ax is None:
         ax = plt.gca()
         
+    if clear_ax is True:
+        ax.clear()
+
     # plot out guidance lines for tangent angle interpretation
     ax.plot([0,6],[-90,-90],'--k')
     ax.plot([0,6],[90,90],'--k')
@@ -93,10 +102,13 @@ def plot_sm_tangent_angle(trialtime=[],cursor_vel=[],hand_vel=[],ax=None,scatter
     
     return sc
 
-def plot_sm_tangent_magnitude(trialtime=[],cursor_vel=np.array([]),hand_vel=np.array([]),ax=None,scatter_args=dict(),**kwargs):
+def plot_sm_tangent_magnitude(trialtime=[],cursor_vel=np.array([]),hand_vel=np.array([]),ax=None,clear_ax=True,scatter_args=dict(),**kwargs):
     if ax is None:
         ax = plt.gca()
         
+    if clear_ax is True:
+        ax.clear()
+
     # sensorimotor tangent magnitude
     sc = ax.scatter(
         trialtime,
@@ -111,10 +123,13 @@ def plot_sm_tangent_magnitude(trialtime=[],cursor_vel=np.array([]),hand_vel=np.a
     
     return sc
 
-def plot_cst_monitor_instant(cursor_pos=0,hand_pos=0,ax=None,**kwargs):
+def plot_cst_monitor_instant(cursor_pos=0,hand_pos=0,ax=None,clear_ax=True,**kwargs):
     if ax is None:
         ax = plt.gca()
         
+    if clear_ax is True:
+        ax.clear()
+
     ax.fill_between(
         [-50,50],
         0,y2=2,
@@ -130,9 +145,15 @@ def plot_cst_monitor_instant(cursor_pos=0,hand_pos=0,ax=None,**kwargs):
     
     return cursor_sc,hand_sc
 
-def plot_cst_traces(trialtime=[],cursor_pos=[],hand_pos=[],ax=None,flipxy=False,**kwargs):
+def plot_cst_traces(trialtime=None,cursor_pos=np.array([]),hand_pos=np.array([]),ax=None,clear_ax=True,flipxy=False,**kwargs):
     if ax is None:
         ax = plt.gca()
+        
+    if clear_ax is True:
+        ax.clear()
+
+    if trialtime is None:
+        trialtime=np.arange(hand_pos.shape[0])
         
     if flipxy:
         ax.plot([0,0],[0,6],'-k')

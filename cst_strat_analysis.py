@@ -52,30 +52,44 @@ cmap = gradient_cmap(colors)
 save_figures = False
 
 # %%
-# filename = '/data/raeed/project-data/smile/cst-gainlag/library/python/Ford_20180618_COCST_TD.mat'
-filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/Ford_20180618_COCST_TD.mat'
+file_info = {
+    'monkey': 'Earl',
+    'session_date': '20190716'
+}
+filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/{monkey}_{session_date}_COCST_TD.mat'.format(**file_info)
 td = cst.load_clean_data(filename)
 td.set_index('trial_id',inplace=True)
 
 # %%
-N_iters = 50
-num_states = 4
-obs_dim = 1
-input_dims = 3
+td_cst = td.loc[td['task']=='CST',:].copy()
+td_cst = pyaldata.restrict_to_interval(
+    td_cst,
+    start_point_name='idx_cstStartTime',
+    end_point_name='idx_cstEndTime',
+    reset_index=False
+)
+td_cst = pyaldata.combine_time_bins(td_cst,20)
 
-lambda_to_use = 3.3
-td_lambda = td[td['lambda']==lambda_to_use]
-# td_lambda = td
+N_iters = 50
+num_states = 3
+obs_dim = 1
+input_dims = 1
+
+# lambda_to_use = 3.3
+# td_lambda = td[td['lambda']==lambda_to_use]
+td_lambda = td_cst
 # control_obs = [el[:,0][:,None] for el in td_lambda['hand_vel']]
 control_obs = [el[:,0][:,None] for el in td_lambda['hand_vel']]
-vis_input = [np.column_stack((pos[:,0],vel[:,0],hand_pos[:,0]))
-            for pos,vel,hand_pos in zip(td_lambda['cursor_pos_shift'],td_lambda['cst_cursor_command_shift'],td_lambda['hand_pos'])]
+control_in = [pos[:,0][:,None] for pos in td_lambda['rel_hand_pos']]
+# vis_input = [np.column_stack((pos[:,0],vel[:,0],hand_pos[:,0]))
+#             for pos,vel,hand_pos in zip(td_lambda['cursor_pos'],td_lambda['cst_cursor_command'],td_lambda['hand_pos'])]
 
 # hand_vel = A_{z_t}*(hand_vel_{t-1}) + V_{z_t}*[cursor_pos_shift;cursor_vel_shift;hand_pos] + b_{z_t} + \omega
-hmm = ssm.HMM(num_states, obs_dim, M=input_dims, observations="input_driven_gaussian",transitions='recurrent_only')
+hmm = ssm.HMM(num_states, obs_dim, M=input_dims, observations="gaussian")
 # hmm = ssm.HMM(num_states, obs_dim, M=input_dims, observations="autoregressive",transitions='recurrent_only',observation_kwargs=dict(l2_penalty_A=1e10))
+# hmm = ssm.HMM(num_states, obs_dim, observations="autoregressive",transitions='sticky')
 
-hmm_lls = hmm.fit(control_obs, inputs=vis_input, method="em", num_iters=N_iters, init_method="kmeans") #can also use random for initialization method, which sometimes works better
+hmm_lls = hmm.fit(control_obs, inputs=control_in, method="em", num_iters=N_iters, init_method="kmeans") #can also use random for initialization method, which sometimes works better
 
 # make plots
 plt.plot(hmm_lls, label="EM")
@@ -90,16 +104,18 @@ hmm.permute([1,0,3,2])
 
 # %%
 from ipywidgets import interact
+# %matplotlib notebook
 
-@interact(trial_id=list(td.index),scale=(10,60),color_by_state=False)
+@interact(trial_id=list(td_cst.index),scale=(10,60),color_by_state=False)
 def plot_cst_trial(trial_id,scale,color_by_state):
-    trial = td.loc[trial_id,:]
+    trial = td_cst.loc[trial_id,:].copy()
+    trial['trialtime'] = trial['bin_size']*np.arange(trial['hand_pos'].shape[0])
     data = trial['hand_vel'][:,0][:,None]
-    inpt = np.column_stack((trial['cursor_pos_shift'][:,0],trial['cst_cursor_command_shift'][:,0],trial['hand_pos'][:,0]))
+#     inpt = np.column_stack((trial['cursor_pos_shift'][:,0],trial['cst_cursor_command_shift'][:,0],trial['hand_pos'][:,0]))
     
     # Plot the true and inferred discrete states
-    hmm_z = hmm.most_likely_states(data,input=inpt)
-    posterior_probs = hmm.expected_states(data=data, input=inpt)[0]
+    hmm_z = hmm.most_likely_states(data,input=trial['rel_hand_pos'][:,0][:,None])
+    posterior_probs = hmm.expected_states(data=data)[0]
     
     if color_by_state:
         sm_scatter_args = {
@@ -118,8 +134,8 @@ def plot_cst_trial(trial_id,scale,color_by_state):
     # old way
     trace_fig,trace_ax = plt.subplots(3,1,figsize=(7.5,5),sharex=True)
     trace_ax[0].plot([0,6],[0,0],'-k')
-    trace_ax[0].plot(trial['trialtime'],trial['cursor_pos'][:,0],'-b')
-    trace_ax[0].plot(trial['trialtime'],trial['hand_pos'][:,0],'-r')
+    trace_ax[0].plot(trial['trialtime'],trial['rel_cursor_pos'][:,0],'-b')
+    trace_ax[0].plot(trial['trialtime'],trial['rel_hand_pos'][:,0],'-r')
     trace_ax[0].set_xlim(0,6)
     trace_ax[0].set_xticks([])
     trace_ax[0].set_ylim(-scale,scale)
@@ -148,28 +164,38 @@ def plot_cst_trial(trial_id,scale,color_by_state):
     sns.despine(ax=trace_ax[2],left=False,trim=True)
     
     sm_fig,sm_ax = plt.subplots(1,2,figsize=(10,5))
-    cst.plot_sensorimotor(trial,ax=sm_ax[0],scatter_args=sm_scatter_args)
+    cst.plot_sensorimotor(
+        cursor_pos=trial['rel_cursor_pos'][:,0],
+        hand_pos=trial['rel_hand_pos'][:,0],
+        ax=sm_ax[0],
+        scatter_args=sm_scatter_args
+    )
     sm_ax[0].set_xlim(-scale,scale)
     sm_ax[0].set_ylim(-scale,scale)
-    cst.plot_sensorimotor_velocity(trial,ax=sm_ax[1],scatter_args=sm_scatter_args)
+    cst.plot_sensorimotor_velocity(
+        cursor_vel=trial['cst_cursor_command'][:,0],
+        hand_vel=trial['hand_vel'][:,0],
+        ax=sm_ax[1],
+        scatter_args=sm_scatter_args
+    )
     
-    cst.plot_sm_tangent_polar(trial,scatter_args=sm_scatter_args)
+#     cst.plot_sm_tangent_polar(trial,scatter_args=sm_scatter_args)
     
-#     fig,ax = plt.subplots(num_states+1,1,figsize=(6,6),sharex=True,sharey=True)
-#     ax[0].hist(
-#         trial['hand_vel'][:,0],
-#         bins=np.linspace(trial['hand_vel'][:,0].min(),trial['hand_vel'][:,0].max(),30),
-#         color='k')
-#     for statenum in range(num_states):
-#         ax[statenum+1].hist(
-#             trial['hand_vel'][hmm_z==statenum,0],
-#             bins=np.linspace(trial['hand_vel'][:,0].min(),trial['hand_vel'][:,0].max(),30),
-#             color=colors[statenum])
-#         sns.despine()
+    fig,ax = plt.subplots(num_states+1,1,figsize=(6,6),sharex=True,sharey=True)
+    ax[0].hist(
+        trial['hand_vel'][:,0],
+        bins=np.linspace(trial['hand_vel'][:,0].min(),trial['hand_vel'][:,0].max(),30),
+        color='k')
+    for statenum in range(num_states):
+        ax[statenum+1].hist(
+            trial['hand_vel'][hmm_z==statenum,0],
+            bins=np.linspace(trial['hand_vel'][:,0].min(),trial['hand_vel'][:,0].max(),30),
+            color=colors[statenum])
+        sns.despine()
         
-#     ax[0].set_title('Hand velocity distribution per state')
-#     ax[-1].set_xlabel('Hand velocity (mm/s)')
-#     ax[-1].set_ylabel('Number of 1 ms bins')
+    ax[0].set_title('Hand velocity distribution per state')
+    ax[-1].set_xlabel('Hand velocity (mm/s)')
+    ax[-1].set_ylabel('Number of 1 ms bins')
 
 
 # %%
