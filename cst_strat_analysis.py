@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.4
+#       jupytext_version: 1.12.0
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -53,8 +53,8 @@ save_figures = False
 
 # %%
 file_info = {
-    'monkey': 'Earl',
-    'session_date': '20190716'
+    'monkey': 'Ford',
+    'session_date': '20180618'
 }
 filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/{monkey}_{session_date}_COCST_TD.mat'.format(**file_info)
 td = cst.load_clean_data(filename)

@@ -3,6 +3,7 @@ import pyaldata
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib as mpl
+# from .plot import plot_sensorimotor
 
 def plot_hold_move_speed(trial,fig=None,max_speed=None,hold_thresh=None,hold_slice_fun=None,move_slice_fun=None):
     if hold_slice_fun is None:
@@ -24,6 +25,7 @@ def plot_hold_move_speed(trial,fig=None,max_speed=None,hold_thresh=None,hold_sli
 
     gs = mpl.gridspec.GridSpec(2,3,width_ratios=(4,1,1))
     pos_ax = fig.add_subplot(gs[0,0])
+    sm_ax = fig.add_subplot(gs[0,1:])
     speed_ax = fig.add_subplot(gs[1,0],sharex=pos_ax)
     hold_hist_ax = fig.add_subplot(gs[1,1],sharey=speed_ax)
     move_hist_ax = fig.add_subplot(gs[1,2],sharey=speed_ax)
@@ -91,17 +93,19 @@ def plot_hold_move_speed(trial,fig=None,max_speed=None,hold_thresh=None,hold_sli
     pos_ax.plot([-move_time,end_time-move_time],[0,0],'-k')
     pos_ax.plot(
         np.arange(0,move_time,bin_size)-move_time,
-        trial['rel_hand_pos'][hold_slice_fun(trial),0],
+        trial['hand_pos'][hold_slice_fun(trial),0],
         c='k',
     )
     pos_ax.plot(
         bin_size*np.arange(move_sig.shape[0]),
-        trial['rel_hand_pos'][move_slice_fun(trial),0],
+        trial['hand_pos'][move_slice_fun(trial),0],
         c='r',
     )
     pos_ax.set_ylim(-35,35)
     pos_ax.set_ylabel('Hand position')
     sns.despine(ax=pos_ax,trim=True)
+
+    # cst.plot_sensorimotor
 
 def find_move_thresh(trial,hold_slice_fun=None):
     if hold_slice_fun is None:
