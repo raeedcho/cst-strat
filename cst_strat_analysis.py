@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.12.0
+#       jupytext_version: 1.13.1
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -21,6 +21,7 @@ import pandas as pd
 import cst
 import pyaldata
 import scipy
+import sklearn
 
 import ssm
 from ssm.util import find_permutation
@@ -53,14 +54,15 @@ save_figures = False
 
 # %%
 file_info = {
-    'monkey': 'Ford',
-    'session_date': '20180618'
+    'monkey': 'Earl',
+    'session_date': '20190716'
 }
 filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/{monkey}_{session_date}_COCST_TD.mat'.format(**file_info)
 td = cst.load_clean_data(filename)
 td.set_index('trial_id',inplace=True)
 
 # %%
+# restrict to time points of interest
 td_cst = td.loc[td['task']=='CST',:].copy()
 td_cst = pyaldata.restrict_to_interval(
     td_cst,
@@ -68,28 +70,38 @@ td_cst = pyaldata.restrict_to_interval(
     end_point_name='idx_cstEndTime',
     reset_index=False
 )
-td_cst = pyaldata.combine_time_bins(td_cst,20)
+td_cst = pyaldata.combine_time_bins(td_cst,10)
+
+# %%
+## Get smoothed pca
+td_cst['M1_rates'] = [pyaldata.smooth_data(spikes/bin_size,dt=bin_size,std=0.05) 
+                  for spikes,bin_size in zip(td_cst['M1_spikes'],td_cst['bin_size'])]
+M1_pca_model = sklearn.decomposition.PCA()
+td_cst = pyaldata.dim_reduce(td_cst,M1_pca_model,'M1_rates','M1_pca')
+
+# %%
+# lambda_to_use = 3.3
+# td_lambda = td[td['lambda']==lambda_to_use]
+# td_lambda = td_cst
+# control_obs = [el[:,0][:,None] for el in td_lambda['hand_vel']]
+hmm_obs = [el[:,0][:,None] for el in td_cst['hand_vel']]
+# hmm_input = [pos[:,0][:,None] for pos in td_cst['rel_hand_pos']]
+# hmm_input = [np.column_stack((pos[:,0],vel[:,0],hand_pos[:,0]))
+#             for pos,vel,hand_pos in zip(td_lambda['cursor_pos'],td_lambda['cst_cursor_command'],td_lambda['hand_pos'])]
 
 N_iters = 50
 num_states = 3
 obs_dim = 1
-input_dims = 1
-
-# lambda_to_use = 3.3
-# td_lambda = td[td['lambda']==lambda_to_use]
-td_lambda = td_cst
-# control_obs = [el[:,0][:,None] for el in td_lambda['hand_vel']]
-control_obs = [el[:,0][:,None] for el in td_lambda['hand_vel']]
-control_in = [pos[:,0][:,None] for pos in td_lambda['rel_hand_pos']]
-# vis_input = [np.column_stack((pos[:,0],vel[:,0],hand_pos[:,0]))
-#             for pos,vel,hand_pos in zip(td_lambda['cursor_pos'],td_lambda['cst_cursor_command'],td_lambda['hand_pos'])]
+input_dims = 0
 
 # hand_vel = A_{z_t}*(hand_vel_{t-1}) + V_{z_t}*[cursor_pos_shift;cursor_vel_shift;hand_pos] + b_{z_t} + \omega
-hmm = ssm.HMM(num_states, obs_dim, M=input_dims, observations="gaussian")
+hmm = ssm.HMM(num_states, obs_dim, M=input_dims, observations="gaussian",transitions="standard")
 # hmm = ssm.HMM(num_states, obs_dim, M=input_dims, observations="autoregressive",transitions='recurrent_only',observation_kwargs=dict(l2_penalty_A=1e10))
 # hmm = ssm.HMM(num_states, obs_dim, observations="autoregressive",transitions='sticky')
 
-hmm_lls = hmm.fit(control_obs, inputs=control_in, method="em", num_iters=N_iters, init_method="kmeans") #can also use random for initialization method, which sometimes works better
+# hmm_lls = hmm.fit(hmm_obs, inputs=hmm_input, method="em", num_iters=N_iters, init_method="kmeans") #can also use random for initialization method, which sometimes works better
+hmm_lls = hmm.fit(hmm_obs, method="em", num_iters=N_iters, init_method="kmeans") #can also use random for initialization method, which sometimes works better
+
 
 # make plots
 plt.plot(hmm_lls, label="EM")
@@ -99,23 +111,29 @@ plt.legend(loc="lower right")
 plt.show()
 
 # %%
-# permute states to keep things consistent
-hmm.permute([1,0,3,2])
+# permute states to keep things consistent, order states by average velocities
+state_order = np.argsort(np.squeeze(hmm.observations.mus))
+hmm.permute(state_order)
+
+# %%
+# insert hmm most likely states into trialdata
+td_cst['hmm_state'] = [hmm.most_likely_states(vel[:,0][:,None],input=pos[:,0][:,None])
+                       for vel,pos in zip(td_cst['hand_vel'],td_cst['rel_hand_pos'])]
 
 # %%
 from ipywidgets import interact
 # %matplotlib notebook
 
-@interact(trial_id=list(td_cst.index),scale=(10,60),color_by_state=False)
+@interact(trial_id=list(td_cst.index),scale=(10,60),color_by_state=True)
 def plot_cst_trial(trial_id,scale,color_by_state):
     trial = td_cst.loc[trial_id,:].copy()
-    trial['trialtime'] = trial['bin_size']*np.arange(trial['hand_pos'].shape[0])
+    trial['trialtime'] = trial['bin_size']*np.arange(trial['rel_hand_pos'].shape[0])
     data = trial['hand_vel'][:,0][:,None]
 #     inpt = np.column_stack((trial['cursor_pos_shift'][:,0],trial['cst_cursor_command_shift'][:,0],trial['hand_pos'][:,0]))
     
     # Plot the true and inferred discrete states
-    hmm_z = hmm.most_likely_states(data,input=trial['rel_hand_pos'][:,0][:,None])
-    posterior_probs = hmm.expected_states(data=data)[0]
+    hmm_z = trial['hmm_state']
+    posterior_probs = hmm.expected_states(data=data, input=trial['rel_hand_pos'])[0]
     
     if color_by_state:
         sm_scatter_args = {
@@ -126,7 +144,7 @@ def plot_cst_trial(trial_id,scale,color_by_state):
         }
     else:
         sm_scatter_args = {
-            'c': trial['trialtime'],
+            'c': 'k',
             'cmap': 'viridis',
             's': 10
         }
@@ -143,12 +161,16 @@ def plot_cst_trial(trial_id,scale,color_by_state):
     trace_ax[0].set_title('$\lambda = {}$'.format(trial['lambda']))
     
     trace_ax[1].plot([0,6],[0,0],'-k')
+#     trace_ax[1].plot(trial['trialtime'],trial['M1_pca'][:,0],'-c')
+#     trace_ax[1].plot(trial['trialtime'],trial['M1_pca'][:,1],'-m')
+#     trace_ax[1].plot(trial['trialtime'],trial['M1_pca'][:,2],'-y')
+#     trace_ax[1].plot(trial['trialtime'],trial['M1_pca'][:,3],'-k')
     trace_ax[1].plot(trial['trialtime'],trial['cst_cursor_command'][:,0],'-b')
     trace_ax[1].plot(trial['trialtime'],trial['hand_vel'][:,0],'-r')
     trace_ax[1].set_xlim(0,6)
     trace_ax[1].set_xticks([])
     trace_ax[1].set_ylim(-100,100)
-    trace_ax[1].set_ylabel('Cursor or hand velocity')
+    trace_ax[1].set_ylabel('Neural state')
     
     
     for k in range(num_states):
@@ -159,6 +181,7 @@ def plot_cst_trial(trial_id,scale,color_by_state):
     trace_ax[2].set_xlim(0,6)
     trace_ax[2].set_xlabel('Time (s)')
     trace_ax[2].set_ylabel("p(state)")
+    
     sns.despine(ax=trace_ax[0],left=False,bottom=True,trim=True)
     sns.despine(ax=trace_ax[1],left=False,bottom=True,trim=True)
     sns.despine(ax=trace_ax[2],left=False,trim=True)
@@ -178,6 +201,11 @@ def plot_cst_trial(trial_id,scale,color_by_state):
         ax=sm_ax[1],
         scatter_args=sm_scatter_args
     )
+#     sm_ax[2].scatter(
+#         trial['M1_pca'][:,0],
+#         trial['M1_pca'][:,1],
+#         **sm_scatter_args
+#     )
     
 #     cst.plot_sm_tangent_polar(trial,scatter_args=sm_scatter_args)
     
@@ -208,13 +236,9 @@ plt.plot(td_lambda.loc[159,'hand_acc'][100:5000,0])
 # td_lambda.loc[159,'cursor_vel']
 
 # %%
-import importlib
-importlib.reload(cst)
-
-# %%
 for i in range(num_states):
     plt.subplot(4,2,2*i+2)
-    plt.imshow(hmm.observations.As[i],aspect='auto',cmap='RdBu',clim=[-1,1])
+    plt.imshow(hmm.observations.mus[i],aspect='auto',cmap='RdBu',clim=[-1,1])
     if i==0:
         plt.title('Predicted')
     plt.ylabel('State'+str(i))
@@ -270,7 +294,8 @@ print(hmm.transitions.r)
 print(hmm.transitions.Ws)
 
 # %%
-hmm.transitions.transition_matrices(np.ones((3,1)),input=np.zeros((3,2)),mask=None,tag=None)
+fig,ax = plt.subplots(1,1)
+ax.imshow(np.squeeze(hmm.transitions.transition_matrices(np.ones((3,1)),input=np.zeros((3,2)),mask=None,tag=None)))
 
 # %%
 for trial_id,trial in td_lambda.iterrows():
@@ -392,3 +417,52 @@ ax[0].set_title('Hand velocity distribution per state')
 ax[-1].set_xlabel('Hand velocity (mm/s)')
 ax[-1].set_ylabel('Number of 1 ms bins')
 # plt.savefig(r'/mnt/c/Users/Raeed/Wiki/professional/cabinet/talks/20210420-ncm2021/assets/Ford_20180618_CST_trial159_handvelhist.pdf')
+
+# %%
+# find neural covariance matrices in each state and plot against each other
+full_state_list = pd.Series(np.concatenate(td_cst['hmm_state'].values))
+full_neural_state = pd.DataFrame(np.concatenate(td_cst['M1_rates'].values))
+
+state_corr = [full_neural_state.loc[full_state_list==state,:].corr().values.flatten() for state in range(num_states)]
+state_corr = pd.DataFrame(state_corr).T
+
+pd.plotting.scatter_matrix(state_corr,alpha=0.2)
+
+# check subspace alignment index
+def subspace_alignment(ref_cov,eig_vecs,eig_vals):
+    return np.trace(eig_vecs.T @ ref_cov @ eig_vecs)/sum(eig_vals)
+
+state_covs = [full_neural_state.loc[full_state_list==state,:].cov().values for state in range(num_states)]
+state_eigs = [np.linalg.eig(cov) for cov in state_covs]
+
+align_index = np.zeros((num_states,num_states))
+for ref_state in range(num_states):
+    for check_state in range(num_states):
+        align_index[ref_state,check_state] = subspace_alignment(
+            state_covs[ref_state],
+            state_eigs[check_state][1][:,0:10],
+            state_eigs[check_state][0][0:10]
+        )
+        
+## Answers to these questions--neural manifold is quite aligned across all states
+
+# %%
+# What does the neural repertoire look like during the "wait" state?
+M1_hold_pca_model = sklearn.decomposition.PCA(n_components=10)
+M1_hold_pca_model.fit(full_neural_state.loc[full_state_list==1,:].values)
+
+hold_neural_state = M1_hold_pca_model.transform(full_neural_state.loc[full_state_list==1,:].values)
+
+fig,ax = plt.subplots()
+@interact(trial_id = list(td_cst.index))
+def plot_hold_neural_state(trial_id):
+    hold_neural_state = M1_hold_pca_model.transform(td_cst.loc[trial_id,'M1_rates'])
+    ax.clear()
+    ax.scatter(
+        hold_neural_state[:,0],
+        hold_neural_state[:,1],
+        alpha=0.2,
+        c=td_cst.loc[trial_id,'hmm_state'],
+        cmap=cmap,
+        norm=mpl.colors.Normalize(vmin=0,vmax=len(color_names)-1)
+    )
