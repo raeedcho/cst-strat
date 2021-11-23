@@ -93,12 +93,12 @@ def plot_hold_move_speed(trial,fig=None,max_speed=None,hold_thresh=None,hold_sli
     pos_ax.plot([-move_time,end_time-move_time],[0,0],'-k')
     pos_ax.plot(
         np.arange(0,move_time,bin_size)-move_time,
-        trial['hand_pos'][hold_slice_fun(trial),0],
+        trial['rel_hand_pos'][hold_slice_fun(trial),0],
         c='k',
     )
     pos_ax.plot(
         bin_size*np.arange(move_sig.shape[0]),
-        trial['hand_pos'][move_slice_fun(trial),0],
+        trial['rel_hand_pos'][move_slice_fun(trial),0],
         c='r',
     )
     pos_ax.set_ylim(-35,35)
