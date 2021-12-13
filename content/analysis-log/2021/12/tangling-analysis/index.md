@@ -2,8 +2,8 @@
 # weight: 2021121401
 title: CO-CST tangling analysis
 date: "2021-12-14"
-mathjax: true
-tags:
+katex: true
+categories:
 - dynamics
 - neural
 - population
