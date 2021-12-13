@@ -1,4 +1,4 @@
-baseURL = 'http://example.org/'
+baseURL = 'https://raeedcho.github.io/cst-strat'
 languageCode = 'en-us'
 title = 'CST Strategy Project Notes'
 theme = "hugo-book"
