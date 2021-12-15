@@ -1,0 +1,64 @@
+baseURL: 'https://raeedcho.github.io/cst-strat'
+languageCode: 'en-us'
+title: 'CST Strategy Project Notes'
+theme: "hugo-tania"
+enableEmoji: true
+
+params:
+  # Emoji will show before the blog title on site navbar.
+  titleEmoji:
+
+  # Logo will show before the blog title on site navbar.
+  titleLogo:
+  
+  # Enable float footnotes.
+  # Default to true
+  enableFootnotes: true
+  
+  siteName: "CST Strategy project notes"
+  siteDesc: "Notes for CST project"
+  author: "Raeed Chowdhury"
+
+
+  # Limit how many categories filter show above search input.
+  # Default to 5
+  maxCategoryToShow: 10
+
+  # Show your socail information with icon on index bio with `_index.md` content.
+  socialOptions:
+    dev-to:
+    email:
+    facebook:
+    github:
+    instagram:
+    linkedin:
+    medium:
+    stack-overflow:
+    steam:
+    telegram:
+    twitter:
+    twitch:
+    whatsapp:
+  
+  # Comments settings
+  comments:
+    enabled: false
+    provider:
+
+menu:
+  header:
+    - name: Analysis brainstorming
+      url: "/neural-analyses/"
+    - name: Analysis log
+      url: "/analysis-log/"
+
+markup:
+  highlight:
+    noClasses: false
+    lineNos: true
+  goldmark:
+    renderer:
+      unsafe: true
+
+outputs:
+  home: ["HTML", "RSS", "JSON"]

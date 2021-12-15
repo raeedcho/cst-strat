@@ -1,9 +1,8 @@
 ---
-weight: 2021121002
+# weight: 2021121002
 title: CO-CST hold time analysis
+date: 2021-12-10
 ---
-
-# 2021/12/10 Hold time neural analysis
 
 - :question: Are there dimensions of neural activity that separate CO and CST?
     - :heavy_check_mark: Hold time analysis says possibly in the very early part of the movement, but perhaps this is due to kinematic differences?

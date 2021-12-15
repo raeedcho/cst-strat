@@ -1,9 +1,8 @@
 ---
-weight: 2021121401
+# weight: 2021121401
 title: CO-CST tangling analysis
+date: "2021-12-14"
 ---
-
-# 2021/12/13 Tangling analysis
 
 ## Overall task tangling
 
@@ -66,4 +65,6 @@ This representation of the trial is the same as the CO plots, with the exception
 
 It's hard to say anything for sure from these plots, but it does seem like larger movements in general have lower tangling. This might be due to the neural state reaching out from the tangled ball in the center (right plot), but it's not entirely clear. We maybe have to come up with some submovement decomposition over which to average neural traces before we can interpret tangling in this task.
 
-Find more figs/trials folder.
+Here's a slideshow of trials:
+
+{{< slide "figs/trials"  >}}

@@ -1,0 +1,49 @@
+{{ $fadein := 2 }}
+{{ $visible := 4 }}
+{{ $param := .Get 0 }}
+{{ $localFolder := printf "content/%s%s" .Page.Dir $param }}
+
+{{ $files := sort (readDir $localFolder) }}
+{{ $numberOfFiles := len $files }}
+{{ $animationDuration := mul (add $fadein $visible) $numberOfFiles }}
+
+<div class="slider">
+{{ range $files }}
+{{ $imgsrc := print $param "/" .Name}}
+<img src={{ $imgsrc}}>
+{{ end }}
+</div>
+
+<style>
+    .slider {
+        padding-bottom: 70%;
+        width: 100%;
+        height: 0;
+        position: relative;
+    }    
+    .slider img {
+        width: 100%;
+        height: auto;
+        position: absolute;
+        opacity: 0;
+        animation: slide infinite {{$animationDuration}}s;
+    }
+
+    {{ $x := div 100.0 $animationDuration }}
+    {{ $p0 := 0 }}
+    {{ $p1 := mul $x $fadein }}
+    {{ $p2 := mul $x (add $fadein $visible) }}
+    {{ $p3 := mul $x (add (add $fadein $visible) $fadein) }}
+
+    @keyframes slide {
+        {{ $p0 }}% { opacity: 0; }
+        {{ $p1 }}% { opacity: 1; }
+        {{ $p2 }}% { opacity: 1; }
+        {{ $p3 }}% { opacity: 0; }
+    }
+
+    {{ range $index, $value := $files }}
+    {{ $delay := mul (add $fadein $visible) $index }}
+    .slider img:nth-child({{add $index 1}}){animation-delay:{{$delay}}s;}
+    {{ end }}
+</style>

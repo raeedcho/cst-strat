@@ -1,8 +1,8 @@
 ---
-weight: 2021120901
+# weight: 2021120901
 title: CO-CST covariance analysis
+date: "2021-12-09"
 ---
-# 2021/12/09 CO-CST covariance analysis
 
 For neural covariance analysis, we have a number of possible questions:
 

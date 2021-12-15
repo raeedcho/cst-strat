@@ -1,9 +1,8 @@
 ---
-weight: 2021120902
+# weight: 2021120902
 title: CO Condition independent signal analysis
+date: "2021-12-09"
 ---
-
-# 2021/12/09 Condition independent signal analysis
 
 :question: Is there a neural "go" signal underlying intermittent movements/control?
 
