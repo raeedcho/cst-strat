@@ -1,0 +1,105 @@
+<!doctype html><html lang=en dir=ltr>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=description content="2021/12/09 Condition independent signal analysis #  ❓ Is there a neural &ldquo;go&rdquo; signal underlying intermittent movements/control?
+One result out of the literature recently has been that there are condition-independent signals (CIS) in neural activity that don&rsquo;t relate to the exact movement being performed, but rather as a signal of whether a movement is being performed at all (see Kaufman et al. 2016, Rouse et al. 2018, Zimnik and Churchland 2021).">
+<meta name=theme-color content="#FFFFFF">
+<meta name=color-scheme content="light dark"><meta property="og:title" content="CO Condition independent signal analysis">
+<meta property="og:description" content="2021/12/09 Condition independent signal analysis #  ❓ Is there a neural &ldquo;go&rdquo; signal underlying intermittent movements/control?
+One result out of the literature recently has been that there are condition-independent signals (CIS) in neural activity that don&rsquo;t relate to the exact movement being performed, but rather as a signal of whether a movement is being performed at all (see Kaufman et al. 2016, Rouse et al. 2018, Zimnik and Churchland 2021).">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://example.org/neural-analyis-notes/20211209-cis-analysis/"><meta property="article:section" content="neural-analyis-notes">
+<title>CO Condition independent signal analysis | CST Strategy Project Notes</title>
+<link rel=manifest href=/manifest.json>
+<link rel=icon href=/favicon.png type=image/x-icon>
+<link rel=stylesheet href=/book.min.95d69eb6bad8b9707ff2b5d8d9e31ce70a1b84f2ed7ffaf665ffcf00aa7993bd.css integrity="sha256-ldaetrrYuXB/8rXY2eMc5wobhPLtf/r2Zf/PAKp5k70=" crossorigin=anonymous>
+<script defer src=/flexsearch.min.js></script>
+<script defer src=/en.search.min.dc816db093bb4ddb54659068f360daf57abfce9dc12b21bdb96abe6875a0eac3.js integrity="sha256-3IFtsJO7TdtUZZBo82Da9Xq/zp3BKyG9uWq+aHWg6sM=" crossorigin=anonymous></script>
+</head>
+<body dir=ltr>
+<input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control>
+<main class="container flex">
+<aside class=book-menu>
+<div class=book-menu-content>
+<nav>
+<h2 class=book-brand>
+<a class="flex align-center" href=/><span>CST Strategy Project Notes</span>
+</a>
+</h2>
+<div class=book-search>
+<input type=text id=book-search-input placeholder=Search aria-label=Search maxlength=64 data-hotkeys=s/>
+<div class="book-search-spinner hidden"></div>
+<ul id=book-search-results></ul>
+</div>
+<ul>
+<li>
+<a href=http://example.org/neural-analyis-notes/>Possible neural analyses to compare CO and CST</a>
+<ul>
+<li>
+<a href=http://example.org/neural-analyis-notes/20211209-covariance-analysis/>CO-CST covariance analysis</a>
+</li>
+<li>
+<a href=http://example.org/neural-analyis-notes/20211209-cis-analysis/ class=active>CO Condition independent signal analysis</a>
+</li>
+<li>
+<a href=http://example.org/neural-analyis-notes/20211210-engagement-analysis/>CST neural engagement</a>
+</li>
+<li>
+<a href=http://example.org/neural-analyis-notes/20211210-hold-analysis/>CO-CST hold time analysis</a>
+</li>
+<li>
+<a href=http://example.org/neural-analyis-notes/20211214-tangling-analysis/>CO-CST tangling analysis</a>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+<script>(function(){var a=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(b){localStorage.setItem("menu.scrollTop",a.scrollTop)}),a.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+</div>
+</aside>
+<div class=book-page>
+<header class=book-header>
+<div class="flex align-center justify-between">
+<label for=menu-control>
+<img src=/svg/menu.svg class=book-icon alt=Menu>
+</label>
+<strong>CO Condition independent signal analysis</strong>
+<label for=toc-control>
+<img src=/svg/toc.svg class=book-icon alt="Table of Contents">
+</label>
+</div>
+<aside class="hidden clearfix">
+<nav id=TableOfContents></nav>
+</aside>
+</header>
+<article class=markdown><h1 id=20211209-condition-independent-signal-analysis>
+2021/12/09 Condition independent signal analysis
+<a class=anchor href=#20211209-condition-independent-signal-analysis>#</a>
+</h1>
+<p>❓ Is there a neural &ldquo;go&rdquo; signal underlying intermittent movements/control?</p>
+<p>One result out of the literature recently has been that there are condition-independent signals (CIS) in neural activity that don&rsquo;t relate to the exact movement being performed, but rather as a signal of whether a movement is being performed at all (see <a href=https://doi.org/10.1523/eneuro.0085-16.2016>Kaufman et al. 2016</a>, <a href=https://doi.org/10.1101/453746>Rouse et al. 2018</a>, <a href=https://doi.org/10.1038/s41593-021-00798-5>Zimnik and Churchland 2021</a>). The signal seems like a kind of neural &ldquo;go&rdquo; signal&ndash;it&rsquo;s one thing we might be able to look for in CST as a marker of corrective or intermittent movements.</p>
+<p>First, though, we need to see if we can find the CIS in CO on a single trial level&ndash;most, if not all previous work with the CIS has been using trial-averaged data, and since we can&rsquo;t readily do that with CST, we&rsquo;d like to be able to find the CIS in single CO trials.</p>
+<p>The results are unfortunately mostly negative&ndash;though the CIS dimensions are clearly there in a trial average, it&rsquo;s very difficult to see on single trials (see figures below).</p>
+<p><img src=figs/20211203_Earl20190716_CO_CISdimactivity.png alt="Earl CIS activity"></p>
+<p><img src=figs/20211203_Ford20180627_CO_CISdimactivity.png alt="Ford CIS activity"></p>
+<p>So if we want to pull out a CIS from CST trials, we&rsquo;ll need to find a way to average across movements. Perhaps we could take the first 500ms of each CST trial, or we could run some submovement decomposition to pull out hold and move states.</p>
+</article>
+<footer class=book-footer>
+<div class="flex flex-wrap justify-between">
+</div>
+<script>(function(){function a(c){const a=window.getSelection(),b=document.createRange();b.selectNodeContents(c),a.removeAllRanges(),a.addRange(b)}document.querySelectorAll("pre code").forEach(b=>{b.addEventListener("click",function(c){a(b.parentElement),navigator.clipboard&&navigator.clipboard.writeText(b.parentElement.textContent)})})})()</script>
+</footer>
+<div class=book-comments>
+</div>
+<label for=menu-control class="hidden book-menu-overlay"></label>
+</div>
+<aside class=book-toc>
+<div class=book-toc-content>
+<nav id=TableOfContents></nav>
+</div>
+</aside>
+</main>
+</body>
+</html>

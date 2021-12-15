@@ -1,0 +1,117 @@
+<!doctype html><html lang=en dir=ltr>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=description content="2021/12/10 Hold time neural analysis #   ❓ Are there dimensions of neural activity that separate CO and CST?  ✔️ Hold time analysis says possibly in the very early part of the movement, but perhaps this is due to kinematic differences?    Gallego et al. 2018 showed that M1 neural activity underlying multiple tasks shared some dimensions of neural activity, but also that there were certain dimensions of activity that separated different tasks.">
+<meta name=theme-color content="#FFFFFF">
+<meta name=color-scheme content="light dark"><meta property="og:title" content="CO-CST hold time analysis">
+<meta property="og:description" content="2021/12/10 Hold time neural analysis #   ❓ Are there dimensions of neural activity that separate CO and CST?  ✔️ Hold time analysis says possibly in the very early part of the movement, but perhaps this is due to kinematic differences?    Gallego et al. 2018 showed that M1 neural activity underlying multiple tasks shared some dimensions of neural activity, but also that there were certain dimensions of activity that separated different tasks.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://example.org/neural-analyis-notes/20211210-hold-analysis/"><meta property="article:section" content="neural-analyis-notes">
+<title>CO-CST hold time analysis | CST Strategy Project Notes</title>
+<link rel=manifest href=/manifest.json>
+<link rel=icon href=/favicon.png type=image/x-icon>
+<link rel=stylesheet href=/book.min.95d69eb6bad8b9707ff2b5d8d9e31ce70a1b84f2ed7ffaf665ffcf00aa7993bd.css integrity="sha256-ldaetrrYuXB/8rXY2eMc5wobhPLtf/r2Zf/PAKp5k70=" crossorigin=anonymous>
+<script defer src=/flexsearch.min.js></script>
+<script defer src=/en.search.min.dc816db093bb4ddb54659068f360daf57abfce9dc12b21bdb96abe6875a0eac3.js integrity="sha256-3IFtsJO7TdtUZZBo82Da9Xq/zp3BKyG9uWq+aHWg6sM=" crossorigin=anonymous></script>
+</head>
+<body dir=ltr>
+<input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control>
+<main class="container flex">
+<aside class=book-menu>
+<div class=book-menu-content>
+<nav>
+<h2 class=book-brand>
+<a class="flex align-center" href=/><span>CST Strategy Project Notes</span>
+</a>
+</h2>
+<div class=book-search>
+<input type=text id=book-search-input placeholder=Search aria-label=Search maxlength=64 data-hotkeys=s/>
+<div class="book-search-spinner hidden"></div>
+<ul id=book-search-results></ul>
+</div>
+<ul>
+<li>
+<a href=http://example.org/neural-analyis-notes/>Possible neural analyses to compare CO and CST</a>
+<ul>
+<li>
+<a href=http://example.org/neural-analyis-notes/20211209-covariance-analysis/>CO-CST covariance analysis</a>
+</li>
+<li>
+<a href=http://example.org/neural-analyis-notes/20211209-cis-analysis/>CO Condition independent signal analysis</a>
+</li>
+<li>
+<a href=http://example.org/neural-analyis-notes/20211210-engagement-analysis/>CST neural engagement</a>
+</li>
+<li>
+<a href=http://example.org/neural-analyis-notes/20211210-hold-analysis/ class=active>CO-CST hold time analysis</a>
+</li>
+<li>
+<a href=http://example.org/neural-analyis-notes/20211214-tangling-analysis/>CO-CST tangling analysis</a>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+<script>(function(){var a=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(b){localStorage.setItem("menu.scrollTop",a.scrollTop)}),a.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+</div>
+</aside>
+<div class=book-page>
+<header class=book-header>
+<div class="flex align-center justify-between">
+<label for=menu-control>
+<img src=/svg/menu.svg class=book-icon alt=Menu>
+</label>
+<strong>CO-CST hold time analysis</strong>
+<label for=toc-control>
+<img src=/svg/toc.svg class=book-icon alt="Table of Contents">
+</label>
+</div>
+<aside class="hidden clearfix">
+<nav id=TableOfContents></nav>
+</aside>
+</header>
+<article class=markdown><h1 id=20211210-hold-time-neural-analysis>
+2021/12/10 Hold time neural analysis
+<a class=anchor href=#20211210-hold-time-neural-analysis>#</a>
+</h1>
+<ul>
+<li>❓ Are there dimensions of neural activity that separate CO and CST?
+<ul>
+<li>✔️ Hold time analysis says possibly in the very early part of the movement, but perhaps this is due to kinematic differences?</li>
+</ul>
+</li>
+</ul>
+<p>Gallego et al. 2018 showed that M1 neural activity underlying multiple tasks shared some dimensions of neural activity, but also that there were certain dimensions of activity that separated different tasks. Though the tasks differed in the impedance of wrist movement (ranging from isometric to freely moving), the tasks were quite comparable: they were all wrist-based tasks with similar trial structure, where the monkey moved a cursor to visually presented targets within a set amount of time.</p>
+<p>If we want to compare CO and CST in the same way, our best bet to start with is to compare neural activity during the hold period, when the instructions and hand kinematics are roughly the same between tasks. Simply plotting the hold time neural activity in the top PCs initially showed that there was a great separability between CO and CST hold-time neural state, despite there not being as much difference in the hand position during the hold time (figures below).</p>
+<p><img src=figs/20211207_Earl20190716_holdactivity_smooth50ms.png alt="Earl hold time activity, smoothed 50ms"></p>
+<p><img src=figs/20211207_Ford20180627_holdactivity_smooth50ms.png alt="Ford hold time activity, smoothed 50ms"></p>
+<p>In both figures, each dot represents the average activity or hand position in one trial, with CO trials in red and CST trials in viridis (blue-green-yellow), with blue corresponding to low lambdas and yellow corresponding to high lambdas.</p>
+<p>This separation was impressive, but I realized that I had mistakenly smoothed the neural activity with a 50ms wide Gaussian kernel before trimming and averaging the data. Because the kernel is non-causal, there was potentially some leakage from the initial movement phase into the apparent hold time activity. Removing the smoothing seemingly removes the easy-to-see separation in the neural space:</p>
+<p><img src=figs/20211207_Earl20190716_holdactivity_nosmooth.png alt="Earl hold time activity, no smoothing"></p>
+<p><img src=figs/20211207_Ford20180627_holdactivity_nosmooth.png alt="Ford hold time activity, no smoothing"></p>
+<p>This is disappointing, but we should note two things:</p>
+<ol>
+<li>There&rsquo;s significant overlap in the first few PCs of neural activity, but that doesn&rsquo;t preclude the existence of a task context dimension of neural activity in a lower variance dimension.</li>
+<li>The fact that such a small change (a 50 ms smoothing kernel) can induce such a large separation in neural activity suggests that even if there&rsquo;s no separation during the hold time, the neural activity separates remarkably quickly after the trial starts. We still need to investigate whether this separation is simply due to a difference in initial kinematics, but it&rsquo;s possible that the early part of the trial is where the neural activity separates based on context.</li>
+</ol>
+<p>So there are still avenues to pursue to extract a task context dimension of neural activity. Perhaps there&rsquo;s even a separation between $\lambdas$ in the initial period of the trial.</p>
+</article>
+<footer class=book-footer>
+<div class="flex flex-wrap justify-between">
+</div>
+<script>(function(){function a(c){const a=window.getSelection(),b=document.createRange();b.selectNodeContents(c),a.removeAllRanges(),a.addRange(b)}document.querySelectorAll("pre code").forEach(b=>{b.addEventListener("click",function(c){a(b.parentElement),navigator.clipboard&&navigator.clipboard.writeText(b.parentElement.textContent)})})})()</script>
+</footer>
+<div class=book-comments>
+</div>
+<label for=menu-control class="hidden book-menu-overlay"></label>
+</div>
+<aside class=book-toc>
+<div class=book-toc-content>
+<nav id=TableOfContents></nav>
+</div>
+</aside>
+</main>
+</body>
+</html>
