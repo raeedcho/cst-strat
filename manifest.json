@@ -1,14 +1,14 @@
 {
   "name": "CST Strategy Project Notes",
   "short_name": "CST Strategy Project Notes",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "/cst-strat/",
+  "scope": "/cst-strat/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "/cst-strat/favicon.svg",
       "sizes": "512x512"
     }
   ]
