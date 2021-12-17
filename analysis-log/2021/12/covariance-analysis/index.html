@@ -82,8 +82,8 @@ By Raeed Chowdhury | <time>December 09, 2021</time>
 </li>
 </ul>
 <p>I examined the first two questions together, during the movement period of both CO and CST (figures below). Important to note: I calculated all of these after softnorming neural activity within each task ($\alpha$=5). No smoothing applied. Applying these techniques without the softnorm gives similar results for variance, though parallel analysis results are noisier (probably due to high variability of a few neurons). Reasonable levels of smoothing doesn&rsquo;t change any of these results much, though I would guess that oversmoothing data would decrease dimensionality.</p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Earl20190716_COCSTmove_vardim_comparison-01.png alt="Earl Movement variance/dimensionality comparison" width=1714 height=1986></p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Ford20180627_COCSTmove_vardim_comparison-01.png alt="Ford Movement variance/dimensionality comparison" width=1714 height=2120></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Earl20190716_COCSTmove_vardim_comparison-01.png alt="Earl Movement variance/dimensionality comparison" width=1714 height=1986></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Ford20180627_COCSTmove_vardim_comparison-01.png alt="Ford Movement variance/dimensionality comparison" width=1714 height=2120></p>
 <h2 id=neural-variance>
 <a href=#neural-variance class=anchor><svg class="icon" aria-hidden="true" focusable="false" height="16" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5.0-3-1.69-3-3.5S2.55 3 4 3h4c1.45.0 3 1.69 3 3.5.0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98.0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98.0-2-1.22-2-2.5.0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45.0 3-1.69 3-3.5S14.5 6 13 6z"/></svg>
 </a>
@@ -97,23 +97,23 @@ Neural dimensionality
 </h2>
 <p>The same plots above show two measures of dimensionality: the participation ratio, which a measure of how flat the eigenspectrum of a covariance matrix is (flat eigenspectrum would have PR equal to the number of neurons), and parallel analysis dimensionality, which constructs a null distribution of eigenspectra by shuffling neural activity independently across time. The upshot is that PR says that the eigenspectra of both tasks are remarkably flat (when neurons are softnormed at least), but PA suggests that both tasks have significant covariance in only a few dimensions. Notably, when evaluated at individual $\lambda$, the PA dimensionality (black solid line) is very similar to the CO dimensionality (red dashed line), while CST dimensionality when evaluated over all $\lambda$ (black dashed line) is notably higher (though unclear if this difference is statistically significant). The most mundane explanation for this difference is that when you add more data, you get higher estimated dimensionality (see Surya Ganguli&rsquo;s work and Ryan Williamson&rsquo;s work). A less mundane explanation might be that you use different, not fully overlapping dimensions of neural activity at different $\lambda$, but this claim seems unlikely.</p>
 <p>Below are some eigenspectra for CO and CST movement-time activity for both monkeys, with 95th percentile null distribution from parallel analysis.</p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Earl20190716_COmove_eigenspectrum_with_PA-01.png alt="Earl CO movement-time eigenspectrum" width=1475 height=720></p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Earl20190716_CSTmove_eigenspectrum_with_PA-01.png alt="Earl CST movement-time eigenspectrum" width=1384 height=721></p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Ford20180627_COmove_eigenspectrum_with_PA-01.png alt="Ford CO movement-time eigenspectrum" width=1780 height=830></p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Ford20180627_CSTmove_eigenspectrum_with_PA-01.png alt="Ford CST movement-time eigenspectrum" width=1828 height=794></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Earl20190716_COmove_eigenspectrum_with_PA-01.png alt="Earl CO movement-time eigenspectrum" width=1475 height=720></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Earl20190716_CSTmove_eigenspectrum_with_PA-01.png alt="Earl CST movement-time eigenspectrum" width=1384 height=721></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Ford20180627_COmove_eigenspectrum_with_PA-01.png alt="Ford CO movement-time eigenspectrum" width=1780 height=830></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Ford20180627_CSTmove_eigenspectrum_with_PA-01.png alt="Ford CST movement-time eigenspectrum" width=1828 height=794></p>
 <h3 id=gpfa-dimensionality-estimation>
 <a href=#gpfa-dimensionality-estimation class=anchor><svg class="icon" aria-hidden="true" focusable="false" height="16" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5.0-3-1.69-3-3.5S2.55 3 4 3h4c1.45.0 3 1.69 3 3.5.0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98.0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98.0-2-1.22-2-2.5.0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45.0 3-1.69 3-3.5S14.5 6 13 6z"/></svg>
 </a>
 GPFA dimensionality estimation
 </h3>
 <p>We can also evaluate the dimensionality using GPFA cross-validated log-likelihood across number of factors used to describe the data. For this dataset, it has been a little tricky to fairly compare CO and CST, since generally there&rsquo;s so much more CST data than CO. But just pushing the data through the pipeline, we get these figures (note that these data were not softnormed before running GPFA, and this particular analysis takes hours to run):</p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211209-covariance-analysis/figs/non-normed/gpfa/Ford_20180627_CO_gpfa_LLvDim-01.png alt="Ford CO GPFA cross-validated log-likelihood" width=1547 height=1409></p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211209-covariance-analysis/figs/non-normed/gpfa/Ford_20180627_CST_full_gpfa_LLvDim-01.png alt="Ford CST GPFA cross-validated log-likelihood" width=1517 height=1376></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/covariance-analysis/figs/non-normed/gpfa/Ford_20180627_CO_gpfa_LLvDim-01.png alt="Ford CO GPFA cross-validated log-likelihood" width=1547 height=1409></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/covariance-analysis/figs/non-normed/gpfa/Ford_20180627_CST_full_gpfa_LLvDim-01.png alt="Ford CST GPFA cross-validated log-likelihood" width=1517 height=1376></p>
 <p>This suggests that CST does indeed have higher dimensionality than CO. However, when we select only the number of CST trials (each 6 seconds long) to match the total number of time points across tasks, we get this for CST:</p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211209-covariance-analysis/figs/non-normed/gpfa/Ford_20180627_CST_timepointmatch_gpfa_LLvDim-01.png alt="Ford CST GPFA cross-validated log-likelihood" width=1651 height=1497></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/covariance-analysis/figs/non-normed/gpfa/Ford_20180627_CST_timepointmatch_gpfa_LLvDim-01.png alt="Ford CST GPFA cross-validated log-likelihood" width=1651 height=1497></p>
 <p>And that seems to suggest a similar dimensionality between the two tasks.</p>
 <p>But we can also match both number of trials and number of timepoints in each tasks, subselecting one 0.5 s portion of each CST trial to match the CO trials:</p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211209-covariance-analysis/figs/non-normed/gpfa/Ford_20180627_CST_trialmatch_gpfa_LLvDim-01.png alt="Ford CST trial-matched GPFA cross-validated log-likelihood" width=1497 height=1396></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/covariance-analysis/figs/non-normed/gpfa/Ford_20180627_CST_trialmatch_gpfa_LLvDim-01.png alt="Ford CST trial-matched GPFA cross-validated log-likelihood" width=1497 height=1396></p>
 <p>And that gives something mostly nonsensical. Haven&rsquo;t quite figured this one out yet, but I think the overall story is just that CST and CO have similar dimensionality, and everything weird here is just measurement error.</p>
 <h3 id=hold-time-analyses>
 <a href=#hold-time-analyses class=anchor><svg class="icon" aria-hidden="true" focusable="false" height="16" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5.0-3-1.69-3-3.5S2.55 3 4 3h4c1.45.0 3 1.69 3 3.5.0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98.0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98.0-2-1.22-2-2.5.0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45.0 3-1.69 3-3.5S14.5 6 13 6z"/></svg>
@@ -121,24 +121,26 @@ GPFA dimensionality estimation
 Hold time analyses
 </h3>
 <p>I also ran all of these analyses (except the GPFA analysis) on the hold time before movement in both tasks. Here are those figures:</p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Earl20190716_COCSThold_vardim_comparison-01.png alt="Earl hold variance/dimensionality comparison" width=1566 height=2020></p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Ford20180627_COCSThold_vardim_comparison-01.png alt="Ford hold variance/dimensionality comparison" width=1554 height=1908></p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Earl20190716_COhold_eigenspectrum_with_PA-01.png alt="Earl CO hold-time eigenspectrum" width=1688 height=805></p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Earl20190716_CSThold_eigenspectrum_with_PA-01.png alt="Earl CST hold-time eigenspectrum" width=1750 height=793></p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Ford20180627_COhold_eigenspectrum_with_PA-01.png alt="Ford CO hold-time eigenspectrum" width=1769 height=817></p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Ford20180627_CSThold_eigenspectrum_with_PA-01.png alt="Ford CST hold-time eigenspectrum" width=1763 height=792></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Earl20190716_COCSThold_vardim_comparison-01.png alt="Earl hold variance/dimensionality comparison" width=1566 height=2020></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Ford20180627_COCSThold_vardim_comparison-01.png alt="Ford hold variance/dimensionality comparison" width=1554 height=1908></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Earl20190716_COhold_eigenspectrum_with_PA-01.png alt="Earl CO hold-time eigenspectrum" width=1688 height=805></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Earl20190716_CSThold_eigenspectrum_with_PA-01.png alt="Earl CST hold-time eigenspectrum" width=1750 height=793></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Ford20180627_COhold_eigenspectrum_with_PA-01.png alt="Ford CO hold-time eigenspectrum" width=1769 height=817></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Ford20180627_CSThold_eigenspectrum_with_PA-01.png alt="Ford CST hold-time eigenspectrum" width=1763 height=792></p>
 <p>The scales are a little bit off (note that variance y-axis has quite tiny range compared to previous figures), but basically, variance and dimensionality were pretty much the same in the hold period of CO and CST. Also, Ford&rsquo;s neural data during hold period is quite noisy, as shown by his hold-time eigenspectra being close to the noise.</p>
 </div>
 </div>
 <div class=container>
 <nav class="flex container suggested">
-<a rel=next href=/cst-strat/analysis-log/20211209-cis-analysis/ title="Next post (newer)">
+<a rel=next href=/cst-strat/analysis-log/2021/12/cis-analysis/ title="Next post (newer)">
 <span>Next</span>
 CO Condition independent signal analysis
 </a>
 </nav>
 </div>
 <div class=container>
+<script src=https://giscus.app/client.js data-repo=raeedcho/cst-strat data-repo-id="MDEwOlJlcG9zaXRvcnkzMjkxNDc2NTU=" data-category=Comments data-category-id=DIC_kwDOE55lB84CAVLz data-mapping=pathname data-reactions-enabled=1 data-emit-metadata=0 data-theme=light crossorigin=anonymous async></script>
+<script>function setGiscusTeheme(b){let a=document.querySelector('.giscus iframe');a&&a.contentWindow.postMessage({giscus:{setConfig:{theme:b}}},'https://giscus.app')}addEventListener('message',a=>{if(a.origin!=='https://giscus.app')return;setGiscusTeheme(document.documentElement.dataset.userColorScheme)}),window.addEventListener('onColorSchemeChange',a=>{setGiscusTeheme(a.detail)})</script>
 </div>
 </main>
 </main>

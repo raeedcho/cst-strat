@@ -1,4 +1,4 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>CST Strategy Project Notes</title><link>https://raeedcho.github.io/cst-strat/</link><description>Recent content on CST Strategy Project Notes</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 14 Dec 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://raeedcho.github.io/cst-strat/index.xml" rel="self" type="application/rss+xml"/><item><title>CO-CST tangling analysis</title><link>https://raeedcho.github.io/cst-strat/analysis-log/20211214-tangling-analysis/</link><pubDate>Tue, 14 Dec 2021 00:00:00 +0000</pubDate><guid>https://raeedcho.github.io/cst-strat/analysis-log/20211214-tangling-analysis/</guid><description>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>CST Strategy Project Notes</title><link>https://raeedcho.github.io/cst-strat/</link><description>Recent content on CST Strategy Project Notes</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 14 Dec 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://raeedcho.github.io/cst-strat/index.xml" rel="self" type="application/rss+xml"/><item><title>CO-CST tangling analysis</title><link>https://raeedcho.github.io/cst-strat/analysis-log/2021/12/tangling-analysis/</link><pubDate>Tue, 14 Dec 2021 00:00:00 +0000</pubDate><guid>https://raeedcho.github.io/cst-strat/analysis-log/2021/12/tangling-analysis/</guid><description>
 &lt;h2 id="overall-task-tangling">
 &lt;a href="#overall-task-tangling" class="anchor">
 &lt;svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
@@ -23,25 +23,25 @@ Overall task tangling
 &lt;p>where $x_{t}$ corresponds to the neural state at timepoint $t$ and $\dot{x}_t$ corresponds to the time derivative of the neural state at time $t$. Tangling ($Q(t)$) is thus maximal when two neural states are close together, but their time derivatives are quite different.&lt;/p>
 &lt;p>Because CST is more feedback-driven than CO, you would expect that M1 neural dynamics shouldn&amp;rsquo;t be as autonomous-like in CST as we know it is in CO. This could mean that we should expect higher tangling in CST than CO. To check this, we ran an analysis of neural tangling in the 8 dimensions of neural activity that explain the most variance for both CO and CST. In both cases, we smoothed the neural activity using a Gaussian kernel with standard deviation of 75 ms and soft normalized it (with $\alpha=5$). The time periods in which we checked tangling was between the go cue time and the end of each trial.&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211214-tangling-analysis/figs/20211207_Ford20180627_tangling_density_fullCST_longCO.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/tangling-analysis/figs/20211207_Ford20180627_tangling_density_fullCST_longCO.png"
 alt="Ford tangling"
 width=560
 height="420" />&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211214-tangling-analysis/figs/20211207_Earl20190716_tangling_density.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/tangling-analysis/figs/20211207_Earl20190716_tangling_density.png"
 alt="Earl tangling"
 width=560
 height="420" />&lt;/p>
 &lt;p>Plotting an estimated probability density of tangling values for each task shows that there&amp;rsquo;s a great deal of overlap in tangling distributions, which seems quite unexpected, given how feedback driven CST is. One possibility is that including the whole trial during the CO task includes more than just the ballistic, feedforward part of the movement. In the time right after go cue, there are likely some inputs to M1 telling it which target to prepare and execute a movement for. Likewise, near the end of a CO movement, a monkey will often adjust the trajectory of the hand based on errors in the reach. Thus one modification may be to limit the CO tangling analysis to the middle portion of the trial, after movement onset and before any possible corrections.&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211214-tangling-analysis/figs/20211207_Ford20180627_tangling_density_fullCST.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/tangling-analysis/figs/20211207_Ford20180627_tangling_density_fullCST.png"
 alt="Ford tangling with ballistic CO"
 width=560
 height="420" />&lt;/p>
 &lt;p>From this reduction in CO trial time, there is slightly more difference between the two task distributions, though they still overlap significantly.&lt;/p>
 &lt;p>Another possible consideration is that we search for highly tangled pairs of states in a much larger set of timepoints with CST, given that CST has 6 second trials and there are many more of them. This may artificially inflate tangling, especially in the presence of noisy neural state. We can test this by limiting the CST trials to one specific $\lambda$ (in the following figure, $\lambda = 3.3$, still taking only the middle part of the CO trials)&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211214-tangling-analysis/figs/20211207_Ford20180627_tangling_density_lambda3.3.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/tangling-analysis/figs/20211207_Ford20180627_tangling_density_lambda3.3.png"
 alt="Ford tangling with ballistic CO"
 width=560
 height="420" />&lt;/p>
@@ -67,25 +67,25 @@ Timecourse of tangling
 &lt;p>If tangling is generally low in M1 because the monkey is intermittently integrating feedback information, then it may be possible to see this by looking at the timecourse of tangling through CO and CST trials.&lt;/p>
 &lt;p>Below is a representation of an example CO trial.&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211214-tangling-analysis/figs/trials/20211208_Ford20180627_COtangling_trial20.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/tangling-analysis/figs/trials/20211208_Ford20180627_COtangling_trial20.png"
 alt="Ford CO tangling trial 20"
 width=2631
 height="820" />&lt;/p>
 &lt;p>In this figure, the left column shows the timecourse of tangling (top, yellow is highest tangling), hand kinematics, and the 8 dimensions of M1 neural state. Middle column shows the hand movement in the x-y plane, with points colored by tangling (same color map as top left). Right plot shows the top three dimensions of M1 activity, colored by tangling.&lt;/p>
 &lt;p>One highly noticable aspect of this trial is the late correction that the monkey makes to stay in the final target&amp;ndash;this correction is surrounded by a period of high tangling, as we might expect. However, not all CO trials are this readily interpretable. For example, here is a trial in which tangling appears to be high during the main movement.&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211214-tangling-analysis/figs/trials/20211208_Ford20180627_COtangling_trial81.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/tangling-analysis/figs/trials/20211208_Ford20180627_COtangling_trial81.png"
 alt="Ford CO tangling trial 81"
 width=2631
 height="820" />&lt;/p>
 &lt;p>Moving onto CST trials, interpretation is (as always) a little bit trickier. Below are representations of a few CST trials.&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211214-tangling-analysis/figs/trials/20211208_Ford20180627_CSTtangling_trial271.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/tangling-analysis/figs/trials/20211208_Ford20180627_CSTtangling_trial271.png"
 alt="Ford CST tangling trial 271"
 width=2631
 height="820" />&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211214-tangling-analysis/figs/trials/20211208_Ford20180627_CSTtangling_trial292.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/tangling-analysis/figs/trials/20211208_Ford20180627_CSTtangling_trial292.png"
 alt="Ford CO tangling trial 292"
 width=2631
 height="820" />&lt;/p>
@@ -740,7 +740,7 @@ animation: slide infinite 1878s;
 .slider img:nth-child(311){animation-delay:1860s;}
 .slider img:nth-child(312){animation-delay:1866s;}
 .slider img:nth-child(313){animation-delay:1872s;}
-&lt;/style></description></item><item><title>CO-CST hold time analysis</title><link>https://raeedcho.github.io/cst-strat/analysis-log/20211210-hold-analysis/</link><pubDate>Fri, 10 Dec 2021 00:00:00 +0000</pubDate><guid>https://raeedcho.github.io/cst-strat/analysis-log/20211210-hold-analysis/</guid><description>
+&lt;/style></description></item><item><title>CO-CST hold time analysis</title><link>https://raeedcho.github.io/cst-strat/analysis-log/2021/12/hold-analysis/</link><pubDate>Fri, 10 Dec 2021 00:00:00 +0000</pubDate><guid>https://raeedcho.github.io/cst-strat/analysis-log/2021/12/hold-analysis/</guid><description>
 &lt;ul>
 &lt;li>❓ Are there dimensions of neural activity that separate CO and CST?
 &lt;ul>
@@ -751,24 +751,24 @@ animation: slide infinite 1878s;
 &lt;p>Gallego et al. 2018 showed that M1 neural activity underlying multiple tasks shared some dimensions of neural activity, but also that there were certain dimensions of activity that separated different tasks. Though the tasks differed in the impedance of wrist movement (ranging from isometric to freely moving), the tasks were quite comparable: they were all wrist-based tasks with similar trial structure, where the monkey moved a cursor to visually presented targets within a set amount of time.&lt;/p>
 &lt;p>If we want to compare CO and CST in the same way, our best bet to start with is to compare neural activity during the hold period, when the instructions and hand kinematics are roughly the same between tasks. Simply plotting the hold time neural activity in the top PCs initially showed that there was a great separability between CO and CST hold-time neural state, despite there not being as much difference in the hand position during the hold time (figures below).&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211210-hold-analysis/figs/20211207_Earl20190716_holdactivity_smooth50ms.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/hold-analysis/figs/20211207_Earl20190716_holdactivity_smooth50ms.png"
 alt="Earl hold time activity, smoothed 50ms"
 width=560
 height="420" />&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211210-hold-analysis/figs/20211207_Ford20180627_holdactivity_smooth50ms.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/hold-analysis/figs/20211207_Ford20180627_holdactivity_smooth50ms.png"
 alt="Ford hold time activity, smoothed 50ms"
 width=560
 height="420" />&lt;/p>
 &lt;p>In both figures, each dot represents the average activity or hand position in one trial, with CO trials in red and CST trials in viridis (blue-green-yellow), with blue corresponding to low lambdas and yellow corresponding to high lambdas.&lt;/p>
 &lt;p>This separation was impressive, but I realized that I had mistakenly smoothed the neural activity with a 50ms wide Gaussian kernel before trimming and averaging the data. Because the kernel is non-causal, there was potentially some leakage from the initial movement phase into the apparent hold time activity. Removing the smoothing seemingly removes the easy-to-see separation in the neural space:&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211210-hold-analysis/figs/20211207_Earl20190716_holdactivity_nosmooth.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/hold-analysis/figs/20211207_Earl20190716_holdactivity_nosmooth.png"
 alt="Earl hold time activity, no smoothing"
 width=560
 height="420" />&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211210-hold-analysis/figs/20211207_Ford20180627_holdactivity_nosmooth.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/hold-analysis/figs/20211207_Ford20180627_holdactivity_nosmooth.png"
 alt="Ford hold time activity, no smoothing"
 width=560
 height="420" />&lt;/p>
@@ -777,63 +777,63 @@ height="420" />&lt;/p>
 &lt;li>There&amp;rsquo;s significant overlap in the first few PCs of neural activity, but that doesn&amp;rsquo;t preclude the existence of a task context dimension of neural activity in a lower variance dimension.&lt;/li>
 &lt;li>The fact that such a small change (a 50 ms smoothing kernel) can induce such a large separation in neural activity suggests that even if there&amp;rsquo;s no separation during the hold time, the neural activity separates remarkably quickly after the trial starts. We still need to investigate whether this separation is simply due to a difference in initial kinematics, but it&amp;rsquo;s possible that the early part of the trial is where the neural activity separates based on context.&lt;/li>
 &lt;/ol>
-&lt;p>So there are still avenues to pursue to extract a task context dimension of neural activity. Perhaps there&amp;rsquo;s even a separation between $\lambdas$ in the initial period of the trial.&lt;/p></description></item><item><title>CST neural engagement analysis</title><link>https://raeedcho.github.io/cst-strat/analysis-log/20211210-engagement-analysis/</link><pubDate>Fri, 10 Dec 2021 00:00:00 +0000</pubDate><guid>https://raeedcho.github.io/cst-strat/analysis-log/20211210-engagement-analysis/</guid><description>
+&lt;p>So there are still avenues to pursue to extract a task context dimension of neural activity. Perhaps there&amp;rsquo;s even a separation between $\lambdas$ in the initial period of the trial.&lt;/p></description></item><item><title>CST neural engagement analysis</title><link>https://raeedcho.github.io/cst-strat/analysis-log/2021/12/engagement-analysis/</link><pubDate>Fri, 10 Dec 2021 00:00:00 +0000</pubDate><guid>https://raeedcho.github.io/cst-strat/analysis-log/2021/12/engagement-analysis/</guid><description>
 &lt;p>❓ Is there a dimension of neural activity corresponding to neural engagement? Perhaps something that corresponds to whether $\lambda$ changed on the last trial, or whether there have been previous failures?&lt;/p>
 &lt;p>In &lt;a href="https://doi.org/10.1038/s41593-021-00822-8">Hennig et al. 2021&lt;/a>, they found a neural dimension corresponding to engagement with the BCI task. When there were changes in the task (e.g. the decoder changes), activity along this axis increases and then slowly decreases over a series of trials.&lt;/p>
 &lt;p>They found this axis separately for each target direction during a BCI center-out task&amp;ndash;they defined it as the dimension along which neural activity had the most variance for trials to that specific target. This also happened to line up nicely with the &amp;ldquo;ones&amp;rdquo; axis, the axis along which most, if not all, neural loadings were positive and similar to each other.&lt;/p>
 &lt;p>Aaron has a vague memory of a previous master&amp;rsquo;s student finding some kind of change in neural activity after $\lambda$ changed in CST&amp;ndash;might there be a neural engagement signal in this task too?&lt;/p>
 &lt;p>Since we don&amp;rsquo;t really have targets in CST, our next best bet was to look at the activity during the hold period&amp;ndash;perhaps there would be some large variance dimensions of neural activity that could correspond to whether the $\lambda$ changed within the last couple trials, or the number of previous failures in the task. Below are figures plotting the first three PCs of average hold time activity during CST (note: neural activity was softnormed here)&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211210-engagement-analysis/figs/20211206_Earl20190716_holdPCActivity.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/engagement-analysis/figs/20211206_Earl20190716_holdPCActivity.png"
 alt="Earl hold time PCA activity"
 width=823
 height="625" />&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211210-engagement-analysis/figs/20211206_Ford20180627_holdPCActivity.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/engagement-analysis/figs/20211206_Ford20180627_holdPCActivity.png"
 alt="Ford hold time PCA activity"
 width=774
 height="611" />&lt;/p>
 &lt;p>In these figures, top plot shows the $\lambda$ for each trial as a color (where the actual value is given by the color bar at the top&amp;hellip; it&amp;rsquo;s a little confusing). The red dashed lines indicate trials on which the monkey failed the task. Other three plots show average hold time activity in PC 1, 2, or 3, where each dot represents one trial, colored by its $\lambda$. For Earl, there seems to be a slow drift in PC1 , possibly related to lambda changes or failures, but it could also be related to disinterest in the task&amp;ndash;hard to say without randomized $\lambda$. Other than that, I can&amp;rsquo;t really see a correspondence between hold time activity and $\lambda$ changes or failures.&lt;/p>
 &lt;p>One way to check this out a bit more is to try to predict either the $\lambda$ on the previous trial or the number of previous failures from the hold time activity. Figures below:&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211210-engagement-analysis/figs/20211206_Earl20190716_hold_prevlambda_prediction.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/engagement-analysis/figs/20211206_Earl20190716_hold_prevlambda_prediction.png"
 alt="Earl hold time lambda prediction"
 width=560
 height="420" />&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211210-engagement-analysis/figs/20211206_Ford20180627_hold_prevlambda_prediction.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/engagement-analysis/figs/20211206_Ford20180627_hold_prevlambda_prediction.png"
 alt="Ford hold time lambda prediction"
 width=560
 height="420" />&lt;/p>
 &lt;p>Again, slight correlation in Earl with $\lambda$ on previous trial, but this might be due to the slow drift.&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211210-engagement-analysis/figs/20211206_Earl20190716_hold_prevfailure_prediction.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/engagement-analysis/figs/20211206_Earl20190716_hold_prevfailure_prediction.png"
 alt="Earl hold time failure prediction"
 width=560
 height="420" />&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211210-engagement-analysis/figs/20211206_Ford20180627_hold_prevfailure_prediction.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/engagement-analysis/figs/20211206_Ford20180627_hold_prevfailure_prediction.png"
 alt="Ford hold time failure prediction"
 width=560
 height="420" />&lt;/p>
 &lt;p>No real correlation here unfortunately.&lt;/p>
 &lt;p>One possible followup for this engagement work is just to look at the mean firing rate across neurons for each trial to see if there&amp;rsquo;s anything that jumps out&amp;ndash;since the engagement axis in the Hennig paper was mainly in the &amp;ldquo;ones&amp;rdquo; axis, maybe a straight average across normed neurons will pull something from the noise.&lt;/p>
-&lt;p>If we try to look for engagement in neural population during the movement phase of CST, one thing we might have to contend with is the monkey&amp;rsquo;s arm movements (which weren&amp;rsquo;t present in the BCI task in the Hennig paper), but perhaps we can just fit a linear model between neural activity and arm movement and then just look at the null space of that to take out the majority of arm-related neural signals.&lt;/p></description></item><item><title>CO Condition independent signal analysis</title><link>https://raeedcho.github.io/cst-strat/analysis-log/20211209-cis-analysis/</link><pubDate>Thu, 09 Dec 2021 00:00:00 +0000</pubDate><guid>https://raeedcho.github.io/cst-strat/analysis-log/20211209-cis-analysis/</guid><description>
+&lt;p>If we try to look for engagement in neural population during the movement phase of CST, one thing we might have to contend with is the monkey&amp;rsquo;s arm movements (which weren&amp;rsquo;t present in the BCI task in the Hennig paper), but perhaps we can just fit a linear model between neural activity and arm movement and then just look at the null space of that to take out the majority of arm-related neural signals.&lt;/p></description></item><item><title>CO Condition independent signal analysis</title><link>https://raeedcho.github.io/cst-strat/analysis-log/2021/12/cis-analysis/</link><pubDate>Thu, 09 Dec 2021 00:00:00 +0000</pubDate><guid>https://raeedcho.github.io/cst-strat/analysis-log/2021/12/cis-analysis/</guid><description>
 &lt;p>❓ Is there a neural &amp;ldquo;go&amp;rdquo; signal underlying intermittent movements/control?&lt;/p>
 &lt;p>One result out of the literature recently has been that there are condition-independent signals (CIS) in neural activity that don&amp;rsquo;t relate to the exact movement being performed, but rather as a signal of whether a movement is being performed at all (see &lt;a href="https://doi.org/10.1523/eneuro.0085-16.2016">Kaufman et al. 2016&lt;/a>, &lt;a href="https://doi.org/10.1101/453746">Rouse et al. 2018&lt;/a>, &lt;a href="https://doi.org/10.1038/s41593-021-00798-5">Zimnik and Churchland 2021&lt;/a>). The signal seems like a kind of neural &amp;ldquo;go&amp;rdquo; signal&amp;ndash;it&amp;rsquo;s one thing we might be able to look for in CST as a marker of corrective or intermittent movements.&lt;/p>
 &lt;p>First, though, we need to see if we can find the CIS in CO on a single trial level&amp;ndash;most, if not all previous work with the CIS has been using trial-averaged data, and since we can&amp;rsquo;t readily do that with CST, we&amp;rsquo;d like to be able to find the CIS in single CO trials.&lt;/p>
 &lt;p>The results are unfortunately mostly negative&amp;ndash;though the CIS dimensions are clearly there in a trial average, it&amp;rsquo;s very difficult to see on single trials (see figures below).&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211209-cis-analysis/figs/20211203_Earl20190716_CO_CISdimactivity.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/cis-analysis/figs/20211203_Earl20190716_CO_CISdimactivity.png"
 alt="Earl CIS activity"
 width=951
 height="420" />&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211209-cis-analysis/figs/20211203_Ford20180627_CO_CISdimactivity.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/cis-analysis/figs/20211203_Ford20180627_CO_CISdimactivity.png"
 alt="Ford CIS activity"
 width=951
 height="420" />&lt;/p>
-&lt;p>So if we want to pull out a CIS from CST trials, we&amp;rsquo;ll need to find a way to average across movements. Perhaps we could take the first 500ms of each CST trial, or we could run some submovement decomposition to pull out hold and move states.&lt;/p></description></item><item><title>CO-CST covariance analysis</title><link>https://raeedcho.github.io/cst-strat/analysis-log/20211209-covariance-analysis/</link><pubDate>Thu, 09 Dec 2021 00:00:00 +0000</pubDate><guid>https://raeedcho.github.io/cst-strat/analysis-log/20211209-covariance-analysis/</guid><description>
+&lt;p>So if we want to pull out a CIS from CST trials, we&amp;rsquo;ll need to find a way to average across movements. Perhaps we could take the first 500ms of each CST trial, or we could run some submovement decomposition to pull out hold and move states.&lt;/p></description></item><item><title>CO-CST covariance analysis</title><link>https://raeedcho.github.io/cst-strat/analysis-log/2021/12/covariance-analysis/</link><pubDate>Thu, 09 Dec 2021 00:00:00 +0000</pubDate><guid>https://raeedcho.github.io/cst-strat/analysis-log/2021/12/covariance-analysis/</guid><description>
 &lt;p>For neural covariance analysis, we have a number of possible questions:&lt;/p>
 &lt;ul>
 &lt;li>❓ Because CST has smaller movements, does neural variance also decrease as much as you would expect?
@@ -861,12 +861,12 @@ height="420" />&lt;/p>
 &lt;/ul>
 &lt;p>I examined the first two questions together, during the movement period of both CO and CST (figures below). Important to note: I calculated all of these after softnorming neural activity within each task ($\alpha$=5). No smoothing applied. Applying these techniques without the softnorm gives similar results for variance, though parallel analysis results are noisier (probably due to high variability of a few neurons). Reasonable levels of smoothing doesn&amp;rsquo;t change any of these results much, though I would guess that oversmoothing data would decrease dimensionality.&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Earl20190716_COCSTmove_vardim_comparison-01.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Earl20190716_COCSTmove_vardim_comparison-01.png"
 alt="Earl Movement variance/dimensionality comparison"
 width=1714
 height="1986" />&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Ford20180627_COCSTmove_vardim_comparison-01.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Ford20180627_COCSTmove_vardim_comparison-01.png"
 alt="Ford Movement variance/dimensionality comparison"
 width=1714
 height="2120" />&lt;/p>
@@ -894,22 +894,22 @@ Neural dimensionality
 &lt;p>The same plots above show two measures of dimensionality: the participation ratio, which a measure of how flat the eigenspectrum of a covariance matrix is (flat eigenspectrum would have PR equal to the number of neurons), and parallel analysis dimensionality, which constructs a null distribution of eigenspectra by shuffling neural activity independently across time. The upshot is that PR says that the eigenspectra of both tasks are remarkably flat (when neurons are softnormed at least), but PA suggests that both tasks have significant covariance in only a few dimensions. Notably, when evaluated at individual $\lambda$, the PA dimensionality (black solid line) is very similar to the CO dimensionality (red dashed line), while CST dimensionality when evaluated over all $\lambda$ (black dashed line) is notably higher (though unclear if this difference is statistically significant). The most mundane explanation for this difference is that when you add more data, you get higher estimated dimensionality (see Surya Ganguli&amp;rsquo;s work and Ryan Williamson&amp;rsquo;s work). A less mundane explanation might be that you use different, not fully overlapping dimensions of neural activity at different $\lambda$, but this claim seems unlikely.&lt;/p>
 &lt;p>Below are some eigenspectra for CO and CST movement-time activity for both monkeys, with 95th percentile null distribution from parallel analysis.&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Earl20190716_COmove_eigenspectrum_with_PA-01.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Earl20190716_COmove_eigenspectrum_with_PA-01.png"
 alt="Earl CO movement-time eigenspectrum"
 width=1475
 height="720" />&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Earl20190716_CSTmove_eigenspectrum_with_PA-01.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Earl20190716_CSTmove_eigenspectrum_with_PA-01.png"
 alt="Earl CST movement-time eigenspectrum"
 width=1384
 height="721" />&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Ford20180627_COmove_eigenspectrum_with_PA-01.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Ford20180627_COmove_eigenspectrum_with_PA-01.png"
 alt="Ford CO movement-time eigenspectrum"
 width=1780
 height="830" />&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Ford20180627_CSTmove_eigenspectrum_with_PA-01.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Ford20180627_CSTmove_eigenspectrum_with_PA-01.png"
 alt="Ford CST movement-time eigenspectrum"
 width=1828
 height="794" />&lt;/p>
@@ -925,25 +925,25 @@ GPFA dimensionality estimation
 &lt;/h3>
 &lt;p>We can also evaluate the dimensionality using GPFA cross-validated log-likelihood across number of factors used to describe the data. For this dataset, it has been a little tricky to fairly compare CO and CST, since generally there&amp;rsquo;s so much more CST data than CO. But just pushing the data through the pipeline, we get these figures (note that these data were not softnormed before running GPFA, and this particular analysis takes hours to run):&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211209-covariance-analysis/figs/non-normed/gpfa/Ford_20180627_CO_gpfa_LLvDim-01.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/covariance-analysis/figs/non-normed/gpfa/Ford_20180627_CO_gpfa_LLvDim-01.png"
 alt="Ford CO GPFA cross-validated log-likelihood"
 width=1547
 height="1409" />&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211209-covariance-analysis/figs/non-normed/gpfa/Ford_20180627_CST_full_gpfa_LLvDim-01.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/covariance-analysis/figs/non-normed/gpfa/Ford_20180627_CST_full_gpfa_LLvDim-01.png"
 alt="Ford CST GPFA cross-validated log-likelihood"
 width=1517
 height="1376" />&lt;/p>
 &lt;p>This suggests that CST does indeed have higher dimensionality than CO. However, when we select only the number of CST trials (each 6 seconds long) to match the total number of time points across tasks, we get this for CST:&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211209-covariance-analysis/figs/non-normed/gpfa/Ford_20180627_CST_timepointmatch_gpfa_LLvDim-01.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/covariance-analysis/figs/non-normed/gpfa/Ford_20180627_CST_timepointmatch_gpfa_LLvDim-01.png"
 alt="Ford CST GPFA cross-validated log-likelihood"
 width=1651
 height="1497" />&lt;/p>
 &lt;p>And that seems to suggest a similar dimensionality between the two tasks.&lt;/p>
 &lt;p>But we can also match both number of trials and number of timepoints in each tasks, subselecting one 0.5 s portion of each CST trial to match the CO trials:&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211209-covariance-analysis/figs/non-normed/gpfa/Ford_20180627_CST_trialmatch_gpfa_LLvDim-01.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/covariance-analysis/figs/non-normed/gpfa/Ford_20180627_CST_trialmatch_gpfa_LLvDim-01.png"
 alt="Ford CST trial-matched GPFA cross-validated log-likelihood"
 width=1497
 height="1396" />&lt;/p>
@@ -960,32 +960,32 @@ Hold time analyses
 &lt;/h3>
 &lt;p>I also ran all of these analyses (except the GPFA analysis) on the hold time before movement in both tasks. Here are those figures:&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Earl20190716_COCSThold_vardim_comparison-01.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Earl20190716_COCSThold_vardim_comparison-01.png"
 alt="Earl hold variance/dimensionality comparison"
 width=1566
 height="2020" />&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Ford20180627_COCSThold_vardim_comparison-01.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Ford20180627_COCSThold_vardim_comparison-01.png"
 alt="Ford hold variance/dimensionality comparison"
 width=1554
 height="1908" />&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Earl20190716_COhold_eigenspectrum_with_PA-01.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Earl20190716_COhold_eigenspectrum_with_PA-01.png"
 alt="Earl CO hold-time eigenspectrum"
 width=1688
 height="805" />&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Earl20190716_CSThold_eigenspectrum_with_PA-01.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Earl20190716_CSThold_eigenspectrum_with_PA-01.png"
 alt="Earl CST hold-time eigenspectrum"
 width=1750
 height="793" />&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Ford20180627_COhold_eigenspectrum_with_PA-01.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Ford20180627_COhold_eigenspectrum_with_PA-01.png"
 alt="Ford CO hold-time eigenspectrum"
 width=1769
 height="817" />&lt;/p>
 &lt;p>&lt;img loading="lazy"
-src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/20211209-covariance-analysis/figs/softnormed/20211203_Ford20180627_CSThold_eigenspectrum_with_PA-01.png"
+src="https://raeedcho.github.io/cst-strat/cst-strat/analysis-log/2021/12/covariance-analysis/figs/softnormed/20211203_Ford20180627_CSThold_eigenspectrum_with_PA-01.png"
 alt="Ford CST hold-time eigenspectrum"
 width=1763
 height="792" />&lt;/p>

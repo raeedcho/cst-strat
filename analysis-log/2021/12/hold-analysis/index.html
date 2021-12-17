@@ -65,12 +65,12 @@ By Raeed Chowdhury | <time>December 10, 2021</time>
 </ul>
 <p>Gallego et al. 2018 showed that M1 neural activity underlying multiple tasks shared some dimensions of neural activity, but also that there were certain dimensions of activity that separated different tasks. Though the tasks differed in the impedance of wrist movement (ranging from isometric to freely moving), the tasks were quite comparable: they were all wrist-based tasks with similar trial structure, where the monkey moved a cursor to visually presented targets within a set amount of time.</p>
 <p>If we want to compare CO and CST in the same way, our best bet to start with is to compare neural activity during the hold period, when the instructions and hand kinematics are roughly the same between tasks. Simply plotting the hold time neural activity in the top PCs initially showed that there was a great separability between CO and CST hold-time neural state, despite there not being as much difference in the hand position during the hold time (figures below).</p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211210-hold-analysis/figs/20211207_Earl20190716_holdactivity_smooth50ms.png alt="Earl hold time activity, smoothed 50ms" width=560 height=420></p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211210-hold-analysis/figs/20211207_Ford20180627_holdactivity_smooth50ms.png alt="Ford hold time activity, smoothed 50ms" width=560 height=420></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/hold-analysis/figs/20211207_Earl20190716_holdactivity_smooth50ms.png alt="Earl hold time activity, smoothed 50ms" width=560 height=420></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/hold-analysis/figs/20211207_Ford20180627_holdactivity_smooth50ms.png alt="Ford hold time activity, smoothed 50ms" width=560 height=420></p>
 <p>In both figures, each dot represents the average activity or hand position in one trial, with CO trials in red and CST trials in viridis (blue-green-yellow), with blue corresponding to low lambdas and yellow corresponding to high lambdas.</p>
 <p>This separation was impressive, but I realized that I had mistakenly smoothed the neural activity with a 50ms wide Gaussian kernel before trimming and averaging the data. Because the kernel is non-causal, there was potentially some leakage from the initial movement phase into the apparent hold time activity. Removing the smoothing seemingly removes the easy-to-see separation in the neural space:</p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211210-hold-analysis/figs/20211207_Earl20190716_holdactivity_nosmooth.png alt="Earl hold time activity, no smoothing" width=560 height=420></p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211210-hold-analysis/figs/20211207_Ford20180627_holdactivity_nosmooth.png alt="Ford hold time activity, no smoothing" width=560 height=420></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/hold-analysis/figs/20211207_Earl20190716_holdactivity_nosmooth.png alt="Earl hold time activity, no smoothing" width=560 height=420></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/hold-analysis/figs/20211207_Ford20180627_holdactivity_nosmooth.png alt="Ford hold time activity, no smoothing" width=560 height=420></p>
 <p>This is disappointing, but we should note two things:</p>
 <ol>
 <li>There&rsquo;s significant overlap in the first few PCs of neural activity, but that doesn&rsquo;t preclude the existence of a task context dimension of neural activity in a lower variance dimension.</li>
@@ -81,17 +81,19 @@ By Raeed Chowdhury | <time>December 10, 2021</time>
 </div>
 <div class=container>
 <nav class="flex container suggested">
-<a rel=prev href=/cst-strat/analysis-log/20211210-engagement-analysis/ title="Previous post (older)">
+<a rel=prev href=/cst-strat/analysis-log/2021/12/engagement-analysis/ title="Previous post (older)">
 <span>Previous</span>
 CST neural engagement analysis
 </a>
-<a rel=next href=/cst-strat/analysis-log/20211214-tangling-analysis/ title="Next post (newer)">
+<a rel=next href=/cst-strat/analysis-log/2021/12/tangling-analysis/ title="Next post (newer)">
 <span>Next</span>
 CO-CST tangling analysis
 </a>
 </nav>
 </div>
 <div class=container>
+<script src=https://giscus.app/client.js data-repo=raeedcho/cst-strat data-repo-id="MDEwOlJlcG9zaXRvcnkzMjkxNDc2NTU=" data-category=Comments data-category-id=DIC_kwDOE55lB84CAVLz data-mapping=pathname data-reactions-enabled=1 data-emit-metadata=0 data-theme=light crossorigin=anonymous async></script>
+<script>function setGiscusTeheme(b){let a=document.querySelector('.giscus iframe');a&&a.contentWindow.postMessage({giscus:{setConfig:{theme:b}}},'https://giscus.app')}addEventListener('message',a=>{if(a.origin!=='https://giscus.app')return;setGiscusTeheme(document.documentElement.dataset.userColorScheme)}),window.addEventListener('onColorSchemeChange',a=>{setGiscusTeheme(a.detail)})</script>
 </div>
 </main>
 </main>

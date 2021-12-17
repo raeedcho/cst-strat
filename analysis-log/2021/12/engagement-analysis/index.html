@@ -61,15 +61,15 @@ By Raeed Chowdhury | <time>December 10, 2021</time>
 <p>They found this axis separately for each target direction during a BCI center-out task&ndash;they defined it as the dimension along which neural activity had the most variance for trials to that specific target. This also happened to line up nicely with the &ldquo;ones&rdquo; axis, the axis along which most, if not all, neural loadings were positive and similar to each other.</p>
 <p>Aaron has a vague memory of a previous master&rsquo;s student finding some kind of change in neural activity after $\lambda$ changed in CST&ndash;might there be a neural engagement signal in this task too?</p>
 <p>Since we don&rsquo;t really have targets in CST, our next best bet was to look at the activity during the hold period&ndash;perhaps there would be some large variance dimensions of neural activity that could correspond to whether the $\lambda$ changed within the last couple trials, or the number of previous failures in the task. Below are figures plotting the first three PCs of average hold time activity during CST (note: neural activity was softnormed here)</p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211210-engagement-analysis/figs/20211206_Earl20190716_holdPCActivity.png alt="Earl hold time PCA activity" width=823 height=625></p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211210-engagement-analysis/figs/20211206_Ford20180627_holdPCActivity.png alt="Ford hold time PCA activity" width=774 height=611></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/engagement-analysis/figs/20211206_Earl20190716_holdPCActivity.png alt="Earl hold time PCA activity" width=823 height=625></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/engagement-analysis/figs/20211206_Ford20180627_holdPCActivity.png alt="Ford hold time PCA activity" width=774 height=611></p>
 <p>In these figures, top plot shows the $\lambda$ for each trial as a color (where the actual value is given by the color bar at the top&mldr; it&rsquo;s a little confusing). The red dashed lines indicate trials on which the monkey failed the task. Other three plots show average hold time activity in PC 1, 2, or 3, where each dot represents one trial, colored by its $\lambda$. For Earl, there seems to be a slow drift in PC1 , possibly related to lambda changes or failures, but it could also be related to disinterest in the task&ndash;hard to say without randomized $\lambda$. Other than that, I can&rsquo;t really see a correspondence between hold time activity and $\lambda$ changes or failures.</p>
 <p>One way to check this out a bit more is to try to predict either the $\lambda$ on the previous trial or the number of previous failures from the hold time activity. Figures below:</p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211210-engagement-analysis/figs/20211206_Earl20190716_hold_prevlambda_prediction.png alt="Earl hold time lambda prediction" width=560 height=420></p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211210-engagement-analysis/figs/20211206_Ford20180627_hold_prevlambda_prediction.png alt="Ford hold time lambda prediction" width=560 height=420></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/engagement-analysis/figs/20211206_Earl20190716_hold_prevlambda_prediction.png alt="Earl hold time lambda prediction" width=560 height=420></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/engagement-analysis/figs/20211206_Ford20180627_hold_prevlambda_prediction.png alt="Ford hold time lambda prediction" width=560 height=420></p>
 <p>Again, slight correlation in Earl with $\lambda$ on previous trial, but this might be due to the slow drift.</p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211210-engagement-analysis/figs/20211206_Earl20190716_hold_prevfailure_prediction.png alt="Earl hold time failure prediction" width=560 height=420></p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211210-engagement-analysis/figs/20211206_Ford20180627_hold_prevfailure_prediction.png alt="Ford hold time failure prediction" width=560 height=420></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/engagement-analysis/figs/20211206_Earl20190716_hold_prevfailure_prediction.png alt="Earl hold time failure prediction" width=560 height=420></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/engagement-analysis/figs/20211206_Ford20180627_hold_prevfailure_prediction.png alt="Ford hold time failure prediction" width=560 height=420></p>
 <p>No real correlation here unfortunately.</p>
 <p>One possible followup for this engagement work is just to look at the mean firing rate across neurons for each trial to see if there&rsquo;s anything that jumps out&ndash;since the engagement axis in the Hennig paper was mainly in the &ldquo;ones&rdquo; axis, maybe a straight average across normed neurons will pull something from the noise.</p>
 <p>If we try to look for engagement in neural population during the movement phase of CST, one thing we might have to contend with is the monkey&rsquo;s arm movements (which weren&rsquo;t present in the BCI task in the Hennig paper), but perhaps we can just fit a linear model between neural activity and arm movement and then just look at the null space of that to take out the majority of arm-related neural signals.</p>
@@ -77,17 +77,19 @@ By Raeed Chowdhury | <time>December 10, 2021</time>
 </div>
 <div class=container>
 <nav class="flex container suggested">
-<a rel=prev href=/cst-strat/analysis-log/20211209-cis-analysis/ title="Previous post (older)">
+<a rel=prev href=/cst-strat/analysis-log/2021/12/cis-analysis/ title="Previous post (older)">
 <span>Previous</span>
 CO Condition independent signal analysis
 </a>
-<a rel=next href=/cst-strat/analysis-log/20211210-hold-analysis/ title="Next post (newer)">
+<a rel=next href=/cst-strat/analysis-log/2021/12/hold-analysis/ title="Next post (newer)">
 <span>Next</span>
 CO-CST hold time analysis
 </a>
 </nav>
 </div>
 <div class=container>
+<script src=https://giscus.app/client.js data-repo=raeedcho/cst-strat data-repo-id="MDEwOlJlcG9zaXRvcnkzMjkxNDc2NTU=" data-category=Comments data-category-id=DIC_kwDOE55lB84CAVLz data-mapping=pathname data-reactions-enabled=1 data-emit-metadata=0 data-theme=light crossorigin=anonymous async></script>
+<script>function setGiscusTeheme(b){let a=document.querySelector('.giscus iframe');a&&a.contentWindow.postMessage({giscus:{setConfig:{theme:b}}},'https://giscus.app')}addEventListener('message',a=>{if(a.origin!=='https://giscus.app')return;setGiscusTeheme(document.documentElement.dataset.userColorScheme)}),window.addEventListener('onColorSchemeChange',a=>{setGiscusTeheme(a.detail)})</script>
 </div>
 </main>
 </main>

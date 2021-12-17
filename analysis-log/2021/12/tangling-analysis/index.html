@@ -74,13 +74,13 @@ Overall task tangling
 <p>$$ Q(t) = \underset{\tau}\max( \dfrac {\dot{x}<em>{\tau} - \dot{x}</em>{t}} {x_{\tau}-x_t} ) $$</p>
 <p>where $x_{t}$ corresponds to the neural state at timepoint $t$ and $\dot{x}_t$ corresponds to the time derivative of the neural state at time $t$. Tangling ($Q(t)$) is thus maximal when two neural states are close together, but their time derivatives are quite different.</p>
 <p>Because CST is more feedback-driven than CO, you would expect that M1 neural dynamics shouldn&rsquo;t be as autonomous-like in CST as we know it is in CO. This could mean that we should expect higher tangling in CST than CO. To check this, we ran an analysis of neural tangling in the 8 dimensions of neural activity that explain the most variance for both CO and CST. In both cases, we smoothed the neural activity using a Gaussian kernel with standard deviation of 75 ms and soft normalized it (with $\alpha=5$). The time periods in which we checked tangling was between the go cue time and the end of each trial.</p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211214-tangling-analysis/figs/20211207_Ford20180627_tangling_density_fullCST_longCO.png alt="Ford tangling" width=560 height=420></p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211214-tangling-analysis/figs/20211207_Earl20190716_tangling_density.png alt="Earl tangling" width=560 height=420></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/tangling-analysis/figs/20211207_Ford20180627_tangling_density_fullCST_longCO.png alt="Ford tangling" width=560 height=420></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/tangling-analysis/figs/20211207_Earl20190716_tangling_density.png alt="Earl tangling" width=560 height=420></p>
 <p>Plotting an estimated probability density of tangling values for each task shows that there&rsquo;s a great deal of overlap in tangling distributions, which seems quite unexpected, given how feedback driven CST is. One possibility is that including the whole trial during the CO task includes more than just the ballistic, feedforward part of the movement. In the time right after go cue, there are likely some inputs to M1 telling it which target to prepare and execute a movement for. Likewise, near the end of a CO movement, a monkey will often adjust the trajectory of the hand based on errors in the reach. Thus one modification may be to limit the CO tangling analysis to the middle portion of the trial, after movement onset and before any possible corrections.</p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211214-tangling-analysis/figs/20211207_Ford20180627_tangling_density_fullCST.png alt="Ford tangling with ballistic CO" width=560 height=420></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/tangling-analysis/figs/20211207_Ford20180627_tangling_density_fullCST.png alt="Ford tangling with ballistic CO" width=560 height=420></p>
 <p>From this reduction in CO trial time, there is slightly more difference between the two task distributions, though they still overlap significantly.</p>
 <p>Another possible consideration is that we search for highly tangled pairs of states in a much larger set of timepoints with CST, given that CST has 6 second trials and there are many more of them. This may artificially inflate tangling, especially in the presence of noisy neural state. We can test this by limiting the CST trials to one specific $\lambda$ (in the following figure, $\lambda = 3.3$, still taking only the middle part of the CO trials)</p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211214-tangling-analysis/figs/20211207_Ford20180627_tangling_density_lambda3.3.png alt="Ford tangling with ballistic CO" width=560 height=420></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/tangling-analysis/figs/20211207_Ford20180627_tangling_density_lambda3.3.png alt="Ford tangling with ballistic CO" width=560 height=420></p>
 <p>Once again, the distributions are highly overlapping. We&rsquo;ll probably have to be careful about the amount of data we use to compute tangling going forward, or we will need to find a good way to trial average data across the CST dataset (possibly through a submovement decomposition?).</p>
 <p>The fact that tangling is similar between CO and CST is quite interesting. It suggests that while CST is quite feedback-driven, the dynamics of M1 remain mostly predictable. This predictability may stem from the fact that as a whole, the monkey-CST system has predictable dynamics, apart from sensory and motor noise at the interface between the monkey and the computer. Another possibility is that M1 remains untangled <em>most</em> of the time, but gets tangled at times when it integrates feedback to make a motor adjustment.</p>
 <h2 id=timecourse-of-tangling>
@@ -97,13 +97,13 @@ Timecourse of tangling
 </ul>
 <p>If tangling is generally low in M1 because the monkey is intermittently integrating feedback information, then it may be possible to see this by looking at the timecourse of tangling through CO and CST trials.</p>
 <p>Below is a representation of an example CO trial.</p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211214-tangling-analysis/figs/trials/20211208_Ford20180627_COtangling_trial20.png alt="Ford CO tangling trial 20" width=2631 height=820></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/tangling-analysis/figs/trials/20211208_Ford20180627_COtangling_trial20.png alt="Ford CO tangling trial 20" width=2631 height=820></p>
 <p>In this figure, the left column shows the timecourse of tangling (top, yellow is highest tangling), hand kinematics, and the 8 dimensions of M1 neural state. Middle column shows the hand movement in the x-y plane, with points colored by tangling (same color map as top left). Right plot shows the top three dimensions of M1 activity, colored by tangling.</p>
 <p>One highly noticable aspect of this trial is the late correction that the monkey makes to stay in the final target&ndash;this correction is surrounded by a period of high tangling, as we might expect. However, not all CO trials are this readily interpretable. For example, here is a trial in which tangling appears to be high during the main movement.</p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211214-tangling-analysis/figs/trials/20211208_Ford20180627_COtangling_trial81.png alt="Ford CO tangling trial 81" width=2631 height=820></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/tangling-analysis/figs/trials/20211208_Ford20180627_COtangling_trial81.png alt="Ford CO tangling trial 81" width=2631 height=820></p>
 <p>Moving onto CST trials, interpretation is (as always) a little bit trickier. Below are representations of a few CST trials.</p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211214-tangling-analysis/figs/trials/20211208_Ford20180627_CSTtangling_trial271.png alt="Ford CST tangling trial 271" width=2631 height=820></p>
-<p><img loading=lazy src=/cst-strat/analysis-log/20211214-tangling-analysis/figs/trials/20211208_Ford20180627_CSTtangling_trial292.png alt="Ford CO tangling trial 292" width=2631 height=820></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/tangling-analysis/figs/trials/20211208_Ford20180627_CSTtangling_trial271.png alt="Ford CST tangling trial 271" width=2631 height=820></p>
+<p><img loading=lazy src=/cst-strat/analysis-log/2021/12/tangling-analysis/figs/trials/20211208_Ford20180627_CSTtangling_trial292.png alt="Ford CO tangling trial 292" width=2631 height=820></p>
 <p>This representation of the trial is the same as the CO plots, with the exception that the middle plot is replaced by a sensorimotor plot, showing the hand position plotted against cursor position, highlighting the when the two are and are not in direct opposition.</p>
 <p>It&rsquo;s hard to say anything for sure from these plots, but it does seem like larger movements in general have lower tangling. This might be due to the neural state reaching out from the tangled ball in the center (right plot), but it&rsquo;s not entirely clear. We maybe have to come up with some submovement decomposition over which to average neural traces before we can interpret tangling in this task.</p>
 <p>Here&rsquo;s a slideshow of trials:</p>
@@ -427,13 +427,15 @@ Timecourse of tangling
 </div>
 <div class=container>
 <nav class="flex container suggested">
-<a rel=prev href=/cst-strat/analysis-log/20211210-hold-analysis/ title="Previous post (older)">
+<a rel=prev href=/cst-strat/analysis-log/2021/12/hold-analysis/ title="Previous post (older)">
 <span>Previous</span>
 CO-CST hold time analysis
 </a>
 </nav>
 </div>
 <div class=container>
+<script src=https://giscus.app/client.js data-repo=raeedcho/cst-strat data-repo-id="MDEwOlJlcG9zaXRvcnkzMjkxNDc2NTU=" data-category=Comments data-category-id=DIC_kwDOE55lB84CAVLz data-mapping=pathname data-reactions-enabled=1 data-emit-metadata=0 data-theme=light crossorigin=anonymous async></script>
+<script>function setGiscusTeheme(b){let a=document.querySelector('.giscus iframe');a&&a.contentWindow.postMessage({giscus:{setConfig:{theme:b}}},'https://giscus.app')}addEventListener('message',a=>{if(a.origin!=='https://giscus.app')return;setGiscusTeheme(document.documentElement.dataset.userColorScheme)}),window.addEventListener('onColorSchemeChange',a=>{setGiscusTeheme(a.detail)})</script>
 </div>
 </main>
 </main>
