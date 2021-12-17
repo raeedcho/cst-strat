@@ -42,8 +42,15 @@ params:
   
   # Comments settings
   comments:
-    enabled: false
-    provider:
+    enabled: true
+    provider: giscus
+
+    giscus:
+      repo: raeedcho/cst-strat
+      id: MDEwOlJlcG9zaXRvcnkzMjkxNDc2NTU=
+      category:
+        name: Comments
+        id: DIC_kwDOE55lB84CAVLz
 
 menu:
   header:
