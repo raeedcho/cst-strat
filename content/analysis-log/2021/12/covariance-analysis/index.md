@@ -3,11 +3,11 @@
 title: CO-CST covariance analysis
 date: "2021-12-09"
 tags:
-    - CO/CST comparison
-    - neural
-    - population
-    - covariance
-    - dimensionality
+- CO/CST comparison
+- neural
+- population
+- covariance
+- dimensionality
 ---
 
 For neural covariance analysis, we have a number of possible questions:

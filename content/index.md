@@ -2,6 +2,7 @@
 title: Analysis brainstorming
 weight: 1
 date: 2021-12-01
+tags:
 ---
 
 Below is a broad list of all the analyses that we might run on CST data. The main focus is on neural analyses, which themselves are primarily focused on comparing CST and CO data, but I've also included a short section on behavioral analyses that could help us understand and contextualize the neural analysis results.

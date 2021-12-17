@@ -4,11 +4,11 @@ title: CO-CST tangling analysis
 date: "2021-12-14"
 mathjax: true
 tags:
-    - dynamics
-    - neural
-    - population
-    - tangling
-    - CO/CST comparison
+- dynamics
+- neural
+- population
+- tangling
+- CO/CST comparison
 ---
 
 ## Overall task tangling
