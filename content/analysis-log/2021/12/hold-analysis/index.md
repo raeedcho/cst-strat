@@ -2,6 +2,11 @@
 # weight: 2021121002
 title: CO-CST hold time analysis
 date: 2021-12-10
+tags:
+    - CO/CST comparison
+    - neural
+    - population
+    - hold period
 ---
 
 - :question: Are there dimensions of neural activity that separate CO and CST?

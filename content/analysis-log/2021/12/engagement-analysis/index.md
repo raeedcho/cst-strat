@@ -2,6 +2,11 @@
 # weight: 2021121001
 title: CST neural engagement analysis
 date: "2021-12-10"
+tags:
+    - neural
+    - population
+    - engagement
+    - hold period
 ---
 
 :question: Is there a dimension of neural activity corresponding to neural engagement? Perhaps something that corresponds to whether $\lambda$ changed on the last trial, or whether there have been previous failures?
