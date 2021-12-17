@@ -1,10 +1,18 @@
 ---
-title: Possible neural analyses to compare CO and CST
+title: Analysis brainstorming
 weight: 1
+date: 2021-12-01
 ---
-# Possible neural analyses to compare CO and CST tasks
 
-## Single neuron analyses
+Below is a broad list of all the analyses that we might run on CST data. The main focus is on neural analyses, which themselves are primarily focused on comparing CST and CO data, but I've also included a short section on behavioral analyses that could help us understand and contextualize the neural analysis results.
+
+If you want to see a log of some of the analyses that I've run on the data, check out the [Analysis log](analysis-log/)!
+
+If you have some ideas on analyses that aren't listed below, leave a comment at the bottom of the article (requires GitHub account), or send me an email.
+
+## Neural analyses
+
+### Single neuron analyses
 
 List of analyses that we can use to compare CO and CST on a single neuron level
 
@@ -23,7 +31,7 @@ List of analyses that we can use to compare CO and CST on a single neuron level
         - :bar_chart: Analysis: Fit GLMs and examine how parameters shift between CO and CST
             - :exclamation: Note/caution: neural GLMs are usually noisy and tricky to glean interpretation from
 
-## Population analyses
+### Population analyses
 
 List of population analysis methods we could use to compare CO and CST
 
@@ -67,6 +75,17 @@ List of population analysis methods we could use to compare CO and CST
             - :exclamation: CO seems to have different regimes, according to previous work, but CST data seems a bit too noisy as is
         - :question: Does CST have autonomous and input-driven times in neural dynamics? That is, if we infer inputs to a neural dynamical system (AutoLFADS), do the inputs look similar between movement initiation and submovements?
             - :speech_balloon: Other work suggests movement initiation and corrective movements share features like condition independent signal and inferred inputs
+
+## Behavioral analyses
+
+- Inferrential
+    - :question: We see an apparent "act and wait" type behavior in monkeys performing CST--they often don't respond to small cursor velocities. Can we decompose a subject's behavior into a set of submovements?
+        - :bar_chart: Simple act and wait hidden markov model
+        - :bar_chart: Switching controller strategy
+- Generative
+    - :question: What normative principles are necessary for a generative model to recapitulate the behavior of a subject (human or monkey) performing CST?
+        - :bar_chart: Optimal feedback control (Mohsen)
+        - :bar_chart: Reinforcement learning (Joel)
 
 ## Cross-over analyses
 

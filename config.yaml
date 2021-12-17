@@ -54,8 +54,6 @@ params:
 
 menu:
   header:
-    - name: Analysis brainstorming
-      url: "neural-analyses/"
     - name: Analysis log
       url: "analysis-log/"
 
