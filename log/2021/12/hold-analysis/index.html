@@ -1,0 +1,111 @@
+<!doctype html><html lang=en-us>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=theme-color content="dark">
+<title>CO-CST hold time analysis | CST Strategy Project Notes</title>
+<meta property="og:site_name" content="CST Strategy project notes">
+<meta property="og:title" content="CO-CST hold time analysis | CST Strategy Project Notes">
+<meta itemprop=name content="CO-CST hold time analysis | CST Strategy Project Notes">
+<meta name=twitter:title content="CO-CST hold time analysis | CST Strategy Project Notes">
+<meta name=application-name content="CO-CST hold time analysis | CST Strategy Project Notes">
+<meta name=description content="Notes for CST project">
+<meta name=twitter:description content="Notes for CST project">
+<meta itemprop=description content="Notes for CST project">
+<meta property="og:description" content="Notes for CST project">
+<link rel="shortcut icon" type=image/x-icon href=/cst-strat/favicon.ico>
+<link rel=stylesheet href=/cst-strat/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css>
+</head>
+<script>(function(){const b='ThemeColorScheme',a=localStorage.getItem(b),c=window.matchMedia('(prefers-color-scheme: dark)').matches===!0;a=='dark'||a==='auto'&&c?document.documentElement.dataset.userColorScheme='dark':document.documentElement.dataset.userColorScheme='light'})()</script>
+<body class=dark>
+<nav class=navbar>
+<div class=container>
+<div class=flex>
+<div>
+<a class=brand href=/cst-strat/>
+CST Strategy Project Notes
+</a>
+</div>
+<div class=flex>
+<a href=/cst-strat/analysis-log/>Analysis log</a>
+<button id=dark-mode-button><svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform:rotate(360deg);-webkit-transform:rotate(360deg);transform:rotate(360deg)" viewBox="0 0 36 36"><path fill="#ffd983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163.0 101.643 1.641 1.163 1.163.0 00-1.643-1.641zm-16.022 14.38a1.74 1.74.0 000 2.465 1.742 1.742.0 100-2.465zm13.968-2.147a2.904 2.904.0 01-4.108.0 2.902 2.902.0 010-4.107 2.902 2.902.0 014.108.0 2.902 2.902.0 010 4.107z" fill="#ffcc4d"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)"/></svg><svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform:rotate(360deg);-webkit-transform:rotate(360deg);transform:rotate(360deg)" viewBox="0 0 36 36"><path fill="#ffd983" d="M16 2s0-2 2-2 2 2 2 2v2s0 2-2 2-2-2-2-2V2zm18 14s2 0 2 2-2 2-2 2h-2s-2 0-2-2 2-2 2-2h2zM4 16s2 0 2 2-2 2-2 2H2s-2 0-2-2 2-2 2-2h2zm5.121-8.707s1.414 1.414.0 2.828-2.828.0-2.828.0L4.878 8.708s-1.414-1.414.0-2.829c1.415-1.414 2.829.0 2.829.0l1.414 1.414zm21 21s1.414 1.414.0 2.828-2.828.0-2.828.0l-1.414-1.414s-1.414-1.414.0-2.828 2.828.0 2.828.0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828.0.0-2.828.0-2.828l1.414-1.414s1.414-1.414 2.828.0.0 2.828.0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828.0.0-2.828.0-2.828l1.414-1.414s1.414-1.414 2.828.0.0 2.828.0 2.828l-1.414 1.414zM16 32s0-2 2-2 2 2 2 2v2s0 2-2 2-2-2-2-2v-2z"/><circle fill="#ffd983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)"/></svg>
+</button>
+</div>
+</div>
+</div>
+</nav>
+<main>
+<div class=container>
+<article>
+<header class=article-header>
+<div class=thumb>
+<div>
+<h1>CO-CST hold time analysis</h1>
+<div class=post-meta>
+<div>
+By Raeed Chowdhury | <time>December 10, 2021</time>
+| 3 minutes
+</div>
+<div class=tags>
+<a href=/cst-strat/tags/co/cst-comparison/>CO/CST comparison</a>
+<a href=/cst-strat/tags/neural/>neural</a>
+<a href=/cst-strat/tags/population/>population</a>
+<a href=/cst-strat/tags/hold-period/>hold period</a>
+</div>
+</div>
+</div>
+</div>
+</header>
+</article>
+<div class=article-post>
+<ul>
+<li>❓ Are there dimensions of neural activity that separate CO and CST?
+<ul>
+<li>✔️ Hold time analysis says possibly in the very early part of the movement, but perhaps this is due to kinematic differences?</li>
+</ul>
+</li>
+</ul>
+<p>Gallego et al. 2018 showed that M1 neural activity underlying multiple tasks shared some dimensions of neural activity, but also that there were certain dimensions of activity that separated different tasks. Though the tasks differed in the impedance of wrist movement (ranging from isometric to freely moving), the tasks were quite comparable: they were all wrist-based tasks with similar trial structure, where the monkey moved a cursor to visually presented targets within a set amount of time.</p>
+<p>If we want to compare CO and CST in the same way, our best bet to start with is to compare neural activity during the hold period, when the instructions and hand kinematics are roughly the same between tasks. Simply plotting the hold time neural activity in the top PCs initially showed that there was a great separability between CO and CST hold-time neural state, despite there not being as much difference in the hand position during the hold time (figures below).</p>
+<p><img loading=lazy src=/cst-strat/log/2021/12/hold-analysis/figs/20211207_Earl20190716_holdactivity_smooth50ms.png alt="Earl hold time activity, smoothed 50ms" width=560 height=420></p>
+<p><img loading=lazy src=/cst-strat/log/2021/12/hold-analysis/figs/20211207_Ford20180627_holdactivity_smooth50ms.png alt="Ford hold time activity, smoothed 50ms" width=560 height=420></p>
+<p>In both figures, each dot represents the average activity or hand position in one trial, with CO trials in red and CST trials in viridis (blue-green-yellow), with blue corresponding to low lambdas and yellow corresponding to high lambdas.</p>
+<p>This separation was impressive, but I realized that I had mistakenly smoothed the neural activity with a 50ms wide Gaussian kernel before trimming and averaging the data. Because the kernel is non-causal, there was potentially some leakage from the initial movement phase into the apparent hold time activity. Removing the smoothing seemingly removes the easy-to-see separation in the neural space:</p>
+<p><img loading=lazy src=/cst-strat/log/2021/12/hold-analysis/figs/20211207_Earl20190716_holdactivity_nosmooth.png alt="Earl hold time activity, no smoothing" width=560 height=420></p>
+<p><img loading=lazy src=/cst-strat/log/2021/12/hold-analysis/figs/20211207_Ford20180627_holdactivity_nosmooth.png alt="Ford hold time activity, no smoothing" width=560 height=420></p>
+<p>This is disappointing, but we should note two things:</p>
+<ol>
+<li>There&rsquo;s significant overlap in the first few PCs of neural activity, but that doesn&rsquo;t preclude the existence of a task context dimension of neural activity in a lower variance dimension.</li>
+<li>The fact that such a small change (a 50 ms smoothing kernel) can induce such a large separation in neural activity suggests that even if there&rsquo;s no separation during the hold time, the neural activity separates remarkably quickly after the trial starts. We still need to investigate whether this separation is simply due to a difference in initial kinematics, but it&rsquo;s possible that the early part of the trial is where the neural activity separates based on context.</li>
+</ol>
+<p>So there are still avenues to pursue to extract a task context dimension of neural activity. Perhaps there&rsquo;s even a separation between $\lambdas$ in the initial period of the trial.</p>
+</div>
+</div>
+<div class=container>
+<nav class="flex container suggested">
+<a rel=prev href=/cst-strat/log/2021/12/engagement-analysis/ title="Previous post (older)">
+<span>Previous</span>
+CST neural engagement analysis
+</a>
+<a rel=next href=/cst-strat/log/2021/12/tangling-analysis/ title="Next post (newer)">
+<span>Next</span>
+CO-CST tangling analysis
+</a>
+</nav>
+</div>
+<div class=container>
+<script src=https://giscus.app/client.js data-repo=raeedcho/cst-strat data-repo-id="MDEwOlJlcG9zaXRvcnkzMjkxNDc2NTU=" data-category=Comments data-category-id=DIC_kwDOE55lB84CAVLz data-mapping=pathname data-reactions-enabled=1 data-emit-metadata=0 data-theme=light crossorigin=anonymous async></script>
+<script>function setGiscusTeheme(b){let a=document.querySelector('.giscus iframe');a&&a.contentWindow.postMessage({giscus:{setConfig:{theme:b}}},'https://giscus.app')}addEventListener('message',a=>{if(a.origin!=='https://giscus.app')return;setGiscusTeheme(document.documentElement.dataset.userColorScheme)}),window.addEventListener('onColorSchemeChange',a=>{setGiscusTeheme(a.detail)})</script>
+</div>
+</main>
+</main>
+<footer class="footer flex">
+<section class=container>
+<nav class=footer-links>
+</nav>
+</section>
+<script defer src=/cst-strat/ts/features.a534d05c446023fa2ae2a638f87cc2443ad8e49f6aaeb4d9f24ed61d53766712.js data-enable-footnotes=true></script>
+</footer>
+</body>
+</html>
