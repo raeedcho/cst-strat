@@ -3,7 +3,7 @@
 title: CO-CST tangling analysis
 date: "2021-12-14"
 katex: true
-categories:
+tags:
 - dynamics
 - neural
 - population

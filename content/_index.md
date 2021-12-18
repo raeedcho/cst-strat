@@ -3,7 +3,7 @@ title: Analysis brainstorming
 weight: 1
 date: 2021-12-01
 layout: "single"
-categories:
+tags:
 ---
 
 Below is a broad list of all the analyses that we might run on CST data. The main focus is on neural analyses, which themselves are primarily focused on comparing CST and CO data, but I've also included a short section on behavioral analyses that could help us understand and contextualize the neural analysis results.
@@ -35,9 +35,9 @@ List of analyses that we can use to compare CO and CST on a single neuron level
 
 ### Population analyses
 
-List of population analysis methods we could use to compare CO and CST
+List of [population analysis](tags/population) methods we could use to compare CO and CST
 
-- Neural covariance
+- Neural [covariance](tags/covariance)
     - :question: Because CST has smaller movements, does neural variance also decrease as much as you would expect?
         - :bar_chart: Analysis: compare total neural variance between CO and CST
         - :heavy_check_mark: CST usually has smaller variance than CO, but unclear yet if it's what we would expect from smaller movements
@@ -65,15 +65,15 @@ List of population analysis methods we could use to compare CO and CST
     - :question: Are there dimensions of neural activity that separate CO and CST?
         - :heavy_check_mark: Hold time analysis says possibly in the very early part of the movement, but perhaps this is due to kinematic differences?
         - :question: if there's a task context dimension, how aligned with kinematic potent space is it? Perhaps this dimension separates different motor cortical dynamic regimes?
-- Neural dynamics
-    - :bar_chart: Tangling analysis
+- Neural [dynamics](tags/dynamics)
+    - :bar_chart: [Tangling analysis](tags/tangling)
         - :question: CST is much more feedback driven than CO. Does this show up as M1 dynamics being less apparently autonomous? That is, is neural tangling higher in CST than CO?
             - :heavy_check_mark: Tangling doesn't really appear to be much higher in CST than CO, suggesting that the feedback may be "predictable" most of the time. 
             - :speech_balloon: Does tangling depend on the amount of data you use to check it? Right now I'm thinking it probably does, but I can't be sure without simulation
         - :question: Does the timecourse of tangling over a CST or CO trial reveal anything about corrective movements? Perhaps tangling increases before corrective movements or after apparent errors to signify introduction of unexpected feedback.
             - :speech_balloon: May need to develop corrective movement detection to enable trial averaging, as well as apparent error detection (for CST, this might equate to moving the hand in the wrong direction)
     - :bar_chart: Neural dynamic modeling
-        - :question: Does CST contain different neural dynamical regimes? e.g. movement vs. hold/preparation
+        - :question: Does CST contain different neural dynamical regimes? e.g. [switching dynamics](tags/switching) between movement vs. hold/preparation
             - :exclamation: CO seems to have different regimes, according to previous work, but CST data seems a bit too noisy as is
         - :question: Does CST have autonomous and input-driven times in neural dynamics? That is, if we infer inputs to a neural dynamical system (AutoLFADS), do the inputs look similar between movement initiation and submovements?
             - :speech_balloon: Other work suggests movement initiation and corrective movements share features like condition independent signal and inferred inputs
