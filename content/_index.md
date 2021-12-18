@@ -2,6 +2,7 @@
 title: Analysis brainstorming
 weight: 1
 date: 2021-12-01
+layout: "single"
 categories:
 ---
 
