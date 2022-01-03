@@ -19,6 +19,7 @@ elephant = "*"
 scipy = "*"
 jupyterlab = "*"
 ipympl = "*"
+lxml = ">=4.6.5" # fixing security issue raised for jupyter extensions
 
 [dev-packages]
 
