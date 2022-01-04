@@ -24,7 +24,7 @@ lxml = ">=4.6.5" # fixing security issue raised for jupyter extensions
 [dev-packages]
 
 [requires]
-python_version = "3.9.8"
+python_version = "3.9"
 
 [packages.ssm]
 editable = true
@@ -45,3 +45,7 @@ ref = "master"
 git = "https://github.com/jglaser2/ssa.git"
 editable = true
 ref = "main"
+
+[packages.e1839a8]
+path = "."
+editable = true
