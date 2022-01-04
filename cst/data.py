@@ -2,9 +2,22 @@ import pandas as pd
 import pyaldata
 import numpy as np
 import scipy
+import os
 
-def load_clean_data(filename):
-    td = pyaldata.mat2dataframe(filename,True,'trial_data')
+def load_clean_data(file_query):
+    '''
+    Loads and cleans COCST trial data, given a file query
+    inputs:
+        file_query: dict with keys ('monkey','session_date')
+
+    Note: this function has an assumed data directory:
+    data_dir = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/'
+
+    TODO: extend to make directory easier to specify, or set up a system to load data from local DataJoint server
+    '''
+    data_dir = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/'
+    filename = '{monkey}_{session_date}_COCST_TD.mat'.format(**file_query)
+    td = pyaldata.mat2dataframe(os.path.join(data_dir,filename),True,'trial_data')
 
     # condition dates and times
     td['date_time'] = pd.to_datetime(td['date_time'])
@@ -38,6 +51,7 @@ def load_clean_data(filename):
 
         td = pyaldata.remove_low_firing_neurons(td,'M1_spikes',0.1,divide_by_bin_size=True,verbose=True)
 
+    td.set_index('trial_id',inplace=True)
     return td
 
 def trim_nans(trial_data):
