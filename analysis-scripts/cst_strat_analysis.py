@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.13.1
+#       jupytext_version: 1.13.3
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -31,7 +31,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 mpl.rcParams['pdf.fonttype'] = 42
 mpl.rcParams['ps.fonttype'] = 42
-# %matplotlib notebook
+# %matplotlib widget
 
 import seaborn as sns
 sns.set_style("ticks")
@@ -124,6 +124,10 @@ td_cst['hmm_state'] = [hmm.most_likely_states(vel[:,0][:,None],input=pos[:,0][:,
 from ipywidgets import interact
 # %matplotlib notebook
 
+trace_fig, trace_ax = plt.subplots(3, 1, figsize=(7.5, 5), sharex=True)
+sm_fig, sm_ax = plt.subplots(1, 2, figsize=(10, 5))
+hist_fig, hist_ax = plt.subplots(num_states+1, 1, figsize=(6, 6), sharex=True, sharey=True)
+
 @interact(trial_id=list(td_cst.index),scale=(10,60),color_by_state=True)
 def plot_cst_trial(trial_id,scale,color_by_state):
     trial = td_cst.loc[trial_id,:].copy()
@@ -150,7 +154,7 @@ def plot_cst_trial(trial_id,scale,color_by_state):
         }
 
     # old way
-    trace_fig,trace_ax = plt.subplots(3,1,figsize=(7.5,5),sharex=True)
+    trace_ax[0].clear()
     trace_ax[0].plot([0,6],[0,0],'-k')
     trace_ax[0].plot(trial['trialtime'],trial['rel_cursor_pos'][:,0],'-b')
     trace_ax[0].plot(trial['trialtime'],trial['rel_hand_pos'][:,0],'-r')
@@ -160,6 +164,7 @@ def plot_cst_trial(trial_id,scale,color_by_state):
     trace_ax[0].set_ylabel('Cursor or hand position')
     trace_ax[0].set_title('$\lambda = {}$'.format(trial['lambda']))
     
+    trace_ax[1].clear()
     trace_ax[1].plot([0,6],[0,0],'-k')
 #     trace_ax[1].plot(trial['trialtime'],trial['M1_pca'][:,0],'-c')
 #     trace_ax[1].plot(trial['trialtime'],trial['M1_pca'][:,1],'-m')
@@ -173,6 +178,7 @@ def plot_cst_trial(trial_id,scale,color_by_state):
     trace_ax[1].set_ylabel('Neural state')
     
     
+    trace_ax[2].clear()
     for k in range(num_states):
         trace_ax[2].plot(trial['trialtime'],posterior_probs[:, k], label="State " + str(k + 1), lw=2,
              color=colors[k])
@@ -186,7 +192,6 @@ def plot_cst_trial(trial_id,scale,color_by_state):
     sns.despine(ax=trace_ax[1],left=False,bottom=True,trim=True)
     sns.despine(ax=trace_ax[2],left=False,trim=True)
     
-    sm_fig,sm_ax = plt.subplots(1,2,figsize=(10,5))
     cst.plot_sensorimotor(
         cursor_pos=trial['rel_cursor_pos'][:,0],
         hand_pos=trial['rel_hand_pos'][:,0],
@@ -209,21 +214,22 @@ def plot_cst_trial(trial_id,scale,color_by_state):
     
 #     cst.plot_sm_tangent_polar(trial,scatter_args=sm_scatter_args)
     
-    fig,ax = plt.subplots(num_states+1,1,figsize=(6,6),sharex=True,sharey=True)
-    ax[0].hist(
+    for ax in hist_ax:
+        ax.clear()
+    hist_ax[0].hist(
         trial['hand_vel'][:,0],
         bins=np.linspace(trial['hand_vel'][:,0].min(),trial['hand_vel'][:,0].max(),30),
         color='k')
     for statenum in range(num_states):
-        ax[statenum+1].hist(
+        hist_ax[statenum+1].hist(
             trial['hand_vel'][hmm_z==statenum,0],
             bins=np.linspace(trial['hand_vel'][:,0].min(),trial['hand_vel'][:,0].max(),30),
             color=colors[statenum])
         sns.despine()
         
-    ax[0].set_title('Hand velocity distribution per state')
-    ax[-1].set_xlabel('Hand velocity (mm/s)')
-    ax[-1].set_ylabel('Number of 1 ms bins')
+    hist_ax[0].set_title('Hand velocity distribution per state')
+    hist_ax[-1].set_xlabel('Hand velocity (mm/s)')
+    hist_ax[-1].set_ylabel('Number of 1 ms bins')
 
 
 # %%

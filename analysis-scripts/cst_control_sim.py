@@ -1,37 +1,20 @@
-# ---
-# jupyter:
-#   jupytext:
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.11.3
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
-# %%
+# %% Imports and initial settings
 import autograd.numpy as np
 import autograd.numpy.random as npr
 
 import pandas as pd
 import cst
-import pyaldata
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 mpl.rcParams['pdf.fonttype'] = 42
 mpl.rcParams['ps.fonttype'] = 42
-# %matplotlib inline
 
 import seaborn as sns
 sns.set_style("ticks")
 sns.set_context("talk")
 
-# %%
+# %% 
 lambda_to_use = 3.3
 delay = 100
 trial_length = 6

@@ -1,19 +1,4 @@
-# ---
-# jupyter:
-#   jupytext:
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.11.4
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
-# %%
+# %% Importing and setup
 import autograd.numpy as np
 import autograd.numpy.random as npr
 
@@ -60,13 +45,11 @@ cmap = gradient_cmap(colors)
 save_figures = False
 
 # %%
-file_info = {
+file_query = {
     'monkey': 'Earl',
     'session_date': '20190716'
 }
-filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/{monkey}_{session_date}_COCST_TD.mat'.format(**file_info)
-td = cst.load_clean_data(filename)
-td.set_index('trial_id',inplace=True)
+td = cst.load_clean_data(file_query)
 
 # %%
 ## Try switching model on CO data first
@@ -108,7 +91,7 @@ ax.legend(loc="lower right")
 # plot out discrete and continuous latents for each given trial
 fig = plt.figure(figsize=(8,8))
 
-@interact(trial_id=list(td_co.index))
+# @interact(trial_id=list(td_co.index))
 def plot_slds_fit(trial_id):
     trial = td_co.loc[trial_id,:]
     
@@ -151,7 +134,7 @@ def plot_slds_fit(trial_id):
     emis_ax.set_title('Emissions raster')
     sns.despine(ax=emis_ax,trim=True)
 
-
+plot_slds_fit(23)
 
 # %%
 target_dirs = td_co['tgtDir'].unique()

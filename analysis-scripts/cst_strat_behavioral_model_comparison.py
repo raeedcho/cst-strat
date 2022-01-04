@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.3
+#       jupytext_version: 1.13.1
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -45,14 +45,14 @@ color_names = [
 ]
 
 colors = sns.xkcd_palette(color_names)
-cmap = ssm.plots.gradient_cmap(colors)
+# cmap = ssm.plots.gradient_cmap(colors)
 
 # Speficy whether or not to save figures
 save_figures = False
 
 # %%
 # filename = '/data/raeed/project-data/smile/cst-gainlag/library/python/Ford_20180618_COCST_TD.mat'
-filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/python/Ford_20180618_COCST_TD.mat'
+filename = '/mnt/g/raeed/project-data/smile/cst-gainlag/library/python/Ford_20180618_COCST_TD.mat'
 # td = cst.get_cst_dataframe(filename)
 td = pyaldata.mat2dataframe(filename,True,'td_cst')
 td.set_index('trial_id',inplace=True)
