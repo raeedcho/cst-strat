@@ -10,12 +10,13 @@ def load_clean_data(file_query):
     inputs:
         file_query: dict with keys ('monkey','session_date')
 
-    Note: this function has an assumed data directory:
-    data_dir = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/'
+    Note: this function assumes that data to be loaded has been moved into:
+    $PROJECTROOT/data
 
-    TODO: extend to make directory easier to specify, or set up a system to load data from local DataJoint server
+    TODO: set up an initial script to move data into the 'data' folder of the project (maybe with DVC)
     '''
-    data_dir = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/'
+    # data_dir = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/'
+    data_dir = '../data/'
     filename = '{monkey}_{session_date}_COCST_TD.mat'.format(**file_query)
     td = pyaldata.mat2dataframe(os.path.join(data_dir,filename),True,'trial_data')
 
@@ -38,7 +39,7 @@ def load_clean_data(file_query):
     unit_guide = td.loc[td.index[0],'M1_unit_guide']
     if unit_guide.shape[0]>0:
         # remove unsorted neurons (unit number <=1)
-        bad_units = unit_guide[:,1]<=1;
+        bad_units = unit_guide[:,1]<=1
 
         # for this particular file only, remove correlated neurons...
         if td.loc[td.index[0],'session_date']==pd.to_datetime('2018/06/26'):
