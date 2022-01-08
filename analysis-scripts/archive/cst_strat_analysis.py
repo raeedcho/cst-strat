@@ -1,19 +1,4 @@
-# ---
-# jupyter:
-#   jupytext:
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.13.3
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
-# %%
+# %% Importing and setup
 import autograd.numpy as np
 import autograd.numpy.random as npr
 
@@ -48,20 +33,17 @@ color_names = [
 colors = sns.xkcd_palette(color_names)
 cmap = gradient_cmap(colors)
 
-
 # Speficy whether or not to save figures
 save_figures = False
 
-# %%
-file_info = {
+# %% Load data
+file_query = {
     'monkey': 'Earl',
     'session_date': '20190716'
 }
-filename = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/{monkey}_{session_date}_COCST_TD.mat'.format(**file_info)
-td = cst.load_clean_data(filename)
-td.set_index('trial_id',inplace=True)
+td = cst.load_clean_data(file_query)
 
-# %%
+# %% Extract and condition CST data for HMM analysis
 # restrict to time points of interest
 td_cst = td.loc[td['task']=='CST',:].copy()
 td_cst = pyaldata.restrict_to_interval(
@@ -70,16 +52,17 @@ td_cst = pyaldata.restrict_to_interval(
     end_point_name='idx_cstEndTime',
     reset_index=False
 )
-td_cst = pyaldata.combine_time_bins(td_cst,10)
 
-# %%
 ## Get smoothed pca
 td_cst['M1_rates'] = [pyaldata.smooth_data(spikes/bin_size,dt=bin_size,std=0.05) 
                   for spikes,bin_size in zip(td_cst['M1_spikes'],td_cst['bin_size'])]
 M1_pca_model = sklearn.decomposition.PCA()
 td_cst = pyaldata.dim_reduce(td_cst,M1_pca_model,'M1_rates','M1_pca')
 
-# %%
+# combine bins to get 10 ms bins
+td_cst = pyaldata.combine_time_bins(td_cst,10)
+
+# %% Fit HMM to CST data
 # lambda_to_use = 3.3
 # td_lambda = td[td['lambda']==lambda_to_use]
 # td_lambda = td_cst
@@ -102,20 +85,17 @@ hmm = ssm.HMM(num_states, obs_dim, M=input_dims, observations="gaussian",transit
 # hmm_lls = hmm.fit(hmm_obs, inputs=hmm_input, method="em", num_iters=N_iters, init_method="kmeans") #can also use random for initialization method, which sometimes works better
 hmm_lls = hmm.fit(hmm_obs, method="em", num_iters=N_iters, init_method="kmeans") #can also use random for initialization method, which sometimes works better
 
-
-# make plots
+# make plots for HMM log likelihood over training
 plt.plot(hmm_lls, label="EM")
 plt.xlabel("EM Iteration")
 plt.ylabel("Log Probability")
 plt.legend(loc="lower right")
 plt.show()
 
-# %%
 # permute states to keep things consistent, order states by average velocities
 state_order = np.argsort(np.squeeze(hmm.observations.mus))
 hmm.permute(state_order)
 
-# %%
 # insert hmm most likely states into trialdata
 td_cst['hmm_state'] = [hmm.most_likely_states(vel[:,0][:,None],input=pos[:,0][:,None])
                        for vel,pos in zip(td_cst['hand_vel'],td_cst['rel_hand_pos'])]
@@ -233,30 +213,12 @@ def plot_cst_trial(trial_id,scale,color_by_state):
 
 
 # %%
-plt.figure()
-# freqs, psd = scipy.signal.welch(td_lambda.loc[159,'hand_vel'][100:5000,0],fs=1000,nfft=2048)
-# plt.semilogy(freqs,psd)
-plt.plot(td_lambda.loc[159,'hand_acc'][100:5000,0])
-# plt.plot(td_lambda.loc[159,'cst_cursor_command_shift'][100:5000,0])
-# plt.plot(td_lambda.loc[159,'lambda']*(td_lambda.loc[159,'hand_pos'][0:5000,0]+td_lambda.loc[159,'cursor_pos'][0:5000,0]))
-# td_lambda.loc[159,'cursor_vel']
-
-# %%
 for i in range(num_states):
     plt.subplot(4,2,2*i+2)
     plt.imshow(hmm.observations.mus[i],aspect='auto',cmap='RdBu',clim=[-1,1])
     if i==0:
         plt.title('Predicted')
     plt.ylabel('State'+str(i))
-
-
-# %%
-dt = 1e-3
-# print((hmm.observations.As-1)/dt)
-# print(hmm.observations.As)
-print(hmm.observations.bs)
-print(hmm.observations.Vs)
-
 
 # %%
 def plot_most_likely_dynamics(model,
@@ -302,22 +264,6 @@ print(hmm.transitions.Ws)
 # %%
 fig,ax = plt.subplots(1,1)
 ax.imshow(np.squeeze(hmm.transitions.transition_matrices(np.ones((3,1)),input=np.zeros((3,2)),mask=None,tag=None)))
-
-# %%
-for trial_id,trial in td_lambda.iterrows():
-    cursor_pos = trial['cursor_pos_shift'][:,0]
-    cursor_vel = trial['cursor_vel_shift'][:,0]
-    hand_pos = trial['hand_pos'][:,0]
-    norm_cursor_pos = np.sqrt(np.mean(cursor_pos**2))
-    norm_cursor_vel = np.sqrt(np.mean(cursor_vel**2))
-    norm_hand_pos = np.sqrt(np.mean(hand_pos**2))
-    print(f"Cursor norm: {norm_cursor_pos}, {norm_cursor_vel}. Hand norm: {norm_hand_pos}")
-
-# %%
-cursor_pos = td.loc[151,'cursor_pos']
-cursor_vel = td.loc[151,'cursor_vel']
-
-np.column_stack((cursor_pos[:,1],cursor_vel[:,1]))
 
 # %%
 np.unique(td['lambda'])

@@ -134,7 +134,7 @@ def plot_slds_fit(trial_id):
     emis_ax.set_title('Emissions raster')
     sns.despine(ax=emis_ax,trim=True)
 
-plot_slds_fit(23)
+# plot_slds_fit(23)
 
 # %%
 target_dirs = td_co['tgtDir'].unique()
