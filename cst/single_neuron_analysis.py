@@ -28,8 +28,8 @@ def get_task_epoch_neural_averages(trial_data,hold_start=-0.4):
         unit_guide = trial_data.loc[trial_data.index[0],array+'_unit_guide']
 
         for task in tasks:
-            temp_td = trial_data.loc[trial_data['task']==task,:].copy()
             for epoch in epochs:
+                temp_td = trial_data.loc[trial_data['task']==task,:].copy()
                 if epoch == 'hold':
                     temp_td = pyaldata.restrict_to_interval(
                         temp_td,
