@@ -4,21 +4,15 @@ import numpy as np
 import scipy
 import os
 
-def load_clean_data(file_query):
+def load_clean_data(filepath,verbose=False):
     '''
     Loads and cleans COCST trial data, given a file query
     inputs:
-        file_query: dict with keys ('monkey','session_date')
-
-    Note: this function assumes that data to be loaded has been moved into:
-    $PROJECTROOT/data
+        filepath: full path to file to be loaded
 
     TODO: set up an initial script to move data into the 'data' folder of the project (maybe with DVC)
     '''
-    # data_dir = '/mnt/c/Users/Raeed/data/project-data/smile/cst-gainlag/library/'
-    data_dir = '../data/'
-    filename = '{monkey}_{session_date}_COCST_TD.mat'.format(**file_query)
-    td = pyaldata.mat2dataframe(os.path.join(data_dir,filename),True,'trial_data')
+    td = pyaldata.mat2dataframe(filepath,True,'trial_data')
 
     # condition dates and times
     td['date_time'] = pd.to_datetime(td['date_time'])
@@ -30,7 +24,8 @@ def load_clean_data(file_query):
     # remove aborts
     abort_idx = np.isnan(td['idx_goCueTime']);
     td = td[~abort_idx]
-    print(f"Removed {sum(abort_idx)} trials that monkey aborted")
+    if verbose:
+        print(f"Removed {sum(abort_idx)} trials that monkey aborted")
 
     td = trim_nans(td)
     td = fill_kinematic_signals(td)
@@ -50,7 +45,7 @@ def load_clean_data(file_query):
         td['M1_spikes'] = [spikes[:,~bad_units] for spikes in td['M1_spikes']]
         td['M1_unit_guide'] = [guide[~bad_units,:] for guide in td['M1_unit_guide']]
 
-        td = pyaldata.remove_low_firing_neurons(td,'M1_spikes',0.1,divide_by_bin_size=True,verbose=True)
+        td = pyaldata.remove_low_firing_neurons(td,'M1_spikes',0.1,divide_by_bin_size=True,verbose=verbose)
 
     td.set_index('trial_id',inplace=True)
     return td
