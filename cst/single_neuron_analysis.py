@@ -1,6 +1,7 @@
 import numpy as np
 import pyaldata
 import pandas as pd
+import matplotlib.pyplot as plt
 
 def get_task_epoch_neural_averages(trial_data,hold_start=-0.4):
     '''
@@ -70,3 +71,30 @@ def get_task_epoch_neural_averages(trial_data,hold_start=-0.4):
     fr_table.reset_index(drop=True,inplace=True)
 
     return fr_table
+
+def plot_task_epoch_neural_averages(avg_fr_table):
+    '''
+    Takes a table of average firing rates per neuron, separated by array, task (CO or CST), and epoch (hold or move)
+    Note: this function alters the current state of matplotlib by using the pyplot state machine
+
+    Arguments:
+        avg_fr_table (DataFrame): table of average firing rates per neuron, with columns:
+            ['monkey','session_date','task','epoch','array','chan_id','unit_id','average_rate']
+
+    Returns:
+        None
+    '''
+    max_fr = avg_fr_table['average_rate'].max()
+    avg_fr_pivot = avg_fr_table.pivot(index=['chan_id','unit_id'],columns=['task','epoch'],values='average_rate')
+    avg_fr_pivot.columns = avg_fr_pivot.columns.to_series().apply(' '.join)
+    axs = pd.plotting.scatter_matrix(avg_fr_pivot,figsize=(10,10))
+    for colnum,col in enumerate(axs):
+        for rownum,ax in enumerate(col):
+            plt.setp(ax.yaxis.get_majorticklabels(),'size',18)
+            plt.setp(ax.xaxis.get_majorticklabels(),'size',18)
+            ax.set_xlim([0, max_fr+5])
+            if rownum != colnum:
+                ax.plot([0,max_fr+5],[0,max_fr+5],'--k')
+                ax.set_ylim([0,max_fr+5])
+
+    plt.suptitle('Task/Epoch average firing rate comparison')
