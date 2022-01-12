@@ -141,5 +141,9 @@ dmypy.json
 # profiling data
 .prof
 
-# data folder
+# VS Code
+.vscode
+
+# data and results folders
 data/
+results/
