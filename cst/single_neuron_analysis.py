@@ -55,15 +55,18 @@ def get_task_epoch_neural_averages(trial_data,hold_start=-0.4):
 
                 avg_fr = pyaldata.get_average_firing_rates(temp_td,array+'_spikes',divide_by_bin_size=True)
 
-        fr_table_list.append(pd.DataFrame({
-            'monkey': temp_td['monkey'].values[0],
-            'session_date': temp_td['session_date'].values[0],
-            'task': task,
-            'epoch': epoch,
-            'array': array,
-            'chan_id': unit_guide[:,0],
-            'unit_id': unit_guide[:,1],
-            'average_rate': avg_fr
-        }))
+                fr_table_list.append(pd.DataFrame({
+                    'monkey': temp_td['monkey'].values[0],
+                    'session_date': temp_td['session_date'].values[0],
+                    'array': array,
+                    'chan_id': unit_guide[:,0],
+                    'unit_id': unit_guide[:,1],
+                    'task': task,
+                    'epoch': epoch,
+                    'average_rate': avg_fr
+                }))
 
-    return pd.concat(fr_table_list)
+    fr_table = pd.concat(fr_table_list)
+    fr_table.reset_index(drop=True,inplace=True)
+
+    return fr_table
