@@ -19,12 +19,12 @@ If you have some ideas on analyses that aren't listed below, leave a comment at 
 List of analyses that we can use to compare CO and CST on a single neuron level
 
 - Averages
-    - :question: How does average firing rate change across tasks?
-        - :bar_chart: Analysis: compare averages across tasks
-    - :question: How does average firing rate change between hold and movement, within and across tasks?
-        - :bar_chart: Analysis: Hold vs. move activity within and across tasks
+    - :question: How does average firing rate and modulation depth change across tasks and hold/movement epoch?
+        - :bar_chart: Analysis: compare averages across tasks and hold/move epochs
+            - :heavy_check_mark: average neural activity is pretty comparable between CST and CO, and between hold move periods--each neuron tends to either be high-firing or low-firing, and there don't seem to be task-selective neurons
+        - :bar_chart: Analysis compare modulation depths across tasks and epochs
     - :question: Can we see a neural engagement signal in the average rates of neurons right after a $\lambda$ change?
-        - :bar_chart: Analysis: look at average neural activity in movement period of CST per trial, plotted as a function of # of trials after $\lambda$ change
+        - :bar_chart: Analysis: look at average neural activity in movement period of CST per trial, plotted as a function of # of trials after $\lambda$ chang
 - PSTHs
     - :question: Do PSTHs in CST look like CO?
         - :bar_chart: Analysis: Calculate PSTHs for hold->move submovements in CST
