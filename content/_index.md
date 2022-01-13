@@ -23,6 +23,8 @@ List of analyses that we can use to compare CO and CST on a single neuron level
         - :bar_chart: Analysis: compare averages across tasks
     - :question: How does average firing rate change between hold and movement, within and across tasks?
         - :bar_chart: Analysis: Hold vs. move activity within and across tasks
+    - :question: Can we see a neural engagement signal in the average rates of neurons right after a $\lambda$ change?
+        - :bar_chart: Analysis: look at average neural activity in movement period of CST per trial, plotted as a function of # of trials after $\lambda$ change
 - PSTHs
     - :question: Do PSTHs in CST look like CO?
         - :bar_chart: Analysis: Calculate PSTHs for hold->move submovements in CST
@@ -94,3 +96,7 @@ List of [population analysis](tags/population) methods we could use to compare C
 List of sophisticated behavioral analyses that could be run on neural data
 
 - :bar_chart: Contraction analysis
+- :question: Can we see a real difference between "position-controlled" or "velocity-controlled" trials according to OFC classification?
+    - :bar_chart: Check neural averages between the two sets of trials
+        - :exclamation: Note: need to control for different regimes of kinematics in the two sets of trials when comparing neural state across labels
+    - :bar_chart: Use deep discriminator on behavior according to OFC-labeled trials (control: compare to random splits of trials)
