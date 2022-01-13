@@ -1,6 +1,6 @@
 <!doctype html><html lang=en-us>
 <head>
-<meta name=generator content="Hugo 0.91.0">
+<meta name=generator content="Hugo 0.92.0">
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta http-equiv=x-ua-compatible content="IE=edge">
@@ -46,7 +46,7 @@ CST Strategy Project Notes
 <div class=post-meta>
 <div>
 By Raeed Chowdhury | <time>December 01, 2021</time>
-| 5 minutes
+| 6 minutes
 </div>
 <div class=tags>
 </div>
@@ -73,14 +73,19 @@ Single neuron analyses
 <ul>
 <li>Averages
 <ul>
-<li>❓ How does average firing rate change across tasks?
+<li>❓ How does average firing rate and modulation depth change across tasks and hold/movement epoch?
 <ul>
-<li>📊 Analysis: compare averages across tasks</li>
+<li>📊 Analysis: compare averages across tasks and hold/move epochs
+<ul>
+<li>✔️ average neural activity is pretty comparable between CST and CO, and between hold move periods&ndash;each neuron tends to either be high-firing or low-firing, and there don&rsquo;t seem to be task-selective neurons</li>
 </ul>
 </li>
-<li>❓ How does average firing rate change between hold and movement, within and across tasks?
+<li>📊 Analysis compare modulation depths across tasks and epochs</li>
+</ul>
+</li>
+<li>❓ Can we see a neural engagement signal in the average rates of neurons right after a $\lambda$ change?
 <ul>
-<li>📊 Analysis: Hold vs. move activity within and across tasks</li>
+<li>📊 Analysis: look at average neural activity in movement period of CST per trial, plotted as a function of # of trials after $\lambda$ chang</li>
 </ul>
 </li>
 </ul>
@@ -259,6 +264,16 @@ Cross-over analyses
 <p>List of sophisticated behavioral analyses that could be run on neural data</p>
 <ul>
 <li>📊 Contraction analysis</li>
+<li>❓ Can we see a real difference between &ldquo;position-controlled&rdquo; or &ldquo;velocity-controlled&rdquo; trials according to OFC classification?
+<ul>
+<li>📊 Check neural averages between the two sets of trials
+<ul>
+<li>❗ Note: need to control for different regimes of kinematics in the two sets of trials when comparing neural state across labels</li>
+</ul>
+</li>
+<li>📊 Use deep discriminator on behavior according to OFC-labeled trials (control: compare to random splits of trials)</li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
