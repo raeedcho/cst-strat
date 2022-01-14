@@ -9,7 +9,7 @@ import seaborn as sns
 
 def main(args):
     td = cst.load_clean_data(args.infile,args.verbose)
-    avg_fr_table = cst.single_neuron_analysis.get_task_epoch_neural_averages(td)
+    avg_fr_table = cst.single_neuron_analysis.get_task_epoch_neural_averages(td,signal='M1_spikes')
 
     sns.set_context('talk') # TODO: make this a command line argument
     cst.single_neuron_analysis.plot_task_epoch_neural_averages(avg_fr_table)
