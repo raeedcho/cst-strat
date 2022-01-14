@@ -59,8 +59,13 @@ def trim_nans(trial_data):
         first_viable_time = np.nonzero(~nan_times)[0][0]
         last_viable_time = np.nonzero(~nan_times)[0][-1]
         return slice(first_viable_time,last_viable_time+1)
+    
+    td_trimmed = pyaldata.restrict_to_interval(trial_data,epoch_fun=epoch_fun)
+    for trial_id in td_trimmed.index:
+        td_trimmed.loc[trial_id,'idx_endTime'] = td_trimmed.loc[trial_id,'M1_spikes'].shape[0]
 
-    return pyaldata.restrict_to_interval(trial_data,epoch_fun=epoch_fun)
+    return td_trimmed
+
 
 @pyaldata.copy_td
 def fill_kinematic_signals(td,cutoff=30):
