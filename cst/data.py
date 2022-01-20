@@ -18,15 +18,13 @@ def load_clean_data(filepath,verbose=False):
     td['date_time'] = pd.to_datetime(td['date_time'])
     td['session_date'] = pd.DatetimeIndex(td['date_time']).normalize()
 
-    # add trial time to td
-    td['trialtime'] = [trial['bin_size']*np.arange(trial['hand_pos'].shape[0]) for (_,trial) in td.iterrows()]
-
     # remove aborts
     abort_idx = np.isnan(td['idx_goCueTime']);
     td = td[~abort_idx]
     if verbose:
         print(f"Removed {sum(abort_idx)} trials that monkey aborted")
 
+    td = add_trial_time(td)
     td = trim_nans(td)
     td = fill_kinematic_signals(td)
 
@@ -131,3 +129,23 @@ def relationize_td(trial_data):
     # td.set_index(['monkey','session_date','trial_id'],inplace=True)
 
     return trial_info,signals
+
+@pyaldata.copy_td
+def add_trial_time(trial_data,ref_event=None):
+    """
+    Add a trialtime column to trial_data, based on the bin_size and shape of hand_pos
+
+    Arguments:
+        - trial_data: DataFrame in form of PyalData
+        - ref_event: string indicating which event to use as reference for trial time
+            (e.g. 'idx_goCueTime') (default: None)
+
+    Returns:
+        - trial_data: DataFrame with trialtime column added
+    """
+    if ref_event is None:
+        trial_data['trialtime'] = [trial['bin_size']*np.arange(trial['hand_pos'].shape[0]) for (_,trial) in trial_data.iterrows()]
+    else:
+        trial_data['trialtime'] = [trial['bin_size']*(np.arange(trial['hand_pos'].shape[0]) - trial[ref_event]) for (_,trial) in trial_data.iterrows()]
+
+    return trial_data
