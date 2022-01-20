@@ -226,3 +226,108 @@ def make_behavior_neural_widget(trial_data,behavior_signals=None,neural_signals=
         
     behavior_plot.display()
     trace_plot.display()
+
+def plot_horizontal_hand_movement(trial, ax=None, events=None, ref_event_idx=0):
+    '''
+    Plot out horizonatal hand movement against time, with some events marked
+
+    Arguments:
+        trial - pandas Series with trial_data structure (a row of trial_data)
+        ax - matplotlib axis to plot into (default: None)
+        events - list of event times to plot (default: None)
+        ref_event_idx - event index to reference the trial time to (default: 0)
+
+    Returns:
+        ax - matplotlib axis with traces plotted
+    '''
+    if ax is None:
+        ax = plt.gca()
+        
+    ax.clear()
+    ax.set_xlabel('Time (s)')
+    ax.set_ylabel('Hand position (mm)')
+
+    trialtime = np.arange(trial['rel_hand_pos'].shape[0])
+
+    ax.plot(trialtime[[0,-1]], [0,0], '-k')
+    ax.plot(trialtime, trial['rel_hand_pos'][:,0],'-r')
+
+    if events is not None:
+        for event in events:
+            event_time = trial[event]
+            ax.plot(event_time*np.array([1,1]),[-50,50],'--g')
+
+    scale_idx_ticks_to_time(ax.xaxis,trial['bin_size'],ref_event_idx)
+    ax.set_title('Horizontal hand movement')
+    sns.despine(ax=ax,trim=True,offset=10)
+
+    return ax
+
+def make_trial_raster(trial, ax=None, events=None, ref_event_idx=0):
+    '''
+    Make a raster plot for a given trial
+
+    Arguments:
+        trial - pandas Series with trial_data structure (a row of trial_data)
+        ax - matplotlib axis to plot into (default: None)
+        events - list of event times to plot (default: None)
+        ref_event_idx - event index to reference the trial time to (default: 0)
+
+    Returns:
+        ax - matplotlib axis with traces plotted
+    '''
+    if ax is None:
+        ax = plt.gca()
+        
+    ax.clear()
+    ax.set_xlabel('Time (s)')
+    ax.set_ylabel('Neurons')
+    
+    if trial['bin_size'] > 0.01:
+        # use an image to plot the spikes
+        ax.imshow(
+            trial['M1_spikes'].T,
+            aspect='auto',
+            cmap='binary',
+            origin='lower',
+        )
+    else:
+        # use sparse matrix plot
+        ax.spy(
+            trial['M1_spikes'].T,
+            aspect='auto',
+            marker='|',
+            markerfacecolor='k',
+            markeredgecolor='k',
+            markersize=2,
+            origin='lower',
+        )
+        ax.tick_params(axis='x', top=False)
+
+    if events is not None:
+        for event in events:
+            event_time = trial[event]
+            ax.plot(event_time*np.array([1,1]),[0,trial['M1_spikes'].shape[1]],'--g')
+
+    scale_idx_ticks_to_time(ax.xaxis,trial['bin_size'],ref_event_idx)
+    ax.set_yticks([])
+    ax.set_title('Neural raster')
+    sns.despine(ax=ax,left=True,bottom=False,trim=True,offset=10)
+
+    return ax
+
+def scale_idx_ticks_to_time(axis,bin_size,ref_event_idx=0):
+    '''
+    TEMPORARY FUNCTION TO SCALE TICKS TO TIME
+    Scale the index ticks of a matplotlib axis to time
+    (Note: this doesn't change any data in the plot--it just changes the tick labels)
+    Side effects: (intended) changes prperties of the axis passed in
+    TODO: figure out how to change extent of spy plots to make this function unneeded
+
+    Arguments:
+        axis - matplotlib axis to change tick labels of (e.g. plt.gca().xaxis)
+        bin_size - correspondence between index and time (size of bin in seconds)
+        ref_event_idx - index of event to reference the trial time to (default: 0)
+    '''
+    ticks = mpl.ticker.FuncFormatter(lambda x,pos: '{0:g}'.format((x-ref_event_idx)*bin_size))
+    axis.set_major_formatter(ticks)
