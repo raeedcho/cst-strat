@@ -6,6 +6,45 @@ import seaborn as sns
 import pyaldata
 from . import util
 
+def get_condition_neural_averages(trial_data,signal='',cond_col=None):
+    '''
+    Takes trial data as input and returns a table of average firing rates per neuron,
+    separated by specified condition column
+
+    Arguments:
+        trial_data (DataFrame): PyalData formatted structure of neural/behavioral data
+        signal (str): name of signal to use for calculating neural averages
+            (Note: signal must end in '_spikes' or '_rate')
+        cond_col (str): name of column to use for grouping trials by condition
+
+    Returns:
+        DataFrame: table of average firing rates per neuron, with columns:
+            ['monkey','session_date','task','epoch','array','chan_id','unit_id','average_rate']
+    '''
+    array = util.get_array_from_signal(signal)
+    unit_guide = trial_data.loc[trial_data.index[0], array+'_unit_guide']
+
+    conditions = trial_data[cond_col].unique()
+
+    fr_table_list = []
+    for cond in conditions:
+        temp_td = trial_data.loc[trial_data[cond_col] == cond, :].copy()
+        avg_fr = pyaldata.get_average_firing_rates(temp_td, array+'_spikes', divide_by_bin_size=True)
+        fr_table_list.append(pd.DataFrame({
+            'monkey': temp_td['monkey'].values[0],
+            'session_date': temp_td['session_date'].values[0],
+            'array': array,
+            'chan_id': unit_guide[:,0],
+            'unit_id': unit_guide[:,1],
+            cond_col: cond,
+            'average_rate': avg_fr
+        }))
+
+    fr_table = pd.concat(fr_table_list)
+    fr_table.reset_index(drop=True,inplace=True)
+
+    return fr_table
+
 def get_task_epoch_neural_averages(trial_data,signal='',hold_start=-0.4):
     '''
     Takes trial data as input and returns a table of average firing rates per neuron,
@@ -23,10 +62,10 @@ def get_task_epoch_neural_averages(trial_data,signal='',hold_start=-0.4):
             ['monkey','session_date','task','epoch','array','chan_id','unit_id','average_rate']
     '''
     array = util.get_array_from_signal(signal)
+    unit_guide = trial_data.loc[trial_data.index[0], array+'_unit_guide']
 
     tasks = ['CO', 'CST']
     epochs = ['hold', 'move']
-    unit_guide = trial_data.loc[trial_data.index[0], array+'_unit_guide']
 
     fr_table_list = []
     for task in tasks:
