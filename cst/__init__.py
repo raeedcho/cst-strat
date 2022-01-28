@@ -1,3 +1,4 @@
+from .util import *
 from .data import *
 from .plot import *
 from .models import *
