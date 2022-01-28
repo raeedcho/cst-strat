@@ -331,3 +331,52 @@ def scale_idx_ticks_to_time(axis,bin_size,ref_event_idx=0):
     '''
     ticks = mpl.ticker.FuncFormatter(lambda x,pos: '{0:g}'.format((x-ref_event_idx)*bin_size))
     axis.set_major_formatter(ticks)
+
+# def plot_slds_fit(trial):
+#     '''
+#     Plots out the SLDS fit for a given trial. They are in order, from top to bottom:
+#     - Behavioral kinematics plot
+#     - discrete state plot
+#     - continuous state plot
+#     - emmisions (neural firing) raster
+#     
+#     Note: this function is unfinished
+#     '''
+#     fig.clear()   
+#     [beh_ax,disc_ax,cont_ax,emis_ax] = fig.subplots(4,1)
+#     
+#     hand_pos = trial['rel_hand_pos']
+#     lim = abs(hand_pos[:2]).max()
+#     for d in range(2):
+#         beh_ax.plot(hand_pos[:,d]+lim*d,'-k')
+#     beh_ax.plot(trial['idx_goCueTime']*np.array([1,1]),lim*np.array([-1,1]),'--r')
+#     beh_ax.set_xticks([])
+#     beh_ax.set_yticks(np.arange(2) * lim)
+#     beh_ax.set_yticklabels(['horizontal','vertical'])
+#     beh_ax.set_title('Hand position')
+#     sns.despine(ax=beh_ax,trim=True,bottom=True)
+#     
+#     cmap_limited = mpl.colors.ListedColormap(colors[0:num_disc_states])
+#     disc_ax.imshow(trial['M1_slds_disc'][None,:],aspect='auto',cmap=cmap_limited)
+#     disc_ax.plot(trial['idx_goCueTime']*np.array([1,1]),[-0.5,0.5],'--r')
+#     disc_ax.set_yticks([])
+#     disc_ax.set_xticks([])
+#     disc_ax.set_title('Most likely discrete state')
+#     
+#     sns.despine(ax=disc_ax,left=True,bottom=True)
+# 
+#     lim = abs(trial['M1_slds_cont']).max()
+#     for d in range(latent_dim):
+#         cont_ax.plot(trial['M1_slds_cont'][:,d],'-k')
+#     cont_ax.plot(trial['idx_goCueTime']*np.array([1,1]),lim*np.array([-1,1]),'--r')
+#     # cont_ax.set_yticks(np.arange(latent_dim) * lim)
+#     # cont_ax.set_yticklabels(["$x_{}$".format(d+1) for d in range(latent_dim)])
+#     cont_ax.set_xticks([])
+#     cont_ax.set_title('Estimated continuous latents')
+#     sns.despine(ax=cont_ax,bottom=True,trim=True)
+# 
+#     emis_ax.imshow(trial['M1_spikes'].T,aspect='auto',cmap='inferno')
+#     emis_ax.plot(trial['idx_goCueTime']*np.array([1,1]),[0,trial['M1_spikes'].shape[1]],'--r')
+#     emis_ax.set_yticks([])
+#     emis_ax.set_title('Emissions raster')
+#     sns.despine(ax=emis_ax,trim=True)
