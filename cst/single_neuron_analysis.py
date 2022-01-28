@@ -20,6 +20,9 @@ def get_condition_neural_averages(trial_data,signal='',cond_col=None):
     Returns:
         DataFrame: table of average firing rates per neuron, with columns:
             ['monkey','session_date','task','epoch','array','chan_id','unit_id','average_rate']
+
+    TODO: combine this with get_task_epoch_neural_averages by passing in cond_col as a list
+        (possibly using pandas groupby functionality)
     '''
     array = util.get_array_from_signal(signal)
     unit_guide = trial_data.loc[trial_data.index[0], array+'_unit_guide']
