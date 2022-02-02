@@ -45,7 +45,6 @@ def load_clean_data(filepath,verbose=False):
 
         td = pyaldata.remove_low_firing_neurons(td,'M1_spikes',0.1,divide_by_bin_size=True,verbose=verbose)
 
-    td.set_index('trial_id',inplace=True)
     return td
 
 def trim_nans(trial_data):
