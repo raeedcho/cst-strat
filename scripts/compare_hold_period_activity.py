@@ -16,23 +16,24 @@ from sklearn.decomposition import PCA
 def main(args):
     sns.set_context('talk')
 
-    td_hold = prep_hold_data(args.infile,args.verbose)
-    pca_fig = plot_M1_pca(td_hold)
-    lda_fig = plot_M1_lda(td_hold)
-    beh_fig = plot_hold_behavior(td_hold)
-    beh_lda_fig = plot_beh_lda(td_hold)
+    td_hold,td_smooth = prep_hold_move_data(args.infile,args.verbose)
+    td_hold,td_smooth = apply_models(td_hold,td_smooth)
+    td_smooth_avg = pyaldata.trial_average(td_smooth,'task')
 
-    fig_outfile_name = cst.format_outfile_name(td_hold,postfix='task_M1_pca.png')
-    pca_fig.savefig(os.path.join(args.outdir,fig_outfile_name))
+    fig_gen_dict = {
+        'task_M1_pca':plot_M1_hold_pca(td_hold),
+        'task_M1_lda':plot_M1_lda(td_hold),
+        'task_beh':plot_hold_behavior(td_hold),
+        'task_beh_lda':plot_beh_lda(td_hold),
+        # LDA traces
+        'task_lda_trace':plot_M1_lda_traces(td_smooth),
+        'task_lda_trace_avg':plot_M1_lda_traces(td_smooth_avg)
+    }
 
-    fig_outfile_name = cst.format_outfile_name(td_hold,postfix='task_M1_lda.png')
-    lda_fig.savefig(os.path.join(args.outdir,fig_outfile_name))
-    
-    fig_outfile_name = cst.format_outfile_name(td_hold,postfix='task_beh.png')
-    beh_fig.savefig(os.path.join(args.outdir,fig_outfile_name))
-
-    fig_outfile_name = cst.format_outfile_name(td_hold,postfix='task_beh_lda.png')
-    beh_lda_fig.savefig(os.path.join(args.outdir,fig_outfile_name))
+    for fig_postfix,fig in fig_gen_dict.items():
+        fig_name = cst.format_outfile_name(td_hold,postfix=fig_postfix)
+        fig.savefig(os.path.join(args.outdir,fig_name+'.png'))
+        # fig.savefig(os.path.join(args.outdir,fig_name+'.pdf'))
 
 def prep_hold_move_data(infile,verbose=False):
     '''
