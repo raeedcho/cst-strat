@@ -34,15 +34,16 @@ def main(args):
     fig_outfile_name = cst.format_outfile_name(td_hold,postfix='task_beh_lda.png')
     beh_lda_fig.savefig(os.path.join(args.outdir,fig_outfile_name))
 
-def prep_hold_data(infile,verbose=False):
+def prep_hold_move_data(infile,verbose=False):
     '''
-    Prepare data for hold-time PCA and LDA
+    Prepare data for hold-time PCA and LDA, as well as data for smooth hold/move M1 activity
     
     Arguments:
         args (Namespace): Namespace of command-line arguments
         
     Returns:
         td_hold (DataFrame): PyalData formatted structure of neural/behavioral data
+        td_smooth (DataFrame): PyalData formatted structure of neural/behavioral data
     '''
     td = cst.load_clean_data(infile,verbose)
     td_hold = pyaldata.restrict_to_interval(
@@ -56,15 +57,34 @@ def prep_hold_data(infile,verbose=False):
     assert td_hold['M1_spikes'].values[0].ndim==1, "Binning didn't work"
     td_hold['M1_rates'] = [spikes/bin_size for spikes,bin_size in zip(td_hold['M1_spikes'],td_hold['bin_size'])]
 
+    td_smooth = pyaldata.add_firing_rates(td,'smooth')
+    td_smooth = pyaldata.restrict_to_interval(
+        td_smooth,
+        start_point_name='idx_goCueTime',
+        rel_start=-0.4/td['bin_size'].values[0],
+        rel_end=0.5/td['bin_size'].values[0],
+        reset_index=False
+    )
+    td_smooth = pyaldata.combine_time_bins(td_smooth,int(0.05/td_smooth['bin_size'].values[0]))
+
+    return td_hold,td_smooth
+
+@pyaldata.copy_td
+def apply_models(td_hold,td_smooth):
+    '''
+    Apply PCA and LDA models to hold-time data
+    '''
     pca_model = PCA(n_components=8)
     td_hold['M1_pca'] = list(pca_model.fit_transform(np.row_stack(td_hold['M1_rates'].values)))
+    td_smooth['M1_pca'] = [pca_model.transform(rates) for rates in td_smooth['M1_rates']]
 
-    lda_model = LinearDiscriminantAnalysis()
-    td_hold['M1_lda'] = lda_model.fit_transform(
+    M1_lda_model = LinearDiscriminantAnalysis()
+    td_hold['M1_lda'] = M1_lda_model.fit_transform(
         np.row_stack(td_hold['M1_pca'].values),
         td_hold['task']
     )
-    td_hold['M1_task_pred'] = lda_model.predict(np.row_stack(td_hold['M1_pca']))
+    td_hold['M1_task_pred'] = M1_lda_model.predict(np.row_stack(td_hold['M1_pca']))
+    td_smooth['M1_lda'] = [M1_lda_model.transform(sig) for sig in td_smooth['M1_pca']]
 
     beh_lda_model = LinearDiscriminantAnalysis()
     td_hold['beh_lda'] = beh_lda_model.fit_transform(
@@ -81,9 +101,9 @@ def prep_hold_data(infile,verbose=False):
         ])
     )
 
-    return td_hold
+    return td_hold,td_smooth
 
-def plot_M1_pca(td_hold):
+def plot_M1_hold_pca(td_hold):
     '''
     Plot the M1 neural population activity for CO and CST trials
 
@@ -106,6 +126,34 @@ def plot_M1_pca(td_hold):
     sns.despine(ax=pca_ax,trim=True)
 
     return pca_fig
+
+def plot_M1_lda_traces(td_smooth):
+    '''
+    Plot out M1 activity through hold period and first part of trial
+    projected through LDA axis fit on average hold activity to separate
+    tasks.
+
+    Arguments:
+        td_smooth (DataFrame): PyalData formatted structure of neural/behavioral data
+
+    Returns:
+        lda_fig (Figure): Figure of LDA plot
+    '''
+    task_colors = {'CO':'r','CST':'b'}
+    lda_fig,lda_ax = plt.subplots(1,1,figsize=(8,6))
+    for _,trial in td_smooth.iterrows():
+        trialtime = (np.arange(trial['M1_rates'].shape[0])-trial['idx_goCueTime'])*trial['bin_size']
+        lda_ax.plot(
+            trialtime,
+            trial['M1_lda'][:,0],
+            c=task_colors[trial['task']],
+            alpha=0.2,
+        )
+    lda_ax.set_ylabel('M1 LDA')
+    lda_ax.set_xlabel('Time from go cue (s)')
+    sns.despine(ax=lda_ax,trim=True)
+
+    return lda_fig
 
 def plot_hold_behavior(td_hold):
     '''
