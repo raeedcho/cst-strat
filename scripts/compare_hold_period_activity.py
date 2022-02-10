@@ -16,8 +16,9 @@ from sklearn.decomposition import PCA
 def main(args):
     sns.set_context('talk')
 
-    td_hold,td_smooth = prep_hold_move_data(args.infile,args.verbose)
-    td_hold,td_smooth = apply_models(td_hold,td_smooth)
+    td = cst.load_clean_data(args.infile,args.verbose)
+    td_epoch = extract_td_epochs(td)
+    td_hold,td_smooth = apply_models(td_epoch)
     td_smooth_avg = pyaldata.trial_average(td_smooth,'task')
 
     fig_gen_dict = {
@@ -35,7 +36,7 @@ def main(args):
         fig.savefig(os.path.join(args.outdir,fig_name+'.png'))
         # fig.savefig(os.path.join(args.outdir,fig_name+'.pdf'))
 
-def prep_hold_move_data(infile,verbose=False):
+def extract_td_epochs(td):
     '''
     Prepare data for hold-time PCA and LDA, as well as data for smooth hold/move M1 activity
     
@@ -43,66 +44,84 @@ def prep_hold_move_data(infile,verbose=False):
         args (Namespace): Namespace of command-line arguments
         
     Returns:
-        td_hold (DataFrame): PyalData formatted structure of neural/behavioral data
+        td_binned (DataFrame): PyalData formatted structure of neural/behavioral data
         td_smooth (DataFrame): PyalData formatted structure of neural/behavioral data
     '''
-    td = cst.load_clean_data(infile,verbose)
-    td_hold = pyaldata.restrict_to_interval(
-        td,
-        start_point_name='idx_goCueTime',
-        rel_start=-0.4/td['bin_size'].values[0],
-        rel_end=-1,
-        reset_index=False
-    )
-    td_hold = pyaldata.combine_time_bins(td_hold,int(0.4/td_hold['bin_size'].values[0]))
-    assert td_hold['M1_spikes'].values[0].ndim==1, "Binning didn't work"
-    td_hold['M1_rates'] = [spikes/bin_size for spikes,bin_size in zip(td_hold['M1_spikes'],td_hold['bin_size'])]
+    binned_epoch_dict = {
+        'hold': pyaldata.generate_epoch_fun(
+            'idx_goCueTime',
+            rel_start=-0.4/td['bin_size'].values[0],
+            rel_end=-1,
+        ),
+        'move': pyaldata.generate_epoch_fun(
+            'idx_goCueTime',
+            rel_start=0,
+            rel_end=0.4/td['bin_size'].values[0],
+        ),
+    }
+    td_binned = cst.split_trials_by_epoch(td,binned_epoch_dict)
+    td_binned = pyaldata.combine_time_bins(td_binned,int(0.4/td_binned['bin_size'].values[0]))
+    assert td_binned['M1_spikes'].values[0].ndim==1, "Binning didn't work"
+    td_binned['M1_rates'] = [spikes/bin_size for spikes,bin_size in zip(td_binned['M1_spikes'],td_binned['bin_size'])]
 
+    smooth_epoch_dict = {
+        'hold_move': pyaldata.generate_epoch_fun(
+            'idx_goCueTime',
+            rel_start=-0.4/td['bin_size'].values[0],
+            rel_end=0.5/td['bin_size'].values[0],
+        ),
+        'full': pyaldata.generate_epoch_fun(
+            'idx_goCueTime',
+            end_point_name='idx_endTime',
+            rel_start=-0.4/td['bin_size'].values[0],
+            rel_end=-1,
+        )
+    }
     td_smooth = pyaldata.add_firing_rates(td,'smooth')
-    td_smooth = pyaldata.restrict_to_interval(
-        td_smooth,
-        start_point_name='idx_goCueTime',
-        rel_start=-0.4/td['bin_size'].values[0],
-        rel_end=0.5/td['bin_size'].values[0],
-        reset_index=False
-    )
+    td_smooth = cst.split_trials_by_epoch(td_smooth,smooth_epoch_dict)
     td_smooth = pyaldata.combine_time_bins(td_smooth,int(0.05/td_smooth['bin_size'].values[0]))
 
-    return td_hold,td_smooth
+    td_epochs = pd.concat([td_binned,td_smooth]).reset_index()
+
+    return td_epochs
 
 @pyaldata.copy_td
-def apply_models(td_hold,td_smooth):
+def apply_models(td,train_epochs=['hold'],test_epochs=['hold_move']):
     '''
     Apply PCA and LDA models to hold-time data
+
+    Note: only returns the data of the chosen epochs
     '''
+    td_train = td.loc[td['epoch'].isin(train_epochs),:].copy()
+    td_test = td.loc[td['epoch'].isin(test_epochs),:].copy()
     pca_model = PCA(n_components=8)
-    td_hold['M1_pca'] = list(pca_model.fit_transform(np.row_stack(td_hold['M1_rates'].values)))
-    td_smooth['M1_pca'] = [pca_model.transform(rates) for rates in td_smooth['M1_rates']]
+    td_train['M1_pca'] = list(pca_model.fit_transform(np.row_stack(td_train['M1_rates'])))
+    td_test['M1_pca'] = [pca_model.transform(rates) for rates in td_test['M1_rates']]
 
     M1_lda_model = LinearDiscriminantAnalysis()
-    td_hold['M1_lda'] = M1_lda_model.fit_transform(
-        np.row_stack(td_hold['M1_pca'].values),
-        td_hold['task']
+    td_train['M1_lda'] = M1_lda_model.fit_transform(
+        np.row_stack(td_train['M1_pca'].values),
+        td_train['task']
     )
-    td_hold['M1_task_pred'] = M1_lda_model.predict(np.row_stack(td_hold['M1_pca']))
-    td_smooth['M1_lda'] = [M1_lda_model.transform(sig) for sig in td_smooth['M1_pca']]
+    td_train['M1_task_pred'] = M1_lda_model.predict(np.row_stack(td_train['M1_pca']))
+    td_test['M1_lda'] = [M1_lda_model.transform(sig) for sig in td_test['M1_pca']]
 
     beh_lda_model = LinearDiscriminantAnalysis()
-    td_hold['beh_lda'] = beh_lda_model.fit_transform(
+    td_train['beh_lda'] = beh_lda_model.fit_transform(
         np.column_stack([
-            np.row_stack(td_hold['rel_hand_pos'].values),
-            np.row_stack(td_hold['hand_vel'].values),
+            np.row_stack(td_train['rel_hand_pos'].values),
+            np.row_stack(td_train['hand_vel'].values),
         ]),
-        td_hold['task']
+        td_train['task']
     )
-    td_hold['beh_task_pred'] = beh_lda_model.predict(
+    td_train['beh_task_pred'] = beh_lda_model.predict(
         np.column_stack([
-            np.row_stack(td_hold['rel_hand_pos'].values),
-            np.row_stack(td_hold['hand_vel'].values),
+            np.row_stack(td_train['rel_hand_pos'].values),
+            np.row_stack(td_train['hand_vel'].values),
         ])
     )
 
-    return td_hold,td_smooth
+    return td_train,td_test
 
 def plot_M1_hold_pca(td_hold):
     '''
