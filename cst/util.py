@@ -29,6 +29,7 @@ def get_array_from_signal(signal):
     else:
         raise ValueError('signal must end in "_spikes" or "_rate"')
 
+@pyaldata.copy_td
 def split_trials_by_epoch(trial_data,epoch_dict,epoch_col_name='epoch'):
     '''
     Split trial_data by epochs
