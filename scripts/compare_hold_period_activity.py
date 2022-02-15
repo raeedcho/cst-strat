@@ -18,17 +18,17 @@ def main(args):
 
     td = cst.load_clean_data(args.infile,args.verbose)
     td_epoch = extract_td_epochs(td)
-    td_hold,td_smooth = apply_models(td_epoch)
-    td_smooth_avg = pyaldata.trial_average(td_smooth,'task')
+    td_train,td_test = apply_models(td_epoch,train_epochs=['hold'],test_epochs=['hold_move'])
+    # td_test_avg = pyaldata.trial_average(td_test,'task')
 
     fig_gen_dict = {
-        'task_M1_pca':plot_M1_hold_pca(td_hold),
-        'task_M1_lda':plot_M1_lda(td_hold),
-        'task_beh':plot_hold_behavior(td_hold),
-        'task_beh_lda':plot_beh_lda(td_hold),
+        'task_M1_pca':plot_M1_hold_pca(td_train),
+        'task_M1_lda':plot_M1_lda(td_train),
+        'task_beh':plot_hold_behavior(td_train),
+        'task_beh_lda':plot_beh_lda(td_train),
         # LDA traces
-        'task_lda_trace':plot_M1_lda_traces(td_smooth),
-        'task_lda_trace_avg':plot_M1_lda_traces(td_smooth_avg)
+        'task_lda_trace':plot_M1_lda_traces(td_test),
+        # 'task_lda_trace_avg':plot_M1_lda_traces(td_test_avg)
     }
 
     for fig_postfix,fig in fig_gen_dict.items():
@@ -77,7 +77,15 @@ def extract_td_epochs(td):
             rel_end=-1,
         )
     }
-    td_smooth = pyaldata.add_firing_rates(td,'smooth')
+    td_smooth = td.copy()
+    td_smooth['M1_rates'] = [
+        pyaldata.smooth_data(
+            spikes,
+            dt=bin_size,
+            std=0.05,
+            backend='convolve',
+        ) for spikes,bin_size in zip(td_smooth['M1_spikes'],td_smooth['bin_size'])
+    ]
     td_smooth = cst.split_trials_by_epoch(td_smooth,smooth_epoch_dict)
     td_smooth = pyaldata.combine_time_bins(td_smooth,int(0.05/td_smooth['bin_size'].values[0]))
 
@@ -92,10 +100,20 @@ def apply_models(td,train_epochs=['hold'],test_epochs=['hold_move']):
 
     Note: only returns the data of the chosen epochs
     '''
+    
+    if type(train_epochs)==str:
+        train_epochs = [train_epochs]
+    if type(test_epochs)==str:
+        test_epochs = [test_epochs]
+
+    assert type(train_epochs)==list, "train_epochs must be a list"
+    assert type(test_epochs)==list, "test_epochs must be a list"
+
     td_train = td.loc[td['epoch'].isin(train_epochs),:].copy()
     td_test = td.loc[td['epoch'].isin(test_epochs),:].copy()
     pca_model = PCA(n_components=8)
-    td_train['M1_pca'] = list(pca_model.fit_transform(np.row_stack(td_train['M1_rates'])))
+    pca_model.fit(np.row_stack(td_train['M1_rates']))
+    td_train['M1_pca'] = [pca_model.transform(rates) for rates in td_train['M1_rates']]
     td_test['M1_pca'] = [pca_model.transform(rates) for rates in td_test['M1_rates']]
 
     M1_lda_model = LinearDiscriminantAnalysis()
