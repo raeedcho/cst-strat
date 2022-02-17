@@ -21,6 +21,7 @@ jupyterlab = "*"
 ipympl = "*"
 lxml = ">=4.6.5"
 pyarrow = "*"
+pytest = "*"
 
 [dev-packages]
 
