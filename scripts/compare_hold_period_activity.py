@@ -32,7 +32,7 @@ def main(args):
     }
 
     for fig_postfix,fig in fig_gen_dict.items():
-        fig_name = cst.format_outfile_name(td_hold,postfix=fig_postfix)
+        fig_name = cst.format_outfile_name(td_train,postfix=fig_postfix)
         fig.savefig(os.path.join(args.outdir,fig_name+'.png'))
         # fig.savefig(os.path.join(args.outdir,fig_name+'.pdf'))
 
@@ -112,8 +112,8 @@ def apply_models(td,train_epochs=['hold'],test_epochs=['hold_move']):
     td_train = td.loc[td['epoch'].isin(train_epochs),:].copy()
     td_test = td.loc[td['epoch'].isin(test_epochs),:].copy()
     pca_model = PCA(n_components=8)
-    pca_model.fit(np.row_stack(td_train['M1_rates']))
-    td_train['M1_pca'] = [pca_model.transform(rates) for rates in td_train['M1_rates']]
+    td_train['M1_pca'] = list(pca_model.fit_transform(np.row_stack(td_train['M1_rates'])))
+    # td_train['M1_pca'] = [pca_model.transform(rates) for rates in td_train['M1_rates']]
     td_test['M1_pca'] = [pca_model.transform(rates) for rates in td_test['M1_rates']]
 
     M1_lda_model = LinearDiscriminantAnalysis()
