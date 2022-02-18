@@ -41,14 +41,35 @@ def main(args):
             rel_start=-0.4/td['bin_size'].values[0],
             rel_end=-1,
         ),
-        'full': pyaldata.generate_epoch_fun(
-            'idx_startTime',
-            end_point_name='idx_endTime',
-            rel_start=0,
-            rel_end=-1,
-        ),
+        # 'full': pyaldata.generate_epoch_fun(
+        #     'idx_startTime',
+        #     end_point_name='idx_endTime',
+        #     rel_start=0,
+        #     rel_end=-1,
+        # ),
     }
     td_epochs = cst.split_trials_by_epoch(td,epoch_dict)
+
+    td_task_epoch_rates = td_epochs.groupby(['task','epoch'],as_index=False).agg(
+        M1_rates = ('M1_rates',np.row_stack)
+    )
+    td_pairs = td_task_epoch_rates.join(
+        td_task_epoch_rates,
+        how='cross',
+        lsuffix='_left',
+        rsuffix='_right',
+    )
+    
+    td_pairs['subspace_overlap'] = [
+        cst.subspace_overlap_index(left,right,num_dims=10)
+        for left,right in zip(td_pairs['M1_rates_left'],td_pairs['M1_rates_right'])
+    ]
+
+    overlap_matrix = td_pairs.pivot(
+        index=['task_left','epoch_left'],
+        columns=['task_right','epoch_right'],
+        values='subspace_overlap'
+    )
 
 if __name__=='__main__':
     import argparse
