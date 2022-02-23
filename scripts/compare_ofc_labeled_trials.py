@@ -13,16 +13,28 @@ from sklearn.decomposition import PCA
 
 def main(args):
     labeled_td = load_labeled_td(args.infile,args.verbose)
+    td_cst = extract_cst_epoch(labeled_td)
+    td_epochs = extract_td_epochs(labeled_td)
+    td_train,td_test = cst.apply_models(td_epochs,train_epochs=['move'],test_epochs=['full'],label_col='ControlPolicy')
 
     sns.set_context('talk')
 
-    single_fr_stats_fig = plot_single_neuron_stats(labeled_td)
-    fig_outfile_name = cst.format_outfile_name(labeled_td,postfix='ofc_trial_label_avg_fr_scatter.png')
-    single_fr_stats_fig.savefig(os.path.join(args.outdir,fig_outfile_name))
+    fig_gen_dict = {
+        'ofc_trial_label_avg_fr_scatter': plot_single_neuron_stats(labeled_td),
+        'ofc_trial_label_pca_traces': plot_pca_traces(labeled_td),
+        'task_M1_pca': cst.plot_M1_hold_pca(td_train,label_col='ControlPolicy',hue_order=['Position','Velocity']),
+        'task_M1_lda': cst.plot_M1_lda(td_train,label_col='ControlPolicy',hue_order=['Position','Velocity']),
+        'task_beh': cst.plot_hold_behavior(td_train,label_col='ControlPolicy',hue_order=['Position','Velocity']),
+        'task_beh_lda': cst.plot_beh_lda(td_train,label_col='ControlPolicy',hue_order=['Position','Velocity']),
+        # LDA traces
+        'task_lda_trace': cst.plot_M1_lda_traces(td_test,label_col='ControlPolicy',label_colors={'Position':'r','Velocity':'b'}),
+        # 'task_lda_trace_avg':plot_M1_lda_traces(td_test_avg)
+    }
 
-    pca_fig = plot_pca_traces(labeled_td)
-    fig_outfile_name = cst.format_outfile_name(labeled_td,postfix='ofc_trial_label_pca_traces.png')
-    pca_fig.savefig(os.path.join(args.outdir,fig_outfile_name))
+    for fig_postfix,fig in fig_gen_dict.items():
+        fig_name = cst.format_outfile_name(labeled_td,postfix=fig_postfix)
+        fig.savefig(os.path.join(args.outdir,fig_name+'.png'))
+        # fig.savefig(os.path.join(args.outdir,fig_name+'.pdf'))
 
 def load_labeled_td(infile,verbose=False):
     '''
@@ -37,35 +49,97 @@ def load_labeled_td(infile,verbose=False):
         DataFrame: trial data with labels
     '''
     td = cst.load_clean_data(infile,verbose)
-    td.reset_index(inplace=True)
-
-    td['M1_rates'] = [
-        pyaldata.smooth_data(spikes/bin_size,dt=bin_size,std=0.05) 
-        for spikes,bin_size in zip(td['M1_spikes'],td['bin_size'])
-    ]
 
     # TODO: generalize this to load an arbitrary label file
     temp = scipy.io.loadmat('data/ofc_trial_label_struct.mat',simplify_cells=True)
     labels = pd.DataFrame(temp['ofc_trial_labels'])
     labels['session_date'] = pd.to_datetime(labels['date'])
 
-    labels = labels.loc[(labels['ControlPolicy']=='Velocity') | (labels['ControlPolicy']=='Position'),:]
+    labels = labels.loc[
+        (labels['ControlPolicy']=='Velocity') | (labels['ControlPolicy']=='Position'),
+        ['monkey','session_date','trial_id','ControlPolicy']]
 
     labeled_td = td.merge(labels)
 
-    labeled_td = pyaldata.restrict_to_interval(
-        labeled_td,
+    return labeled_td
+
+@pyaldata.copy_td
+def extract_cst_epoch(td):
+    '''
+    Pull out epochs of interest from trial data to check for differences between OFC labels
+    '''
+    td['M1_rates'] = [
+        pyaldata.smooth_data(
+            spikes,
+            dt=bin_size,
+            std=0.05,
+            backend='convolve',
+        ) for spikes,bin_size in zip(td['M1_spikes'],td['bin_size'])
+    ]
+    td = pyaldata.restrict_to_interval(
+        td,
         start_point_name='idx_cstStartTime',
         end_point_name='idx_cstEndTime',
         reset_index=False
     )
-
-    labeled_td = pyaldata.combine_time_bins(labeled_td,int(0.05/labeled_td['bin_size'].values[0]))
+    td = pyaldata.combine_time_bins(td,int(0.05/td['bin_size'].values[0]))
 
     pca_model = PCA(n_components=8)
-    labeled_td = pyaldata.dim_reduce(labeled_td,pca_model,'M1_rates','M1_pca')
+    td = pyaldata.dim_reduce(td,pca_model,'M1_rates','M1_pca')
 
-    return labeled_td
+    return td
+
+@pyaldata.copy_td
+def extract_td_epochs(td):
+    '''
+    Pull out epochs of interest from trial data to check for differences between OFC labels
+    '''
+    binned_epoch_dict = {
+        # 'hold': cst.generate_realtime_epoch_fun(
+        #     'idx_goCueTime',
+        #     rel_start_time = -0.4,
+        #     rel_end_time = 0,
+        # ),
+        'move': cst.generate_realtime_epoch_fun(
+            'idx_cstStartTime',
+            rel_start_time = 0,
+            rel_end_time = 5,
+        ),
+    }
+    td_binned = cst.split_trials_by_epoch(td,binned_epoch_dict)
+    # td_binned = pyaldata.combine_time_bins(td_binned,int(0.4/td_binned['bin_size'].values[0]))
+    td_binned = pyaldata.combine_time_bins(td_binned,int(5/td_binned['bin_size'].values[0]))
+    assert td_binned['M1_spikes'].values[0].ndim==1, "Binning didn't work"
+    td_binned['M1_rates'] = [spikes/bin_size for spikes,bin_size in zip(td_binned['M1_spikes'],td_binned['bin_size'])]
+
+    smooth_epoch_dict = {
+        'hold_move': pyaldata.generate_epoch_fun(
+            'idx_goCueTime',
+            rel_start=-0.4/td['bin_size'].values[0],
+            rel_end=0.5/td['bin_size'].values[0],
+        ),
+        'full': pyaldata.generate_epoch_fun(
+            'idx_goCueTime',
+            end_point_name='idx_endTime',
+            rel_start=-0.4/td['bin_size'].values[0],
+            rel_end=-1,
+        )
+    }
+    td_smooth = td.copy()
+    td_smooth['M1_rates'] = [
+        pyaldata.smooth_data(
+            spikes,
+            dt=bin_size,
+            std=0.05,
+            backend='convolve',
+        ) for spikes,bin_size in zip(td_smooth['M1_spikes'],td_smooth['bin_size'])
+    ]
+    td_smooth = cst.split_trials_by_epoch(td_smooth,smooth_epoch_dict)
+    td_smooth = pyaldata.combine_time_bins(td_smooth,int(0.05/td_smooth['bin_size'].values[0]))
+
+    td_epochs = pd.concat([td_binned,td_smooth]).reset_index()
+
+    return td_epochs
 
 def plot_single_neuron_stats(labeled_td):
     '''
