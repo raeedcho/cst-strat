@@ -5,3 +5,4 @@ from .models import *
 from .submovements import *
 from .single_neuron_analysis import *
 from .subspace_tools import *
+from .context_analysis import *
