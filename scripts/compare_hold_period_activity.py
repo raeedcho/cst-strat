@@ -74,7 +74,7 @@ def extract_td_epochs(td):
     td_smooth = td.copy()
     td_smooth['M1_rates'] = [
         pyaldata.smooth_data(
-            spikes,
+            spikes/bin_size,
             dt=bin_size,
             std=0.05,
             backend='convolve',
