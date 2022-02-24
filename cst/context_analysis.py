@@ -164,7 +164,7 @@ def plot_M1_lda(td_hold,label_col='task',hue_order=['CO','CST']):
     '''
     # Hold-time LDA
     lda_fig,lda_ax = plt.subplots(1,1,figsize=(8,6))
-    lda_ax.plot([0,td_hold.shape[0]],[0,0],'k--')
+    lda_ax.plot([td_hold['trial_id'].min(),td_hold['trial_id'].max()],[0,0],'k--')
     sns.scatterplot(
         ax=lda_ax,
         data=td_hold,
@@ -191,7 +191,7 @@ def plot_beh_lda(td_hold,label_col='task',hue_order=['CO','CST']):
     '''
     # Hold-time LDA
     lda_fig,lda_ax = plt.subplots(1,1,figsize=(8,6))
-    lda_ax.plot([0,td_hold.shape[0]],[0,0],'k--')
+    lda_ax.plot([td_hold['trial_id'].min(),td_hold['trial_id'].max()],[0,0],'k--')
     sns.scatterplot(
         ax=lda_ax,
         data=td_hold,
