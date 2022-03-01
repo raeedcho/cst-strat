@@ -24,32 +24,34 @@ def main(args):
     ]
 
     epoch_dict = {
-        'hold': pyaldata.generate_epoch_fun(
+        'hold': cst.generate_realtime_epoch_fun(
             'idx_goCueTime',
-            rel_start=-0.4/td['bin_size'].values[0],
-            rel_end=-1,
+            rel_start_time=-0.4,
+            rel_end_time=0,
         ),
-        'move': pyaldata.generate_epoch_fun(
-            'idx_goCueTime',
-            end_point_name='idx_endTime',
-            rel_start=0,
-            rel_end=-1,
-        ),
-        'hold_move': pyaldata.generate_epoch_fun(
+        'move': cst.generate_realtime_epoch_fun(
             'idx_goCueTime',
             end_point_name='idx_endTime',
-            rel_start=-0.4/td['bin_size'].values[0],
-            rel_end=-1,
+            rel_start_time=0,
+            rel_end_time=0,
         ),
-        # 'full': pyaldata.generate_epoch_fun(
+        'hold_move': cst.generate_realtime_epoch_fun(
+            'idx_goCueTime',
+            end_point_name='idx_endTime',
+            rel_start_time=-0.4,
+            rel_end_time=0,
+        ),
+        # 'full': cst.generate_realtime_epoch_fun(
         #     'idx_startTime',
         #     end_point_name='idx_endTime',
-        #     rel_start=0,
-        #     rel_end=-1,
+        #     rel_start_time=0,
+        #     rel_end_time=0,
         # ),
     }
     td_epochs = cst.split_trials_by_epoch(td,epoch_dict)
+    td_epochs = pyaldata.combine_time_bins(td_epochs,0.05//td_epochs['bin_size'].values[0])
 
+    # TODO: add bootstrapping to this somehow, probably using pandas.groupby.sample
     td_task_epoch_rates = td_epochs.groupby(['task','epoch'],as_index=False).agg(
         M1_rates = ('M1_rates',np.row_stack)
     )
