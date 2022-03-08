@@ -143,7 +143,3 @@ dmypy.json
 
 # VS Code
 .vscode
-
-# data and results folders
-data/
-results/
