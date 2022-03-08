@@ -94,3 +94,42 @@ def generate_realtime_epoch_fun(start_point_name,end_point_name=None,rel_start_t
         )
 
     return epoch_fun
+
+def combine_all_trial_bins(td):
+    '''
+    Combine all bins in each trial into a single bin
+    (wrapper on pyaldata.combine_time_bins)
+    '''
+    pass
+
+def time_shuffle_columns(array):
+    '''
+    Shuffle independently within columns of numpy array
+
+    Arguments:
+        array (np.array): array to shuffle
+
+    Returns:
+        np.array: shuffled array
+    '''
+    rng = np.random.default_rng()
+
+    for colnum in range(array.shape[1]):
+        array[:,colnum] = rng.permutation(array[:,colnum])
+
+    return array
+    
+def random_array_like(array):
+    '''
+    Returns an array of the same size as input,
+    with the same overall mean and standard deviation
+    (assuming a normal distribution)
+    
+    Arguments:
+        array (np.array): array to imitate
+        
+    Returns:
+        np.array: array with same mean and standard deviation
+    '''
+    rng = np.random.default_rng()
+    return rng.standard_normal(array.shape) * np.std(array) + np.mean(array)
