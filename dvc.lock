@@ -1,0 +1,62 @@
+schema: '2.0'
+stages:
+  temp_subspace_consistency:
+    cmd: python scripts/check_subspace_consistency.py --infile data/trial_data/Earl_20190716_COCST_TD.mat
+      --outdir results/subspace_consistency
+    deps:
+    - path: data/trial_data/Earl_20190716_COCST_TD.mat
+      md5: 5b38bd926780c5eb65a237a621e00a6f
+      size: 256345478
+    - path: scripts/check_subspace_consistency.py
+      md5: 8fe4ca91be5633f9d5e885da646794cc
+      size: 5258
+    params:
+      params.yaml:
+        subspace_consistency.analysis_bin_size: 0.05
+        subspace_consistency.num_bootstraps: 1
+        subspace_consistency.smoothing_kernel_std: 0.05
+    outs:
+    - path: results/temp_subspace_consistency/
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
+  subspace_consistency@1:
+    cmd: python scripts/check_subspace_consistency.py --infile data/trial_data/Ford_20180627_COCST_TD.mat
+      --outdir results/subspace_consistency/Ford_20180627/
+    deps:
+    - path: data/trial_data/Ford_20180627_COCST_TD.mat
+      md5: d716e2c6ff9a3759fdb5234b1808da72
+      size: 172600092
+    - path: scripts/check_subspace_consistency.py
+      md5: 8fe4ca91be5633f9d5e885da646794cc
+      size: 5258
+    params:
+      params.yaml:
+        subspace_consistency.analysis_bin_size: 0.05
+        subspace_consistency.num_bootstraps: 1
+        subspace_consistency.smoothing_kernel_std: 0.05
+    outs:
+    - path: results/subspace_consistency/Ford_20180627/
+      md5: 637182397c3fc37662594a9ce9b60527.dir
+      size: 38179
+      nfiles: 1
+  subspace_consistency@0:
+    cmd: python scripts/check_subspace_consistency.py --infile data/trial_data/Earl_20190716_COCST_TD.mat
+      --outdir results/subspace_consistency/Earl_20190716/
+    deps:
+    - path: data/trial_data/Earl_20190716_COCST_TD.mat
+      md5: 5b38bd926780c5eb65a237a621e00a6f
+      size: 256345478
+    - path: scripts/check_subspace_consistency.py
+      md5: 8fe4ca91be5633f9d5e885da646794cc
+      size: 5258
+    params:
+      params.yaml:
+        subspace_consistency.analysis_bin_size: 0.05
+        subspace_consistency.num_bootstraps: 1
+        subspace_consistency.smoothing_kernel_std: 0.05
+    outs:
+    - path: results/subspace_consistency/Earl_20190716/
+      md5: 9cfc53ce24e6edf3d16d3cd941a68f2c.dir
+      size: 38165
+      nfiles: 1

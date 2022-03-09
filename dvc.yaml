@@ -1,0 +1,20 @@
+stages:
+  subspace_consistency:
+    foreach:
+    - monkey: Earl
+      session_date: '20190716'
+    - monkey: Ford
+      session_date: '20180627'
+    do:
+      params:
+      - subspace_consistency.analysis_bin_size
+      - subspace_consistency.num_bootstraps
+      - subspace_consistency.smoothing_kernel_std
+      deps:
+      - data/trial_data/${item.monkey}_${item.session_date}_COCST_TD.mat
+      - scripts/check_subspace_consistency.py
+      outs:
+      - results/subspace_consistency/${item.monkey}_${item.session_date}/:
+          persist: true
+      cmd: python scripts/check_subspace_consistency.py --infile data/trial_data/${item.monkey}_${item.session_date}_COCST_TD.mat
+        --outdir results/subspace_consistency/${item.monkey}_${item.session_date}/
