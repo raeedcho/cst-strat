@@ -8,12 +8,11 @@ import seaborn as sns
 import cst
 import pyaldata
 import os
+import yaml
 
 def main(args):
     # TODO: move parameters to JSON params file
-    num_bootstraps = 100
-    smoothing_kernel_std = 0.05
-    analysis_bin_size = 0.05
+    params = yaml.safe_load(open("params.yaml"))['subspace_consistency']
 
     sns.set_context('talk')
 
@@ -22,7 +21,7 @@ def main(args):
         pyaldata.smooth_data(
             spikes/bin_size,
             dt=bin_size,
-            std=smoothing_kernel_std,
+            std=params['smoothing_kernel_std'],
             backend='convolve',
         ) for spikes,bin_size in zip(td['M1_spikes'],td['bin_size'])
     ]
@@ -41,9 +40,9 @@ def main(args):
         ),
     }
     td_epochs = cst.split_trials_by_epoch(td,epoch_dict)
-    td_epochs = pyaldata.combine_time_bins(td_epochs,int(analysis_bin_size//td_epochs['bin_size'].values[0]))
+    td_epochs = pyaldata.combine_time_bins(td_epochs,int(params['analysis_bin_size']//td_epochs['bin_size'].values[0]))
 
-    td_boots = bootstrap_subspace_overlap(td_epochs,num_bootstraps)
+    td_boots = bootstrap_subspace_overlap(td_epochs,params['num_bootstraps'])
 
     fig_gen_dict = {
         'task_epoch_subpsace_overlap': plot_subspace_overlap(td_boots),
