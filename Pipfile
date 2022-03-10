@@ -23,6 +23,8 @@ lxml = ">=4.6.5"
 pyarrow = "*"
 pytest = "*"
 dvc = "*"
+dpca = "*"
+numexpr = "*"
 
 [dev-packages]
 
