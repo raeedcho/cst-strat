@@ -11,9 +11,7 @@ import os
 import yaml
 
 def main(args):
-    # TODO: move parameters to JSON params file
     params = yaml.safe_load(open("params.yaml"))['subspace_consistency']
-
     sns.set_context('talk')
 
     td = cst.load_clean_data(args.infile,args.verbose)
