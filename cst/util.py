@@ -133,3 +133,14 @@ def random_array_like(array):
     '''
     rng = np.random.default_rng()
     return rng.standard_normal(array.shape) * np.std(array) + np.mean(array)
+
+def form_neural_tensor(td):
+    '''
+    Form a tensor of neural data from a trial_data structure
+
+    Arguments: ???
+
+    Returns:
+        np.array: tensor of neural data
+    '''
+    pass
