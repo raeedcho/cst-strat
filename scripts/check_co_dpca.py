@@ -31,7 +31,7 @@ def run_dpca(td):
 
     # Compose the neural data tensor
     # This is a 4D tensor with dimensions (num_trials, num_neurons, num_time_bins, num_targets)
-    neural_tensor = form_neural_tensor(td) # use groupby somehow
+    neural_tensor = cst.form_neural_tensor(td) # use groupby somehow
 
     # set up dpca
     dpca = dPCA(labels='ts',join={'s':['s','ts']},regularizer='auto')

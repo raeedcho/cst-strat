@@ -134,13 +134,31 @@ def random_array_like(array):
     rng = np.random.default_rng()
     return rng.standard_normal(array.shape) * np.std(array) + np.mean(array)
 
-def form_neural_tensor(td):
+def form_neural_tensor(td,signal,cond_cols=None):
     '''
     Form a tensor of neural data from a trial_data structure
+    Notes:
+        - Trials must be the same length
 
-    Arguments: ???
+    Arguments:
+        td (DataFrame): trial_data structure in PyalData format
+        signal (str): name of signal to form tensor from
+        cond_cols (list): list of columns to use as conditions to split over
+            If None, will form a third order tensor of shape (n_trials,n_neurons,n_timebins)
 
     Returns:
-        np.array: tensor of neural data
+        np.array: tensor of neural data of shape (n_trials,n_neurons,n_timebins,n_cond_1,n_cond_2,n_cond_3,...)
     '''
-    pass
+    # Argument checking
+    assert signal in td.columns, 'Signal must be in trial_data'
+    assert pyaldata.trials_are_same_length(td), 'Trials must be the same length'
+
+    if cond_cols is None:
+        return np.stack([sig.T for sig in td[signal]],axis=0)
+    else:
+        td_grouped = td.groupby(cond_cols)
+        min_trials = int(td_grouped.size().min()['size'])
+        trial_cat_table = td_grouped.agg(
+            signal = (signal, lambda sigs: np.stack([sig.T for sig in sigs.sample(n=min_trials)],axis=0))
+        )
+        # Stack in the remaining axes by condition somehow...
