@@ -2,3 +2,8 @@ subspace_consistency:
     num_bootstraps: 1
     smoothing_kernel_std: 0.05
     analysis_bin_size: 0.05
+co_dpca:
+    rel_start_time: -0.4
+    rel_end_time: 0.5
+    smoothing_kernel_std: 0.05
+    softnorm_rates: False
