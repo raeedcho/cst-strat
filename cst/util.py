@@ -143,22 +143,34 @@ def form_neural_tensor(td,signal,cond_cols=None):
     Arguments:
         td (DataFrame): trial_data structure in PyalData format
         signal (str): name of signal to form tensor from
-        cond_cols (list): list of columns to use as conditions to split over
+        cond_cols (str or list): list of columns to use as conditions to group by
             If None, will form a third order tensor of shape (n_trials,n_neurons,n_timebins)
 
     Returns:
-        np.array: tensor of neural data of shape (n_trials,n_neurons,n_timebins,n_cond_1,n_cond_2,n_cond_3,...)
+        np.array: tensor of neural data of shape (n_trials,n_neurons,n_cond_1,n_cond_2,n_cond_3,...,n_timebins)
     '''
     # Argument checking
     assert signal in td.columns, 'Signal must be in trial_data'
     assert pyaldata.trials_are_same_length(td), 'Trials must be the same length'
 
     if cond_cols is None:
-        return np.stack([sig.T for sig in td[signal]],axis=0)
+        neural_tensor = np.stack([sig.T for sig in td[signal]],axis=0)
     else:
         td_grouped = td.groupby(cond_cols)
-        min_trials = int(td_grouped.size().min()['size'])
+        min_trials = td_grouped.size().min()
         trial_cat_table = td_grouped.agg(
             signal = (signal, lambda sigs: np.stack([sig.T for sig in sigs.sample(n=min_trials)],axis=0))
         )
-        # Stack in the remaining axes by condition somehow...
+        # Stack in the remaining axes by iteratively grouping by remaining columns and stacking
+        while trial_cat_table.index.nlevels > 1:
+            # group by all columns other than the first one
+            part_group = trial_cat_table.groupby(level=list(range(1,trial_cat_table.index.nlevels)))
+            # stack over the first column and overwrite the old table, keeping time axis at the end
+            trial_cat_table = part_group.agg(
+                signal = ('signal', lambda sigs: np.stack(sigs,axis=-2))
+            )
+        else:
+            # final stack
+            neural_tensor = np.stack(trial_cat_table['signal'],axis=-2)
+
+    return neural_tensor
