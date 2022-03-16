@@ -14,7 +14,27 @@ stages:
       - data/trial_data/${item.monkey}_${item.session_date}_COCST_TD.mat
       - scripts/check_subspace_consistency.py
       outs:
-      - results/subspace_consistency/${item.monkey}_${item.session_date}/:
-          persist: true
+      - results/subspace_consistency/${item.monkey}_${item.session_date}/
       cmd: python scripts/check_subspace_consistency.py --infile data/trial_data/${item.monkey}_${item.session_date}_COCST_TD.mat
         --outdir results/subspace_consistency/${item.monkey}_${item.session_date}/
+  co_dpca:
+    foreach:
+    - monkey: Earl
+      session_date: '20190716'
+    - monkey: Ford
+      session_date: '20180627'
+    do:
+      params:
+      - co_dpca.co_rel_start_time
+      - co_dpca.co_rel_end_time
+      - co_dpca.cst_rel_start_time
+      - co_dpca.cst_rel_end_time
+      - co_dpca.smoothing_kernel_std
+      - co_dpca.softnorm_rates
+      deps:
+      - data/trial_data/${item.monkey}_${item.session_date}_COCST_TD.mat
+      - scripts/check_co_dpca.py
+      outs:
+      - results/co_dpca/${item.monkey}_${item.session_date}/
+      cmd: python scripts/check_co_dpca.py --infile data/trial_data/${item.monkey}_${item.session_date}_COCST_TD.mat
+        --outdir results/co_dpca/${item.monkey}_${item.session_date}/
