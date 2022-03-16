@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import cst
+import src
 import pyaldata
 import os
 import yaml
@@ -14,7 +14,7 @@ def main(args):
     params = yaml.safe_load(open("params.yaml"))['subspace_consistency']
     sns.set_context('talk')
 
-    td = cst.load_clean_data(args.infile,args.verbose)
+    td = src.load_clean_data(args.infile,args.verbose)
     td['M1_rates'] = [
         pyaldata.smooth_data(
             spikes/bin_size,
@@ -25,19 +25,19 @@ def main(args):
     ]
 
     epoch_dict = {
-        'hold': cst.generate_realtime_epoch_fun(
+        'hold': src.generate_realtime_epoch_fun(
             'idx_goCueTime',
             rel_start_time=-0.4,
             rel_end_time=0,
         ),
-        'move': cst.generate_realtime_epoch_fun(
+        'move': src.generate_realtime_epoch_fun(
             'idx_goCueTime',
             end_point_name='idx_endTime',
             rel_start_time=0,
             rel_end_time=0,
         ),
     }
-    td_epochs = cst.split_trials_by_epoch(td,epoch_dict)
+    td_epochs = src.split_trials_by_epoch(td,epoch_dict)
     td_epochs = pyaldata.combine_time_bins(td_epochs,int(params['analysis_bin_size']//td_epochs['bin_size'].values[0]))
 
     td_boots = bootstrap_subspace_overlap(td_epochs,params['num_bootstraps'])
@@ -46,8 +46,11 @@ def main(args):
         'task_epoch_subpsace_overlap': plot_subspace_overlap(td_boots),
     }
 
+    if not os.path.isdir(args.outdir):
+        os.mkdir(args.outdir)
+
     for fig_postfix,fig in fig_gen_dict.items():
-        fig_name = cst.format_outfile_name(td,postfix=fig_postfix)
+        fig_name = src.format_outfile_name(td,postfix=fig_postfix)
         fig.savefig(os.path.join(args.outdir,fig_name+'.png'))
         # fig.savefig(os.path.join(args.outdir,fig_name+'.pdf'))
 
@@ -86,12 +89,12 @@ def bootstrap_subspace_overlap(td_epochs,num_bootstraps):
     td_boots = pd.concat(td_boots).reset_index(drop=True)
     
     td_boots['subspace_overlap'] = [
-        cst.subspace_overlap_index(data,proj,num_dims=10)
+        src.subspace_overlap_index(data,proj,num_dims=10)
         for data,proj in zip(td_boots['M1_rates_data'],td_boots['M1_rates_proj'])
     ]
 
     td_boots['subspace_overlap_rand'] = [
-        cst.subspace_overlap_index(data,cst.random_array_like(data),num_dims=10)
+        src.subspace_overlap_index(data,src.random_array_like(data),num_dims=10)
         for data in td_boots['M1_rates_data']
     ]
 

@@ -4,14 +4,14 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import cst
+import src
 import pyaldata
 import os
 import yaml
 from dPCA.dPCA import dPCA
 
 def main(args):
-    td = cst.load_clean_data(args.infile,args.verbose)
+    td = src.load_clean_data(args.infile,args.verbose)
 
     params = yaml.safe_load(open("params.yaml"))['co_dpca']
     sns.set_context('talk')
@@ -20,7 +20,7 @@ def main(args):
 
     # Trim CO data to time around go cue
     td_co = td.groupby(['task','result']).get_group(('CO','R'))
-    epoch_fun = cst.generate_realtime_epoch_fun(
+    epoch_fun = src.generate_realtime_epoch_fun(
         'idx_goCueTime',
         rel_start_time=params['rel_start_time'],
         rel_end_time=params['rel_end_time'],
@@ -37,10 +37,10 @@ def main(args):
 
     # get CST data
     td_cst = td.groupby(['task','result']).get_group(('CST','R'))
-    cst_epoch_fun = cst.generate_realtime_epoch_fun(
         'idx_cstStartTime',
         rel_start_time=0,
         rel_end_time=5,
+    cst_epoch_fun = src.generate_realtime_epoch_fun(
     )
     td_cst = pyaldata.restrict_to_interval(td_cst,epoch_fun=cst_epoch_fun)
 
@@ -55,7 +55,7 @@ def main(args):
     }
 
     for fig_postfix,fig in fig_gen_dict.items():
-        fig_name = cst.format_outfile_name(td,postfix=fig_postfix)
+        fig_name = src.format_outfile_name(td,postfix=fig_postfix)
         fig.savefig(os.path.join(args.outdir,fig_name+'.png'))
         # fig.savefig(os.path.join(args.outdir,fig_name+'.pdf'))
 
@@ -99,7 +99,7 @@ def fit_dpca(td):
 
     # Compose the neural data tensor
     # This is a 4D tensor with dimensions (num_trials, num_neurons, num_targets, num_time_bins)
-    neural_tensor = cst.form_neural_tensor(td,'M1_state',cond_cols='tgtDir')
+    neural_tensor = src.form_neural_tensor(td,'M1_state',cond_cols='tgtDir')
 
     # set up dpca
     dpca = dPCA(labels='st',join={'s':['s','st']},regularizer='auto')

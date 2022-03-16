@@ -6,7 +6,7 @@ import pandas as pd
 import scipy
 import matplotlib.pyplot as plt
 import seaborn as sns
-import cst
+import src
 import pyaldata
 import os
 from sklearn.decomposition import PCA
@@ -15,8 +15,8 @@ def main(args):
     labeled_td = load_labeled_td(args.infile,args.verbose)
     td_cst = extract_cst_epoch(labeled_td)
     td_epochs = extract_td_epochs(labeled_td)
-    td_train_move,td_test_move = cst.apply_models(td_epochs,train_epochs=['move'],test_epochs=['full'],label_col='ControlPolicy')
-    td_train_hold,td_test_hold = cst.apply_models(td_epochs,train_epochs=['hold'],test_epochs=['full'],label_col='ControlPolicy')
+    td_train_move,td_test_move = src.apply_models(td_epochs,train_epochs=['move'],test_epochs=['full'],label_col='ControlPolicy')
+    td_train_hold,td_test_hold = src.apply_models(td_epochs,train_epochs=['hold'],test_epochs=['full'],label_col='ControlPolicy')
 
     sns.set_context('talk')
 
@@ -24,23 +24,23 @@ def main(args):
         'ofc_trial_label_avg_fr_scatter': plot_single_neuron_stats(td_cst),
         'ofc_trial_label_pca_traces': plot_pca_traces(td_cst),
         # Move-trained models
-        'ofc_label_move_M1_pca': cst.plot_M1_hold_pca(td_train_move,label_col='ControlPolicy',hue_order=['Position','Velocity']),
-        'ofc_label_move_M1_lda': cst.plot_M1_lda(td_train_move,label_col='ControlPolicy',hue_order=['Position','Velocity']),
-        'ofc_label_move_beh': cst.plot_hold_behavior(td_train_move,label_col='ControlPolicy',hue_order=['Position','Velocity']),
-        'ofc_label_move_beh_lda': cst.plot_beh_lda(td_train_move,label_col='ControlPolicy',hue_order=['Position','Velocity']),
+        'ofc_label_move_M1_pca': src.plot_M1_hold_pca(td_train_move,label_col='ControlPolicy',hue_order=['Position','Velocity']),
+        'ofc_label_move_M1_lda': src.plot_M1_lda(td_train_move,label_col='ControlPolicy',hue_order=['Position','Velocity']),
+        'ofc_label_move_beh': src.plot_hold_behavior(td_train_move,label_col='ControlPolicy',hue_order=['Position','Velocity']),
+        'ofc_label_move_beh_lda': src.plot_beh_lda(td_train_move,label_col='ControlPolicy',hue_order=['Position','Velocity']),
         # Hold-trained models
-        'ofc_label_hold_M1_pca': cst.plot_M1_hold_pca(td_train_hold,label_col='ControlPolicy',hue_order=['Position','Velocity']),
-        'ofc_label_hold_M1_lda': cst.plot_M1_lda(td_train_hold,label_col='ControlPolicy',hue_order=['Position','Velocity']),
-        'ofc_label_hold_beh': cst.plot_hold_behavior(td_train_hold,label_col='ControlPolicy',hue_order=['Position','Velocity']),
-        'ofc_label_hold_beh_lda': cst.plot_beh_lda(td_train_hold,label_col='ControlPolicy',hue_order=['Position','Velocity']),
+        'ofc_label_hold_M1_pca': src.plot_M1_hold_pca(td_train_hold,label_col='ControlPolicy',hue_order=['Position','Velocity']),
+        'ofc_label_hold_M1_lda': src.plot_M1_lda(td_train_hold,label_col='ControlPolicy',hue_order=['Position','Velocity']),
+        'ofc_label_hold_beh': src.plot_hold_behavior(td_train_hold,label_col='ControlPolicy',hue_order=['Position','Velocity']),
+        'ofc_label_hold_beh_lda': src.plot_beh_lda(td_train_hold,label_col='ControlPolicy',hue_order=['Position','Velocity']),
         # LDA traces
-        'ofc_label_move_lda_trace': cst.plot_M1_lda_traces(td_test_move,label_col='ControlPolicy',label_colors={'Position':'r','Velocity':'b'}),
-        'ofc_label_hold_lda_trace': cst.plot_M1_lda_traces(td_test_hold,label_col='ControlPolicy',label_colors={'Position':'r','Velocity':'b'}),
+        'ofc_label_move_lda_trace': src.plot_M1_lda_traces(td_test_move,label_col='ControlPolicy',label_colors={'Position':'r','Velocity':'b'}),
+        'ofc_label_hold_lda_trace': src.plot_M1_lda_traces(td_test_hold,label_col='ControlPolicy',label_colors={'Position':'r','Velocity':'b'}),
         # 'task_lda_trace_avg':plot_M1_lda_traces(td_test_move_avg)
     }
 
     for fig_postfix,fig in fig_gen_dict.items():
-        fig_name = cst.format_outfile_name(labeled_td,postfix=fig_postfix)
+        fig_name = src.format_outfile_name(labeled_td,postfix=fig_postfix)
         fig.savefig(os.path.join(args.outdir,fig_name+'.png'))
         # fig.savefig(os.path.join(args.outdir,fig_name+'.pdf'))
 
@@ -56,7 +56,7 @@ def load_labeled_td(infile,verbose=False):
     Returns:
         DataFrame: trial data with labels
     '''
-    td = cst.load_clean_data(infile,verbose)
+    td = src.load_clean_data(infile,verbose)
 
     # TODO: generalize this to load an arbitrary label file
     temp = scipy.io.loadmat('data/ofc_trial_label_struct.mat',simplify_cells=True)
@@ -103,18 +103,18 @@ def extract_td_epochs(td):
     Pull out epochs of interest from trial data to check for differences between OFC labels
     '''
     binned_epoch_dict = {
-        'hold': cst.generate_realtime_epoch_fun(
+        'hold': src.generate_realtime_epoch_fun(
             'idx_goCueTime',
             rel_start_time = -0.4,
             rel_end_time = 0,
         ),
-        'move': cst.generate_realtime_epoch_fun(
+        'move': src.generate_realtime_epoch_fun(
             'idx_cstStartTime',
             rel_start_time = 0,
             rel_end_time = 5,
         ),
     }
-    td_binned = cst.split_trials_by_epoch(td,binned_epoch_dict)
+    td_binned = src.split_trials_by_epoch(td,binned_epoch_dict)
     # TODO: make the following lines more extensible by creating a "combine_all_time_bins" function
     td_binned = pd.concat([
         pyaldata.combine_time_bins(
@@ -151,7 +151,7 @@ def extract_td_epochs(td):
             backend='convolve',
         ) for spikes,bin_size in zip(td_smooth['M1_spikes'],td_smooth['bin_size'])
     ]
-    td_smooth = cst.split_trials_by_epoch(td_smooth,smooth_epoch_dict)
+    td_smooth = src.split_trials_by_epoch(td_smooth,smooth_epoch_dict)
     td_smooth = pyaldata.combine_time_bins(td_smooth,int(0.05/td_smooth['bin_size'].values[0]))
 
     td_epochs = pd.concat([td_binned,td_smooth]).reset_index(drop=True)
@@ -168,7 +168,7 @@ def plot_single_neuron_stats(labeled_td):
     Returns:
         fig (Figure): figure object
     '''
-    # avg_fr_table = cst.get_condition_neural_averages(labeled_td,signal='M1_spikes',cond_col='ControlPolicy')
+    # avg_fr_table = src.get_condition_neural_averages(labeled_td,signal='M1_spikes',cond_col='ControlPolicy')
     # max_fr = avg_fr_table['average_rate'].max()
     # avg_fr_pivot = avg_fr_table.pivot(index=['chan_id','unit_id'],columns='ControlPolicy',values='average_rate')
 

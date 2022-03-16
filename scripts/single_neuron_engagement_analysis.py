@@ -2,11 +2,11 @@
 # This script runs a single neuron engagement analysis, looking for
 # how average neural activity changes as lambda changes
 
-import cst
+import src
 import pyaldata
 
 def main(args):
-    td = cst.load_clean_data(args.infile,args.verbose)
+    td = src.load_clean_data(args.infile,args.verbose)
 
     td_cst = td.loc[td['task']=='CST',:].copy()
     td_cst = pyaldata.restrict_to_interval(

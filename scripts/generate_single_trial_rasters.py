@@ -1,7 +1,7 @@
 #!/bin/python3
 # This script simply plots out the neural traces for CO and CST for each neuron
 
-import cst
+import src
 import pyaldata
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,7 +9,7 @@ import os
 import seaborn as sns
 
 def main(args):
-    td = cst.load_clean_data(args.infile,args.verbose)
+    td = src.load_clean_data(args.infile,args.verbose)
     td = pyaldata.restrict_to_interval(
         td,
         start_point_name='idx_goCueTime',
@@ -18,13 +18,13 @@ def main(args):
         rel_end=-1,
         reset_index=False
     )
-    td = cst.add_trial_time(td,ref_event='idx_goCueTime')
+    td = src.add_trial_time(td,ref_event='idx_goCueTime')
 
     sns.set_context('talk')
     for _,trial in td.iterrows():
         fig,[beh_ax,raster_ax] = plt.subplots(2,1,figsize=(10,8),sharex=True)
-        cst.plot_horizontal_hand_movement(trial,ax=beh_ax,events=['idx_goCueTime'],ref_event_idx=trial['idx_goCueTime'])
-        cst.make_trial_raster(trial,ax=raster_ax,events=['idx_goCueTime'],ref_event_idx=trial['idx_goCueTime'])
+        src.plot_horizontal_hand_movement(trial,ax=beh_ax,events=['idx_goCueTime'],ref_event_idx=trial['idx_goCueTime'])
+        src.make_trial_raster(trial,ax=raster_ax,events=['idx_goCueTime'],ref_event_idx=trial['idx_goCueTime'])
 
         beh_ax.set_xlabel('')
         beh_ax.set_title('')

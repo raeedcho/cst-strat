@@ -3,30 +3,30 @@
 
 import pandas as pd
 import seaborn as sns
-import cst
+import src
 import pyaldata
 import os
 
 def main(args):
     sns.set_context('talk')
 
-    td = cst.load_clean_data(args.infile,args.verbose)
+    td = src.load_clean_data(args.infile,args.verbose)
     td_epoch = extract_td_epochs(td)
-    td_train,td_test = cst.apply_models(td_epoch,train_epochs=['hold'],test_epochs=['hold_move'])
+    td_train,td_test = src.apply_models(td_epoch,train_epochs=['hold'],test_epochs=['hold_move'])
     # td_test_avg = pyaldata.trial_average(td_test,'task')
 
     fig_gen_dict = {
-        'task_M1_pca':cst.plot_M1_hold_pca(td_train),
-        'task_M1_lda':cst.plot_M1_lda(td_train),
-        'task_beh':cst.plot_hold_behavior(td_train),
-        'task_beh_lda':cst.plot_beh_lda(td_train),
+        'task_M1_pca':src.plot_M1_hold_pca(td_train),
+        'task_M1_lda':src.plot_M1_lda(td_train),
+        'task_beh':src.plot_hold_behavior(td_train),
+        'task_beh_lda':src.plot_beh_lda(td_train),
         # LDA traces
-        'task_lda_trace':cst.plot_M1_lda_traces(td_test),
+        'task_lda_trace':src.plot_M1_lda_traces(td_test),
         # 'task_lda_trace_avg':plot_M1_lda_traces(td_test_avg)
     }
 
     for fig_postfix,fig in fig_gen_dict.items():
-        fig_name = cst.format_outfile_name(td_train,postfix=fig_postfix)
+        fig_name = src.format_outfile_name(td_train,postfix=fig_postfix)
         fig.savefig(os.path.join(args.outdir,fig_name+'.png'))
         # fig.savefig(os.path.join(args.outdir,fig_name+'.pdf'))
 
@@ -53,7 +53,7 @@ def extract_td_epochs(td):
             rel_end=0.4/td['bin_size'].values[0],
         ),
     }
-    td_binned = cst.split_trials_by_epoch(td,binned_epoch_dict)
+    td_binned = src.split_trials_by_epoch(td,binned_epoch_dict)
     td_binned = pyaldata.combine_time_bins(td_binned,int(0.4/td_binned['bin_size'].values[0]))
     assert td_binned['M1_spikes'].values[0].ndim==1, "Binning didn't work"
     td_binned['M1_rates'] = [spikes/bin_size for spikes,bin_size in zip(td_binned['M1_spikes'],td_binned['bin_size'])]
@@ -80,7 +80,7 @@ def extract_td_epochs(td):
             backend='convolve',
         ) for spikes,bin_size in zip(td_smooth['M1_spikes'],td_smooth['bin_size'])
     ]
-    td_smooth = cst.split_trials_by_epoch(td_smooth,smooth_epoch_dict)
+    td_smooth = src.split_trials_by_epoch(td_smooth,smooth_epoch_dict)
     td_smooth = pyaldata.combine_time_bins(td_smooth,int(0.05/td_smooth['bin_size'].values[0]))
 
     td_epochs = pd.concat([td_binned,td_smooth]).reset_index()
