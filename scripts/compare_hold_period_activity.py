@@ -6,15 +6,16 @@ import seaborn as sns
 import src
 import pyaldata
 import os
+from pathlib import Path
 
 def main(args):
-    sns.set_context('talk')
-
     td = src.load_clean_data(args.infile,args.verbose)
     td_epoch = extract_td_epochs(td)
-    td_train,td_test = src.apply_models(td_epoch,train_epochs=['hold'],test_epochs=['hold_move'])
-    # td_test_avg = pyaldata.trial_average(td_test,'task')
 
+    # TODO: save this output to a feather file in outdir
+    td_train,td_test = src.apply_models(td_epoch,train_epochs=['hold'],test_epochs=['hold_move'])
+
+    sns.set_context('talk')
     fig_gen_dict = {
         'task_M1_pca':src.plot_M1_hold_pca(td_train),
         'task_M1_lda':src.plot_M1_lda(td_train),
