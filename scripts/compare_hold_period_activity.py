@@ -22,12 +22,14 @@ def main(args):
         'task_beh_lda':src.plot_beh_lda(td_train),
         # LDA traces
         'task_lda_trace':src.plot_M1_lda_traces(td_test),
-        # 'task_lda_trace_avg':plot_M1_lda_traces(td_test_avg)
     }
 
+    fig_path = args.outdir/'figs'
+    fig_path.mkdir(parents=True, exist_ok=True)
     for fig_postfix,fig in fig_gen_dict.items():
         fig_name = src.format_outfile_name(td_train,postfix=fig_postfix)
-        fig.savefig(os.path.join(args.outdir,fig_name+'.png'))
+        fig.savefig(fig_path/(fig_name+'.png'))
+        # fig.savefig(os.path.join(args.outdir,fig_name+'.png'))
         # fig.savefig(os.path.join(args.outdir,fig_name+'.pdf'))
 
 def extract_td_epochs(td):
@@ -91,7 +93,7 @@ if __name__=='__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Compare hold period activity between CO and CST trials')
     parser.add_argument('--infile',required=True,help='path to input file')
-    parser.add_argument('--outdir',required=True,help='path to output directory for results and plots')
+    parser.add_argument('--outdir',type=Path,required=True,help='path to output directory for results and plots')
     parser.add_argument('-v', '--verbose', action='store_true', help='increase output verbosity')
     args = parser.parse_args()
 

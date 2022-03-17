@@ -38,3 +38,18 @@ stages:
       - results/co_dpca/${item.monkey}_${item.session_date}/
       cmd: python scripts/check_co_dpca.py --infile data/trial_data/${item.monkey}_${item.session_date}_COCST_TD.mat
         --outdir results/co_dpca/${item.monkey}_${item.session_date}/
+  context_analysis:
+    foreach:
+    - monkey: Earl
+      session_date: '20190716'
+    - monkey: Ford
+      session_date: '20180627'
+    do:
+      deps:
+      - data/trial_data/${item.monkey}_${item.session_date}_COCST_TD.mat
+      - scripts/compare_hold_period_activity.py
+      outs:
+      - results/hold_time_analysis/${item.monkey}_${item.session_date}/:
+          persist: true
+      cmd: python scripts/compare_hold_period_activity.py --infile data/trial_data/${item.monkey}_${item.session_date}_COCST_TD.mat
+        --outdir results/hold_time_analysis/${item.monkey}_${item.session_date}/

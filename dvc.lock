@@ -68,8 +68,8 @@ stages:
       md5: 5b38bd926780c5eb65a237a621e00a6f
       size: 256345478
     - path: scripts/check_co_dpca.py
-      md5: b4a3218dd4b019c0be5c7974a09b252c
-      size: 6796
+      md5: d7bd10c532f7f269939414ad62d959d9
+      size: 6839
     params:
       params.yaml:
         co_dpca.co_rel_end_time: 0.5
@@ -80,8 +80,8 @@ stages:
         co_dpca.softnorm_rates: false
     outs:
     - path: results/co_dpca/Earl_20190716/
-      md5: ef19b204ae32e89bfc5684dd5f83f406.dir
-      size: 480358
+      md5: 340a2921724d151815c5cbffd0b389e3.dir
+      size: 477580
       nfiles: 5
   co_dpca@1:
     cmd: python scripts/check_co_dpca.py --infile data/trial_data/Ford_20180627_COCST_TD.mat
@@ -91,8 +91,8 @@ stages:
       md5: d716e2c6ff9a3759fdb5234b1808da72
       size: 172600092
     - path: scripts/check_co_dpca.py
-      md5: b4a3218dd4b019c0be5c7974a09b252c
-      size: 6796
+      md5: d7bd10c532f7f269939414ad62d959d9
+      size: 6839
     params:
       params.yaml:
         co_dpca.co_rel_end_time: 0.5
@@ -103,6 +103,36 @@ stages:
         co_dpca.softnorm_rates: false
     outs:
     - path: results/co_dpca/Ford_20180627/
-      md5: d4468e84cc8b2fb9e8154817f06ea4eb.dir
-      size: 488569
+      md5: d067bb3153da66549ccf6ae4f7cbdda0.dir
+      size: 482168
       nfiles: 5
+  context_analysis@0:
+    cmd: python scripts/compare_hold_period_activity.py --infile data/trial_data/Earl_20190716_COCST_TD.mat
+      --outdir results/hold_time_analysis/Earl_20190716/
+    deps:
+    - path: data/trial_data/Earl_20190716_COCST_TD.mat
+      md5: 5b38bd926780c5eb65a237a621e00a6f
+      size: 256345478
+    - path: scripts/compare_hold_period_activity.py
+      md5: 2f1b11a6a81a8a24601921a1a21bfa58
+      size: 3668
+    outs:
+    - path: results/hold_time_analysis/Earl_20190716/
+      md5: c969a444b8f94f31dae54ddcf709b863.dir
+      size: 1686411
+      nfiles: 10
+  context_analysis@1:
+    cmd: python scripts/compare_hold_period_activity.py --infile data/trial_data/Ford_20180627_COCST_TD.mat
+      --outdir results/hold_time_analysis/Ford_20180627/
+    deps:
+    - path: data/trial_data/Ford_20180627_COCST_TD.mat
+      md5: d716e2c6ff9a3759fdb5234b1808da72
+      size: 172600092
+    - path: scripts/compare_hold_period_activity.py
+      md5: 2f1b11a6a81a8a24601921a1a21bfa58
+      size: 3668
+    outs:
+    - path: results/hold_time_analysis/Ford_20180627/
+      md5: 5ab3419f1cadbb8d70eba9843fab4100.dir
+      size: 1262164
+      nfiles: 10
