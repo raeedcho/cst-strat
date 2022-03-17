@@ -13,7 +13,8 @@ from dPCA.dPCA import dPCA
 def main(args):
     td = src.load_clean_data(args.infile,args.verbose)
 
-    params = yaml.safe_load(open("params.yaml"))['co_dpca']
+    with open('params.yaml') as param_file:
+        params = yaml.safe_load(param_file)['co_dpca']
 
     td = preprocess_neural_activity(td,params)
 
@@ -120,7 +121,7 @@ def add_dpca_projections(td,dpca):
     return td
 
 def plot_dpca(td,latent_dict):
-    timevec = np.arange(td['M1_state'].values[0].shape[0])*td['bin_size'].values[0]-td['idx_goCueTime'].values[0]
+    timevec = (np.arange(td['M1_state'].values[0].shape[0])-td['idx_goCueTime'].values[0])*td['bin_size'].values[0]
     fig,ax = plt.subplots(2,5,figsize=(15,7),sharex=True,sharey=True)
 
     for condnum,(key,val) in enumerate(latent_dict.items()):
@@ -142,7 +143,7 @@ def plot_dpca_projection(td):
     '''
     Plot out dPCA projections from td
     '''
-    timevec = np.arange(td['M1_state'].values[0].shape[0])*td['bin_size'].values[0]-td['idx_goCueTime'].values[0]
+    timevec = (np.arange(td['M1_state'].values[0].shape[0])-td['idx_goCueTime'].values[0])*td['bin_size'].values[0]
     fig,ax = plt.subplots(2,5,figsize=(15,7),sharex=True,sharey=True)
 
     # tgt_colors = {0: '#1f77b4', 90: '#ff7f0e', 180: '#2ca02c', -90: '#d62728'}

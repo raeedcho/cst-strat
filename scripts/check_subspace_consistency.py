@@ -11,8 +11,8 @@ import os
 import yaml
 
 def main(args):
-    params = yaml.safe_load(open("params.yaml"))['subspace_consistency']
-    sns.set_context('talk')
+    with open('params.yaml') as params_file:
+        params = yaml.safe_load(params_file)['subspace_consistency']
 
     td = src.load_clean_data(args.infile,args.verbose)
     td['M1_rates'] = [
@@ -42,6 +42,7 @@ def main(args):
 
     td_boots = bootstrap_subspace_overlap(td_epochs,params['num_bootstraps'])
 
+    sns.set_context('talk')
     fig_gen_dict = {
         'task_epoch_subpsace_overlap': plot_subspace_overlap(td_boots),
     }
