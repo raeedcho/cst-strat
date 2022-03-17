@@ -45,15 +45,14 @@ def extract_td_epochs(td):
         td_smooth (DataFrame): PyalData formatted structure of neural/behavioral data
     '''
     binned_epoch_dict = {
-        'hold': pyaldata.generate_epoch_fun(
+        'hold': src.generate_realtime_epoch_fun(
             'idx_goCueTime',
-            rel_start=-0.4/td['bin_size'].values[0],
-            rel_end=-1,
+            rel_start_time=-0.4,
         ),
-        'move': pyaldata.generate_epoch_fun(
+        'move': src.generate_realtime_epoch_fun(
             'idx_goCueTime',
-            rel_start=0,
-            rel_end=0.4/td['bin_size'].values[0],
+            rel_start_time=0,
+            rel_end_time=0.4,
         ),
     }
     td_binned = src.split_trials_by_epoch(td,binned_epoch_dict)
@@ -62,16 +61,15 @@ def extract_td_epochs(td):
     td_binned['M1_rates'] = [spikes/bin_size for spikes,bin_size in zip(td_binned['M1_spikes'],td_binned['bin_size'])]
 
     smooth_epoch_dict = {
-        'hold_move': pyaldata.generate_epoch_fun(
+        'hold_move': src.generate_realtime_epoch_fun(
             'idx_goCueTime',
-            rel_start=-0.4/td['bin_size'].values[0],
-            rel_end=0.5/td['bin_size'].values[0],
+            rel_start_time=-0.4,
+            rel_end_time=0.5,
         ),
-        'full': pyaldata.generate_epoch_fun(
+        'full': src.generate_realtime_epoch_fun(
             'idx_goCueTime',
             end_point_name='idx_endTime',
-            rel_start=-0.4/td['bin_size'].values[0],
-            rel_end=-1,
+            rel_start_time=-0.4,
         )
     }
     td_smooth = td.copy()
