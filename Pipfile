@@ -25,6 +25,7 @@ pytest = "*"
 dvc = "*"
 dpca = "*"
 numexpr = "*"
+contrastive = "*"
 
 [dev-packages]
 
