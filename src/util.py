@@ -1,6 +1,7 @@
 import numpy as np
 import pyaldata
 import pandas as pd
+import scipy.signal as ss
 
 def format_outfile_name(trial_data,postfix=''):
     '''
@@ -174,3 +175,24 @@ def form_neural_tensor(td,signal,cond_cols=None):
             neural_tensor = np.stack(trial_cat_table['signal'],axis=-2)
 
     return neural_tensor
+
+def signal_template_match(signal,template):
+    '''
+    Compute the cross-correlation in time between signal and template
+
+    Arguments:
+        signal (np.ndarray): signal to be matched (shape: num_time_bins,num_features)
+        template (np.ndarray): Template to be matched against (shape: num_template_time_bins,num_features)
+
+    Returns:
+        (np.ndarray): Cross-correlation in time between signal and template
+    '''
+    assert signal.shape[1] == template.shape[1], 'Signal and template must have same number of features'
+    
+    time_corr = np.zeros(signal.shape)
+    for colnum in range(signal.shape[1]):
+        time_corr[:,colnum] = ss.correlate(signal[:,colnum],template[:,colnum],mode='same')
+
+    time_corr = np.sum(time_corr,axis=1)
+
+    return time_corr
