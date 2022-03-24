@@ -51,7 +51,7 @@ def main(args):
         'co_dpca_trials': plot_dpca_projection(td_co),
         'cst_dpca_trials': plot_dpca_projection(td_cst),
         'co_dpca_cis_traces': plot_cis_traces(td_co),
-        'cst_dpca_cis_traces': plot_cis_traces(td_cst),
+        'cst_dpca_cis_traces': plot_cis_traces(td_cst.sample(n=1)),
     }
 
     if not os.path.isdir(args.outdir):
