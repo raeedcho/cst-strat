@@ -62,6 +62,17 @@ def main(args):
         fig.savefig(os.path.join(args.outdir,fig_name+'.png'))
         # fig.savefig(os.path.join(args.outdir,fig_name+'.pdf'))
 
+    # from ipywidgets import interact
+    # template = np.mean(np.stack(td_co['M1_dpca_time'], axis=0), axis=0)
+    # @interact(trialnum=list(td_cst.index))
+    # def plot_cis_template_match(trialnum):
+    #     fig, [ax_kin, ax_corr] = plt.subplots(2, 1, figsize=(5, 5), sharex=True)
+    #     trial = td_cst.loc[trialnum,:]
+    #     corr = src.signal_template_match(trial['M1_dpca_time'],template)
+    #     ax_kin.plot(trial['rel_hand_pos'][:,0])
+    #     ax_corr.plot(corr)
+    #     sns.despine(fig=fig, trim=True)
+
 
 def preprocess_neural_activity(td,params):
     '''
