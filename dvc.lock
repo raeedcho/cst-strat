@@ -28,8 +28,8 @@ stages:
       md5: d716e2c6ff9a3759fdb5234b1808da72
       size: 172600092
     - path: scripts/check_subspace_consistency.py
-      md5: b7e4ba94d5531eb4183091454f3fec38
-      size: 5279
+      md5: b8925a6b6b27228d07430a77475ccfd4
+      size: 7077
     params:
       params.yaml:
         subspace_consistency.analysis_bin_size: 0.05
@@ -37,9 +37,9 @@ stages:
         subspace_consistency.smoothing_kernel_std: 0.05
     outs:
     - path: results/subspace_consistency/Ford_20180627/
-      md5: 54fbcc8e7718e834301d427594b2fa8e.dir
-      size: 43405
-      nfiles: 1
+      md5: 33d2d999f89d4655db01646aabd38f52.dir
+      size: 116323
+      nfiles: 2
   subspace_consistency@0:
     cmd: python scripts/check_subspace_consistency.py --infile data/trial_data/Earl_20190716_COCST_TD.mat
       --outdir results/subspace_consistency/Earl_20190716/
@@ -48,18 +48,18 @@ stages:
       md5: 5b38bd926780c5eb65a237a621e00a6f
       size: 256345478
     - path: scripts/check_subspace_consistency.py
-      md5: b7e4ba94d5531eb4183091454f3fec38
-      size: 5279
+      md5: b8925a6b6b27228d07430a77475ccfd4
+      size: 7077
     params:
       params.yaml:
         subspace_consistency.analysis_bin_size: 0.05
-        subspace_consistency.num_bootstraps: 100
+        subspace_consistency.num_bootstraps: 1
         subspace_consistency.smoothing_kernel_std: 0.05
     outs:
     - path: results/subspace_consistency/Earl_20190716/
-      md5: 36427f41fd03ab542d1ca6e893dc32db.dir
-      size: 43184
-      nfiles: 1
+      md5: be8312ee639e2a95a2b8766ce71e4dd4.dir
+      size: 86362
+      nfiles: 2
   co_dpca@0:
     cmd: python scripts/check_co_dpca.py --infile data/trial_data/Earl_20190716_COCST_TD.mat
       --outdir results/co_dpca/Earl_20190716/
@@ -68,8 +68,8 @@ stages:
       md5: 5b38bd926780c5eb65a237a621e00a6f
       size: 256345478
     - path: scripts/check_co_dpca.py
-      md5: d7bd10c532f7f269939414ad62d959d9
-      size: 6839
+      md5: 6677065e273ac0b4e949d1903fca63f6
+      size: 7374
     params:
       params.yaml:
         co_dpca.co_rel_end_time: 0.5
@@ -80,8 +80,8 @@ stages:
         co_dpca.softnorm_rates: false
     outs:
     - path: results/co_dpca/Earl_20190716/
-      md5: 340a2921724d151815c5cbffd0b389e3.dir
-      size: 477580
+      md5: a4887158c6baa8a1da0ff248d61d4101.dir
+      size: 458956
       nfiles: 5
   co_dpca@1:
     cmd: python scripts/check_co_dpca.py --infile data/trial_data/Ford_20180627_COCST_TD.mat
@@ -91,8 +91,8 @@ stages:
       md5: d716e2c6ff9a3759fdb5234b1808da72
       size: 172600092
     - path: scripts/check_co_dpca.py
-      md5: d7bd10c532f7f269939414ad62d959d9
-      size: 6839
+      md5: 6677065e273ac0b4e949d1903fca63f6
+      size: 7374
     params:
       params.yaml:
         co_dpca.co_rel_end_time: 0.5
@@ -103,8 +103,8 @@ stages:
         co_dpca.softnorm_rates: false
     outs:
     - path: results/co_dpca/Ford_20180627/
-      md5: d067bb3153da66549ccf6ae4f7cbdda0.dir
-      size: 482168
+      md5: b0e8409780cb9d367f35dbf22df8172d.dir
+      size: 461367
       nfiles: 5
   context_analysis@0:
     cmd: python scripts/compare_hold_period_activity.py --infile data/trial_data/Earl_20190716_COCST_TD.mat
@@ -114,12 +114,12 @@ stages:
       md5: 5b38bd926780c5eb65a237a621e00a6f
       size: 256345478
     - path: scripts/compare_hold_period_activity.py
-      md5: 2f1b11a6a81a8a24601921a1a21bfa58
-      size: 3668
+      md5: 9a2489c93546ab6e6f69ff45213d1bc8
+      size: 3643
     outs:
     - path: results/hold_time_analysis/Earl_20190716/
-      md5: c969a444b8f94f31dae54ddcf709b863.dir
-      size: 1686411
+      md5: dd51917638f92caf98f03f198fe88454.dir
+      size: 1860752
       nfiles: 10
   context_analysis@1:
     cmd: python scripts/compare_hold_period_activity.py --infile data/trial_data/Ford_20180627_COCST_TD.mat
@@ -129,10 +129,10 @@ stages:
       md5: d716e2c6ff9a3759fdb5234b1808da72
       size: 172600092
     - path: scripts/compare_hold_period_activity.py
-      md5: 2f1b11a6a81a8a24601921a1a21bfa58
-      size: 3668
+      md5: 9a2489c93546ab6e6f69ff45213d1bc8
+      size: 3643
     outs:
     - path: results/hold_time_analysis/Ford_20180627/
-      md5: 5ab3419f1cadbb8d70eba9843fab4100.dir
-      size: 1262164
+      md5: 65d0d549bf6c3f9dca6ab1d7eb0f2b1f.dir
+      size: 1397433
       nfiles: 10
