@@ -11,10 +11,11 @@ import os
 import yaml
 
 def main(args):
+    td = src.load_clean_data(args.infile,args.verbose)
+
     with open('params.yaml') as params_file:
         params = yaml.safe_load(params_file)['subspace_consistency']
 
-    td = src.load_clean_data(args.infile,args.verbose)
     td['M1_rates'] = [
         pyaldata.smooth_data(
             spikes/bin_size,
@@ -24,6 +25,38 @@ def main(args):
         ) for spikes,bin_size in zip(td['M1_spikes'],td['bin_size'])
     ]
 
+    # check subspace consistency across tasks and epochs
+    td_boots_task_epoch = find_task_epoch_overlap(td,params)
+
+    # check subspace consistency across lambda
+    td_boots_lambda = find_lambda_overlap(td,params)
+
+    sns.set_context('talk')
+    fig_gen_dict = {
+        'task_epoch_subpsace_overlap': plot_task_epoch_overlap(td_boots_task_epoch),
+        'lambda_subspace_overlap': plot_lambda_overlap(td_boots_lambda),
+    }
+
+    if not os.path.isdir(args.outdir):
+        os.mkdir(args.outdir)
+
+    for fig_postfix,fig in fig_gen_dict.items():
+        fig_name = src.format_outfile_name(td,postfix=fig_postfix)
+        fig.savefig(os.path.join(args.outdir,fig_name+'.png'))
+        # fig.savefig(os.path.join(args.outdir,fig_name+'.pdf'))
+
+def find_task_epoch_overlap(td,params):
+    '''
+    Find the (bootstrapped) subspace overlap between pairs of task/epoch combos
+
+    Arguments:
+        td: (pandas.DataFrame) trial data
+        params: (dict) parameters for data preprocessing and bootstrapping
+
+    Returns:
+        pandas.DataFrame: dataframe with rows corresponding to each bootstrap
+            of subspace overlap computed for pairs of task/epoch combos
+    '''
     epoch_dict = {
         'hold': src.generate_realtime_epoch_fun(
             'idx_goCueTime',
@@ -40,69 +73,17 @@ def main(args):
     td_epochs = src.split_trials_by_epoch(td,epoch_dict)
     td_epochs = pyaldata.combine_time_bins(td_epochs,int(params['analysis_bin_size']//td_epochs['bin_size'].values[0]))
 
-    td_boots = bootstrap_subspace_overlap(td_epochs,params['num_bootstraps'])
+    # subselect CO trials with only horizontal movement
+    if params['subselect_co_horiz_trials']:
+        is_vert_trial = (td_epochs['tgtDir']==180) | (td_epochs['tgtDir']==-90)
+        td_epochs = td_epochs.loc[~is_vert_trial,:]
 
-    sns.set_context('talk')
-    fig_gen_dict = {
-        'task_epoch_subpsace_overlap': plot_subspace_overlap(td_boots),
-    }
-
-    if not os.path.isdir(args.outdir):
-        os.mkdir(args.outdir)
-
-    for fig_postfix,fig in fig_gen_dict.items():
-        fig_name = src.format_outfile_name(td,postfix=fig_postfix)
-        fig.savefig(os.path.join(args.outdir,fig_name+'.png'))
-        # fig.savefig(os.path.join(args.outdir,fig_name+'.pdf'))
-
-def bootstrap_subspace_overlap(td_epochs,num_bootstraps):
-    '''
-    Compute subspace overlap for each pair of tasks and epochs,
-    with bootstrapping to get distributions
-
-    Arguments:
-        td_epochs: (pandas.DataFrame) trial data with epochs split by task and epoch
-        num_bootstraps: (int) number of bootstraps to perform
-
-    Returns:
-        pandas.DataFrame: dataframe with rows corresponding to each bootstrap
-            of subspace overlap computed for pairs of task/epoch combos
-    '''
-    td_epoch_grouped = td_epochs.groupby(['task','epoch'],as_index=False)
-    td_boots = []
-    for boot_id in range(num_bootstraps):
-        data_td = td_epoch_grouped.agg(
-            M1_rates = ('M1_rates',lambda rates : np.row_stack(rates.sample(frac=1,replace=True)))
-        )
-        proj_td = td_epoch_grouped.agg(
-            M1_rates = ('M1_rates',lambda rates : np.row_stack(rates.sample(frac=1,replace=True)))
-        )
-        td_pairs = data_td.join(
-            proj_td,
-            how='cross',
-            lsuffix='_data',
-            rsuffix='_proj',
-        )
-
-        td_pairs['boot_id'] = boot_id
-        td_boots.append(td_pairs)
+    td_grouped = td_epochs.groupby(['task','epoch'],as_index=False)
+    td_boots = src.bootstrap_subspace_overlap(td_grouped,params['num_bootstraps'])
     
-    td_boots = pd.concat(td_boots).reset_index(drop=True)
-    
-    td_boots['subspace_overlap'] = [
-        src.subspace_overlap_index(data,proj,num_dims=10)
-        for data,proj in zip(td_boots['M1_rates_data'],td_boots['M1_rates_proj'])
-    ]
-
-    td_boots['subspace_overlap_rand'] = [
-        src.subspace_overlap_index(data,src.random_array_like(data),num_dims=10)
-        for data in td_boots['M1_rates_data']
-    ]
-
     return td_boots
 
-
-def plot_subspace_overlap(td_boots):
+def plot_task_epoch_overlap(td_boots):
     axs = td_boots.hist(
         column='subspace_overlap',
         by=['task_data','epoch_data','task_proj','epoch_proj'],
@@ -152,6 +133,81 @@ def plot_subspace_overlap(td_boots):
 
     return plt.gcf()
 
+def find_lambda_overlap(td,params):
+    '''
+    Find subspace overlap between pairs of lambda values for CST data
+
+    Arguments:
+        td: (pandas.DataFrame) trial data
+        params: (dict) parameters for data preprocessing and bootstrapping
+
+    Returns:
+        pandas.DataFrame: dataframe with rows corresponding to each bootstrap
+            of subspace overlap computed for pairs of lambda values
+    '''
+    # get only CST data
+    td_cst = td.groupby('task').get_group('CST')
+    td_cst = pyaldata.restrict_to_interval(
+        td_cst,
+        epoch_fun=src.generate_realtime_epoch_fun(
+            'idx_goCueTime',
+            end_point_name='idx_endTime',
+        ),
+    )
+    td_cst = pyaldata.combine_time_bins(td_cst,int(params['analysis_bin_size']//td_cst['bin_size'].values[0]))
+
+    td_grouped = td_cst.groupby('lambda',as_index=False)
+    td_boots = src.bootstrap_subspace_overlap(td_grouped,params['num_bootstraps'])
+
+    return td_boots
+
+def plot_lambda_overlap(td_boots):
+    axs = td_boots.hist(
+        column='subspace_overlap',
+        by=['lambda_data','lambda_proj'],
+        figsize=(15,8),
+        sharex=True,
+        sharey=True,
+        xrot=0,
+        bins=np.linspace(0,1,40),
+        color=[0.6,0.3,0.6]
+    )
+
+    # fix formatting and make pretty-ish
+    for rownum,row in enumerate(axs):
+        for colnum,ax in enumerate(row):
+            ax.set_xlim([0,1])
+
+            if rownum==axs.shape[0]-1:
+                ax.set_xlabel('Subspace overlap')
+            
+            oldtitle = ax.get_title().replace('(','').replace(')','').split(', ')
+            newtitle = oldtitle[1]
+            newylabel = oldtitle[0]
+            
+            if rownum==0:
+                ax.set_title(newtitle)
+            else:
+                ax.set_title('')
+
+            if colnum==0:
+                ax.set_ylabel(newylabel)
+            else:
+                ax.set_ylabel('')
+
+            # controls
+            ax.hist(
+                td_boots.loc[
+                    (td_boots['lambda_data']==float(oldtitle[0])) &
+                    (td_boots['lambda_proj']==float(oldtitle[1])),
+                    'subspace_overlap_rand'],
+                bins=np.linspace(0,1,40),
+                color=[0.8,0.8,0.8],
+            )
+
+    sns.despine()
+
+    return plt.gcf()
 
 if __name__=='__main__':
     import argparse

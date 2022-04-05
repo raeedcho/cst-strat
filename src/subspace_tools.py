@@ -1,7 +1,10 @@
 # a set of tools to manipulate and analyze geometry of high dimensional data
 
 import numpy as np
+import pandas as pd
 from sklearn.decomposition import PCA
+
+from . import util
 
 def subspace_overlap_index(X,Y,num_dims=10):
     '''
@@ -39,3 +42,72 @@ def subspace_overlap_index(X,Y,num_dims=10):
     soi = np.trace(Y_axes @ X_cov @ Y_axes.T)/X_var
 
     return soi
+
+def bootstrap_subspace_overlap(td_grouped,num_bootstraps):
+    '''
+    Compute subspace overlap for each pair of tasks and epochs,
+    with bootstrapping to get distributions
+
+    Arguments:
+        td_grouped: (pandas.GroupBy object) trial data grouped by some key (e.g. task, epoch)
+        num_bootstraps: (int) number of bootstraps to perform
+
+    Returns:
+        pandas.DataFrame: dataframe with rows corresponding to each bootstrap
+            of subspace overlap computed for pairs of group keys
+    '''
+    td_boots = []
+    for boot_id in range(num_bootstraps):
+        data_td = td_grouped.agg(
+            M1_rates = ('M1_rates',lambda rates : np.row_stack(rates.sample(frac=1,replace=True)))
+        )
+        proj_td = td_grouped.agg(
+            M1_rates = ('M1_rates',lambda rates : np.row_stack(rates.sample(frac=1,replace=True)))
+        )
+        td_pairs = data_td.join(
+            proj_td,
+            how='cross',
+            lsuffix='_data',
+            rsuffix='_proj',
+        )
+
+        td_pairs['boot_id'] = boot_id
+        td_boots.append(td_pairs)
+    
+    td_boots = pd.concat(td_boots).reset_index(drop=True)
+    
+    td_boots['subspace_overlap'] = [
+        subspace_overlap_index(data,proj,num_dims=10)
+        for data,proj in zip(td_boots['M1_rates_data'],td_boots['M1_rates_proj'])
+    ]
+
+    td_boots['subspace_overlap_rand'] = [
+        subspace_overlap_index(data,util.random_array_like(data),num_dims=10)
+        for data in td_boots['M1_rates_data']
+    ]
+
+    return td_boots
+
+def orth_combine_subspaces(space_list):
+    '''
+    Combine subspaces with in space_list to create an orthogonal basis set
+    spanning all spaces
+
+    Arguments:
+        space_list - (list) list of subspaces to combine (each subspace is a
+            numpy array with each column as a basis vector in neural space)
+
+    Returns:
+        np.array - orthogonal basis set spanning all subspaces in space_list
+    '''
+    if type(space_list) != list:
+        space_list = [space_list]
+
+    for space in space_list:
+        assert type(space) == np.ndarray, 'space must be a numpy array'
+        assert space.ndim == 2, 'space must be a 2D array'
+
+    # concatenate basis vectors from each subspace
+    # Then run SVD on the combined basis set to get orthogonal basis set
+
+    return np.nan
