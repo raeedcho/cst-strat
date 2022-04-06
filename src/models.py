@@ -29,12 +29,14 @@ class SSA(object):
         return latent.detach().numpy()
 
 class GPFA(elephant.gpfa.GPFA):
-    def __init__(self,**kwargs):
+    def __init__(self,data_bin_size=0.01,**kwargs):
         # precondition initialization to add SI units to inputs if they're not there
         if 'bin_size' in kwargs and type(kwargs['bin_size']) is not pq.Quantity:
             kwargs['bin_size'] *= pq.s
         if 'tau_init' in kwargs and type(kwargs['tau_init']) is not pq.Quantity:
             kwargs['tau_init'] *= pq.s
+
+        self.data_bin_size = data_bin_size
 
         super().__init__(**kwargs)
 
@@ -45,7 +47,7 @@ class GPFA(elephant.gpfa.GPFA):
             data - list of numpy arrays, where data[k] is the population neural spike train on trial k, binned at 1 ms.
                 Each array is T_k x N, where T_k is the length of trial k and N is the number of neurons.
         """
-        super().fit(_convert_binned_spikes_to_spiketrain(data))
+        super().fit(_convert_binned_spikes_to_spiketrain(data,self.data_bin_size))
 
     def transform(self,data,returned_data=['latent_variable_orth']):
         """
@@ -55,17 +57,17 @@ class GPFA(elephant.gpfa.GPFA):
                 Each array is T_k x N, where T_k is the length of trial k and N is the number of neurons.
             returned_data - which types of data to return (check elephant.gpfa.GPFA.transform docs)
         """
-        result = super().transform(_convert_binned_spikes_to_spiketrain(data),**kwargs)
+        result = super().transform(_convert_binned_spikes_to_spiketrain(data,self.data_bin_size),returned_data=returned_data)
 
-        if returned_data.shape[0]>1:
-            for var in returned_data:
-                result[var] = result[var].T
+        # transpose result to match data
+        if len(returned_data)>1:
+            final_result = {var: [sig.T for sig in result[var]] for var in returned_data}
         else:
-            result = result.T
+            final_result = [sig.T for sig in result]
 
-        return result
+        return final_result
 
-def _convert_binned_spikes_to_spiketrain(data):
+def _convert_binned_spikes_to_spiketrain(data,bin_size):
     """
     Converts a list on numpy arrays with binned spikes into a list of neo.SpikeTrain (mainly for GPFA)
     Inputs:
@@ -75,7 +77,7 @@ def _convert_binned_spikes_to_spiketrain(data):
     # convert data to neo.SpikeTrains
     trial_spikes = []
     for trial_arr in data:
-        timevec = np.arange(trial_arr.shape[0])
+        timevec = np.arange(trial_arr.shape[0])*bin_size
         spiketrains = []
         for neuron_arr in trial_arr.T:
             spike_times = [
@@ -83,7 +85,7 @@ def _convert_binned_spikes_to_spiketrain(data):
                 for time,bin_spike in zip(timevec,neuron_arr)
                 if bin_spike>0
             ]
-            spiketrains.append(neo.SpikeTrain(spike_times,units='sec',t_stop=timevec[-1]))
+            spiketrains.append(neo.SpikeTrain(spike_times,units='sec',t_start=timevec[0],t_stop=timevec[-1]))
 
         trial_spikes.append(spiketrains)
 
