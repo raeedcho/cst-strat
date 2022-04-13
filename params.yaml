@@ -10,3 +10,8 @@ co_dpca:
     cst_rel_end_time: 5
     smoothing_kernel_std: 0.05
     softnorm_rates: False
+dimensionality:
+    smoothing_kernel_std: 0.05
+    analysis_bin_size: 0.05
+    softnorm_rates: False
+    num_dims_list: [2,3,4,5]

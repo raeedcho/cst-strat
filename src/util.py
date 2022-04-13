@@ -196,3 +196,28 @@ def signal_template_match(signal,template):
     time_corr = np.sum(time_corr,axis=1)
 
     return time_corr
+
+def split_hold_move(td):
+    '''
+    Splits each trial into hold and move epochs, returning a new pyaldata structure with an epoch column
+
+    Arguments:
+        td (DataFrame): trial_data structure in PyalData format
+        
+    Returns:
+        DataFrame: trial_data structure with an epoch column
+    '''
+    epoch_dict = {
+        'hold': generate_realtime_epoch_fun(
+            'idx_goCueTime',
+            rel_start_time=-0.4,
+            rel_end_time=0,
+        ),
+        'move': generate_realtime_epoch_fun(
+            'idx_goCueTime',
+            end_point_name='idx_endTime',
+            rel_start_time=0,
+            rel_end_time=0,
+        ),
+    }
+    return split_trials_by_epoch(td,epoch_dict)
