@@ -2,7 +2,6 @@
 # This script uses factor analysis cross-validated log-likelihood to estimate the dimensionality
 # of the neural population in each task and epoch.
 
-from tkinter import W
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -40,20 +39,15 @@ def main(args):
     num_dims_list = np.arange(1,td_epochs['M1_rates'].values[0].shape[1]+1)
     cvLL_task_epoch = (
         td_epochs.groupby(['task','epoch'])['M1_rates']
-        .apply(lambda x: sweep_dims_for_cvll(x,num_dims_list))
+        .apply(lambda x: sweep_dims_for_cvll(x,num_dims_list,params['n_folds'],params['n_repeats']))
     )
     # save this to a feather file...
-    savename = src.format_outfile_name(td,postfix='cvLL_task_epoch')
-    cvLL_task_epoch.to_feather(os.path.join(args.outdir,savename+'.feather'))
+    # savename = src.format_outfile_name(td,postfix='cvLL_task_epoch')
+    # cvLL_task_epoch.reset_index().to_feather(os.path.join(args.outdir,savename+'.feather'))
 
     # temp figure (to be functionalized later)
-    (
-        cvLL_task_epoch
-        .groupby(['task','epoch','num_dims'])
-        .mean()
-        .unstack(level=[0,1])
-        .plot.line()
-    )
+    sns.lineplot(data=cvLL_task_epoch,x='num_dims',y='log_likelihood',hue='task',style='epoch')
+    sns.despine(trim=True)
 
     sns.set_context('talk')
     fig_gen_dict = {
@@ -83,14 +77,18 @@ def score_fa_fold(train_data,test_data,num_dims):
     fa_model.fit(train_data)
     return fa_model.score(test_data)
 
-def sweep_dims_for_cvll(trial_firing_rates,num_dim_list):
+def sweep_dims_for_cvll(trial_firing_rates,num_dim_list,n_folds=5,n_repeats=10):
     '''
     For a group of trials in td, iterate through number of dimensions in num_dim_list
     and compute cross-validated log-likelihood of factor analysis for each number of dimensions.
+    Note: crossval fold splits are the same for each element of num_dim_list,
+    allowing for grouped comparisons.
 
     Arguments:
         trial_firing_rates: (pd.Series of np.array) column out of trial_data of firing rate arrays for each trial
         num_dim_list: (list) list of numbers of dimensions to use for factor analysis
+        n_folds: (int) number of folds to use for cross-validation
+        n_repeats: (int) number of times to repeat cross-validation
 
     Returns:
         pandas.DataFrame: dataframe with rows corresponding to one cv-fold of log likelihood for
@@ -98,10 +96,10 @@ def sweep_dims_for_cvll(trial_firing_rates,num_dim_list):
             - (num_dims,fold_index)
     '''
 
-    rkf = RepeatedKFold(n_splits=5,n_repeats=1)
+    rkf = RepeatedKFold(n_splits=n_folds,n_repeats=n_repeats)
     cvLL_list = []
-    for num_dims in num_dim_list:
-        for fold_idx,(train_idx,test_idx) in enumerate(rkf.split(trial_firing_rates)):
+    for fold_idx, (train_idx, test_idx) in enumerate(rkf.split(trial_firing_rates)):
+        for num_dims in num_dim_list:
             train_data = np.row_stack(trial_firing_rates.values[train_idx])
             test_data = np.row_stack(trial_firing_rates.values[test_idx])
             LL = score_fa_fold(train_data,test_data,num_dims)

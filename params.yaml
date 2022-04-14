@@ -11,7 +11,8 @@ co_dpca:
     smoothing_kernel_std: 0.05
     softnorm_rates: False
 dimensionality:
-    smoothing_kernel_std: 0.05
-    analysis_bin_size: 0.05
+    smoothing_kernel_std: 0.050
+    analysis_bin_size: 0.50
     softnorm_rates: False
-    num_dims_list: [2,3,4,5]
+    n_folds: 5
+    n_repeats: 1
