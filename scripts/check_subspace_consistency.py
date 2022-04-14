@@ -57,20 +57,7 @@ def find_task_epoch_overlap(td,params):
         pandas.DataFrame: dataframe with rows corresponding to each bootstrap
             of subspace overlap computed for pairs of task/epoch combos
     '''
-    epoch_dict = {
-        'hold': src.generate_realtime_epoch_fun(
-            'idx_goCueTime',
-            rel_start_time=-0.4,
-            rel_end_time=0,
-        ),
-        'move': src.generate_realtime_epoch_fun(
-            'idx_goCueTime',
-            end_point_name='idx_endTime',
-            rel_start_time=0,
-            rel_end_time=0,
-        ),
-    }
-    td_epochs = src.split_trials_by_epoch(td,epoch_dict)
+    td_epochs = src.split_hold_move(td)
     td_epochs = pyaldata.combine_time_bins(td_epochs,int(params['analysis_bin_size']//td_epochs['bin_size'].values[0]))
 
     # subselect CO trials with only horizontal movement
