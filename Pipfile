@@ -26,6 +26,7 @@ dvc = "*"
 dpca = "*"
 numexpr = "*"
 contrastive = "*"
+cuda-python = "*"
 
 [dev-packages]
 
