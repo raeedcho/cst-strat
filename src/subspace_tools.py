@@ -111,3 +111,9 @@ def orth_combine_subspaces(space_list):
     # Then run SVD on the combined basis set to get orthogonal basis set
 
     return np.nan
+
+def find_potent_null_space(X,Y):
+    '''
+    
+    '''
+    pass
