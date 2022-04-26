@@ -66,11 +66,7 @@ def extract_td_epochs(td):
             rel_start_time=-0.4,
             rel_end_time=0.5,
         ),
-        'full': src.generate_realtime_epoch_fun(
-            'idx_goCueTime',
-            end_point_name='idx_endTime',
-            rel_start_time=-0.4,
-        )
+        'full': lambda trial : slice(0,trial['M1_spikes'].shape[0]),
     }
     td_smooth = td.copy()
     td_smooth['M1_rates'] = [
