@@ -21,6 +21,9 @@ def main(args):
         'task_M1_lda':src.plot_M1_lda(td_train),
         'task_beh':src.plot_hold_behavior(td_train),
         'task_beh_lda':src.plot_beh_lda(td_train),
+        'task_M1_potent': src.plot_M1_hold_potent(td_train),
+        'task_M1_potent_lda': src.plot_M1_potent_lda(td_train),
+        'task_M1_null_lda': src.plot_M1_null_lda(td_train),
         # LDA traces
         'task_lda_trace':src.plot_M1_lda_traces(td_test),
     }

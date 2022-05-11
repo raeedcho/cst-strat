@@ -3,6 +3,8 @@
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
+from sklearn.linear_model import LinearRegression
+import scipy.linalg as la
 
 from . import util
 
@@ -88,6 +90,20 @@ def bootstrap_subspace_overlap(td_grouped,num_bootstraps):
 
     return td_boots
 
+def calc_projected_variance(X,proj_matrix):
+    '''
+    Calculate the variance of the data projected onto the basis set
+    defined by proj_matrix
+    
+    Arguments:
+        X - (numpy array) data to project
+        proj_matrix - (numpy array) basis set to project onto
+        
+    Returns:
+        (float) projected variance
+    '''
+    pass
+
 def orth_combine_subspaces(space_list):
     '''
     Combine subspaces with in space_list to create an orthogonal basis set
@@ -114,6 +130,36 @@ def orth_combine_subspaces(space_list):
 
 def find_potent_null_space(X,Y):
     '''
-    
+    Runs a linear regression from X to Y to find the potent and null spaces
+    of the transformation that takes X to Y. For example, X could be neural
+    activity and Y could be behavioral data, and potent space would be the
+    neural space that correlates best with behavior.
+
+    Arguments:
+        X (numpy array) - ndarray of input data with features along columns
+            and observations along rows
+        Y (numpy array) - ndarray of output data with features along columns
+            and observations along rows
+
+    Returns:
+        (tuple) - tuple containing:
+            potent_space - (numpy array) potent space of transformation
+                shape is (X.shape[1],<potent dimensionality>)
+            null_space - (numpy array) null space of transformation
+                shape is (X.shape[1],<null dimensionality>)
     '''
-    pass
+    model = LinearRegression(fit_intercept=False)
+    model.fit(X,Y)
+
+    # model.coef_ is the coefficients of the linear regression
+    # (shape: (n_targets, n_features))
+    
+    # null space is the set of vectors such that model.coef_ @ null_vector = 0
+    # null basis is of shape (n_features, null_dim)
+    null_space = la.null_space(model.coef_)
+    
+    # potent space is the orthogonal complement of the null space
+    # which is equivalent to the row space of the model.coef_ matrix
+    potent_space = la.orth(model.coef_.T)
+
+    return potent_space,null_space

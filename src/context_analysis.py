@@ -2,6 +2,7 @@ import pyaldata
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from . import subspace_tools
 
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.decomposition import PCA
@@ -24,7 +25,7 @@ def apply_models(td,train_epochs=None,test_epochs=None,label_col='task'):
 
     td_train = td.loc[td['epoch'].isin(train_epochs),:].copy()
     td_test = td.loc[td['epoch'].isin(test_epochs),:].copy()
-    pca_model = PCA(n_components=8)
+    pca_model = PCA(n_components=15)
     td_train['M1_pca'] = list(pca_model.fit_transform(np.row_stack(td_train['M1_rates'])))
     # td_train['M1_pca'] = [pca_model.transform(rates) for rates in td_train['M1_rates']]
     td_test['M1_pca'] = [pca_model.transform(rates) for rates in td_test['M1_rates']]
@@ -51,6 +52,34 @@ def apply_models(td,train_epochs=None,test_epochs=None,label_col='task'):
             np.row_stack(td_train['hand_vel'].values),
         ])
     )
+
+    # check separability in neuron-behavioral potent space
+    potent_space,null_space = subspace_tools.find_potent_null_space(
+        np.row_stack(td_train['M1_pca']),
+        np.column_stack([
+            np.row_stack(td_train['rel_hand_pos'].values),
+            np.row_stack(td_train['hand_vel'].values),
+        ]),
+    )
+    td_train['M1_potent_space'] = [neural_state @ potent_space for neural_state in td_train['M1_pca']]
+    td_test['M1_potent_space'] = [neural_state @ potent_space for neural_state in td_test['M1_pca']]
+    M1_potent_lda_model = LinearDiscriminantAnalysis()
+    td_train['M1_potent_lda'] = M1_potent_lda_model.fit_transform(
+        np.row_stack(td_train['M1_potent_space'].values),
+        td_train[label_col]
+    )
+    td_train['M1_potent_pred'] = M1_potent_lda_model.predict(np.row_stack(td_train['M1_potent_space']))
+    td_test['M1_potent_lda'] = [M1_potent_lda_model.transform(sig) for sig in td_test['M1_potent_space']]
+
+    td_train['M1_null_space'] = [neural_state @ null_space for neural_state in td_train['M1_pca']]
+    td_test['M1_null_space'] = [neural_state @ null_space for neural_state in td_test['M1_pca']]
+    M1_null_lda_model = LinearDiscriminantAnalysis()
+    td_train['M1_null_lda'] = M1_null_lda_model.fit_transform(
+        np.row_stack(td_train['M1_null_space'].values),
+        td_train[label_col]
+    )
+    td_train['M1_null_pred'] = M1_null_lda_model.predict(np.row_stack(td_train['M1_null_space']))
+    td_test['M1_null_lda'] = [M1_null_lda_model.transform(sig) for sig in td_test['M1_null_space']]
 
     return td_train,td_test
 
@@ -201,6 +230,90 @@ def plot_beh_lda(td_hold,label_col='task',hue_order=['CO','CST']):
     )
     lda_ax.text(0,-3,'Discriminability: {:.2f}'.format((td_hold['beh_pred']==td_hold[label_col]).mean()))
     lda_ax.set_ylabel('Behavioral LDA projection')
+    lda_ax.set_xlabel('Trial ID')
+    sns.despine(ax=lda_ax,trim=True)
+
+    return lda_fig
+
+def plot_M1_hold_potent(td,label_col='task',hue_order=['CO','CST']):
+    '''
+    Plot the M1 potent neural population activity for trials separated by label (e.g. task)
+
+    Arguments:
+        td (DataFrame): PyalData formatted structure of neural/behavioral data
+
+    Returns:
+        pca_fig (Figure): Figure of PCA plot
+    '''
+    assert type(label_col)==str, "label_col must be a string"
+
+    pca_fig,pca_ax = plt.subplots(1,1,figsize=(8,6))
+    sns.scatterplot(
+        ax=pca_ax,
+        data=td,
+        x=np.row_stack(td['M1_potent_space'].values)[:,0],
+        y=np.row_stack(td['M1_potent_space'].values)[:,1],
+        hue=label_col,palette='Set1',hue_order=hue_order
+    )
+    pca_ax.set_ylabel('M1 Potent 2')
+    pca_ax.set_xlabel('M1 Potent 1')
+    sns.despine(ax=pca_ax,trim=True)
+
+    return pca_fig
+
+def plot_M1_potent_lda(td_hold,label_col='task',hue_order=['CO','CST']):
+    '''
+    Plot the M1 neural population activity LDA (in potent space) for CO and CST trials
+
+    Arguments:
+        td_hold (DataFrame): PyalData formatted structure of neural/behavioral data
+
+    Returns:
+        lda_fig (Figure): Figure of lda plot
+
+    TODO: add discriminability text somewhere in this plot
+    '''
+    # Hold-time LDA
+    lda_fig,lda_ax = plt.subplots(1,1,figsize=(8,6))
+    lda_ax.plot([td_hold['trial_id'].min(),td_hold['trial_id'].max()],[0,0],'k--')
+    sns.scatterplot(
+        ax=lda_ax,
+        data=td_hold,
+        y='M1_potent_lda',
+        x='trial_id',
+        hue=label_col,palette='Set1',hue_order=hue_order
+    )
+    lda_ax.text(0,-3,'Discriminability: {:.2f}'.format((td_hold['M1_potent_pred']==td_hold[label_col]).mean()))
+    lda_ax.set_ylabel('M1 potent space LDA projection')
+    lda_ax.set_xlabel('Trial ID')
+    sns.despine(ax=lda_ax,trim=True)
+
+    return lda_fig
+
+def plot_M1_null_lda(td_hold,label_col='task',hue_order=['CO','CST']):
+    '''
+    Plot the M1 neural population activity LDA (in null space) for CO and CST trials
+
+    Arguments:
+        td_hold (DataFrame): PyalData formatted structure of neural/behavioral data
+
+    Returns:
+        lda_fig (Figure): Figure of lda plot
+
+    TODO: add discriminability text somewhere in this plot
+    '''
+    # Hold-time LDA
+    lda_fig,lda_ax = plt.subplots(1,1,figsize=(8,6))
+    lda_ax.plot([td_hold['trial_id'].min(),td_hold['trial_id'].max()],[0,0],'k--')
+    sns.scatterplot(
+        ax=lda_ax,
+        data=td_hold,
+        y='M1_null_lda',
+        x='trial_id',
+        hue=label_col,palette='Set1',hue_order=hue_order
+    )
+    lda_ax.text(0,-3,'Discriminability: {:.2f}'.format((td_hold['M1_null_pred']==td_hold[label_col]).mean()))
+    lda_ax.set_ylabel('M1 null space LDA projection')
     lda_ax.set_xlabel('Trial ID')
     sns.despine(ax=lda_ax,trim=True)
 
