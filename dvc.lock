@@ -114,13 +114,13 @@ stages:
       md5: 5b38bd926780c5eb65a237a621e00a6f
       size: 256345478
     - path: scripts/compare_hold_period_activity.py
-      md5: 9a2489c93546ab6e6f69ff45213d1bc8
-      size: 3643
+      md5: d24ce55784038c6485ed6f84d2789689
+      size: 3734
     outs:
     - path: results/hold_time_analysis/Earl_20190716/
-      md5: dd51917638f92caf98f03f198fe88454.dir
-      size: 1860752
-      nfiles: 10
+      md5: 3a38ec504984538c05a430d7e1c04727.dir
+      size: 2329794
+      nfiles: 13
   context_analysis@1:
     cmd: python scripts/compare_hold_period_activity.py --infile data/trial_data/Ford_20180627_COCST_TD.mat
       --outdir results/hold_time_analysis/Ford_20180627/
@@ -129,10 +129,10 @@ stages:
       md5: d716e2c6ff9a3759fdb5234b1808da72
       size: 172600092
     - path: scripts/compare_hold_period_activity.py
-      md5: 9a2489c93546ab6e6f69ff45213d1bc8
-      size: 3643
+      md5: d24ce55784038c6485ed6f84d2789689
+      size: 3734
     outs:
     - path: results/hold_time_analysis/Ford_20180627/
-      md5: 65d0d549bf6c3f9dca6ab1d7eb0f2b1f.dir
-      size: 1397433
-      nfiles: 10
+      md5: 476cf498a460fb7bf6d8f0635bbe3c58.dir
+      size: 1710815
+      nfiles: 13
